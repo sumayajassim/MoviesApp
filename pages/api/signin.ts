@@ -6,41 +6,29 @@ import bcrypt from 'bcrypt'
 
 export default function signin(req: NextApiRequest , res: NextApiResponse){
 
-    prisma.user.findUnique({
+    prisma.user.findUniqueOrThrow({
         where:{
             emailAddress : req.body.emailAddress
         }
     })
     .then(data => {
 
-        const userPass:any = data?.password
+        const userPass = data.password
         const  verifired =  bcrypt.compare(req.body.password , userPass)
 
         verifired.then(istrue => {
-            console.log(istrue)
+                if(istrue && process.env.SECRET_KEY != null){
 
-                if(istrue){
-                    res.json({data})
+                    const token = jwt.sign(data , process.env.SECRET_KEY, {expiresIn: 604800})
 
-                    jwt.sign(data , env.process.SECRET_KEY , {expiresIn: 604800})
-
-
+                    res.json({token})
 
                 }
                 else{
-                    res.json({message: "Unverified"})
+                    res.json({message: "Wrong Password"})
                 }
 
         })
-
-        // if(!verifired){
-        //     res.json({message: "unverified"})
-        // }
-        // else{
-        //     // res.json({data})
-        //     res.json({message: "verified"})
-
-        // }
     })
     .catch(err => {
         console.log(err)
