@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import AuthForms from "./AuthForms";
+import { useRouter } from 'next/router'
 
 function Navbar(props: { isAuth: Boolean }) {
   const { isAuth } = props;
   const [status, setStatus] = useState<Boolean>(false);
   console.log(isAuth);
-
+  const router = useRouter() 
   const clickHandler = (e: any) => {
     console.log(e.target.id);
 
@@ -15,20 +16,25 @@ function Navbar(props: { isAuth: Boolean }) {
       setStatus((status) => false);
     }
   };
+
+  const logoutHandler = () =>{
+    localStorage.removeItem("token")
+    router.reload()
+  }
   return (
     <>
       <div className="bg-white drop-shadow flex place-items-center w-full px-8 text-red-700 h-12 flex-row justify-between">
         {isAuth ? (
           <>
             <div className="flex flex-row space-x-4 list-none">
-              <li className="drawer-button btn">Home</li>
-              <li>Movies</li>
+              <li className=" btn">Home</li>
+              <li className="drawer-button btn">Movies</li>
             </div>
-            <div className="flex flex-row space-x-4 list-none">
-              <li>Cart</li>
-              <li>My Wishlist</li>
-              <li>My profile</li>
-              <li>Logout</li>
+            <div className="flex flex-row list-none">
+              <li className="p-1 btn--link">Cart</li>
+              <li className="p-1 btn--link">My Wishlist</li>
+              <li className="p-1 btn--link">My profile</li>
+              <li className="p-1 btn--link" onClick={logoutHandler}>Logout</li>
             </div>
           </>
         ) : (

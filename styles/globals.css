@@ -3,7 +3,7 @@
 @import "tailwindcss/utilities"; 
 
 .overflow{
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 .btn {
