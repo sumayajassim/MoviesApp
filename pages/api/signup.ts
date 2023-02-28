@@ -35,7 +35,7 @@ export default async function signup(req: NextApiRequest , res: NextApiResponse)
             }
         }
 
-        const specialCharacters = "@" || "." || "_" || "!" || "#" || "$"
+        const specialCharacters = "@" || "." || "_" || "!" || "#" || "$" || "&" || "*" || "^"
 
         function validPassword(){
 
