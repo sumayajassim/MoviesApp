@@ -8,6 +8,19 @@ const popularTvShowsOfAllTimeArray: any[] = []
 
 const landingPageArray: any[] = []
 
+
+class newObj {
+    title: string
+    id: any
+    array: string
+    constructor(title:string , id:any , array:any){
+        this.title = title,
+        this.id = id,
+        this.array = array
+    }
+}
+
+
 export default function landingpage(req: NextApiRequest , res: NextApiResponse){ 
 
     trendingMovies()
@@ -16,15 +29,24 @@ export default function landingpage(req: NextApiRequest , res: NextApiResponse){
     popularTvShowsOfAllTime()
 
     if(popularArray.length > 1 && popularMoviesOfAllTimeArray.length > 1 && popularTvShowsArray.length > 1 && popularTvShowsOfAllTimeArray.length > 1){
+        
+        
+    const trendingMovies = new newObj("Trending Movies's" , Math.floor(Math.random() * 10) , popularArray)
+    
+    const popularMovies = new newObj("Top Rated Movies's Of All Time's" , Math.floor(Math.random() * 100) , popularMoviesOfAllTimeArray)
+    
+    const trendingTv = new newObj("Trending Tv Show's" , Math.floor(Math.random() * 1000) , popularTvShowsArray)
+    
+    const PopularTv = new newObj("Top Rated Tv Shows Of All Time" , Math.floor(Math.random() * 10000) , popularTvShowsOfAllTimeArray)
 
-    landingPageArray.push(popularArray , popularMoviesOfAllTimeArray, popularTvShowsArray, popularTvShowsOfAllTimeArray)
+    landingPageArray.push(trendingMovies , popularMovies, trendingTv, PopularTv)
     res.json(landingPageArray)
 
     }
 
     else{
         res.json(false)
-    }
+    }  
 
 }
 
