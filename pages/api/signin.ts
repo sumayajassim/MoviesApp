@@ -25,7 +25,7 @@ export default function signin(req: NextApiRequest , res: NextApiResponse){
 
                 }
                 else{
-                    res.json({message: "Wrong Password"})
+                    res.status(400).json({message: "Wrong Password"})
                 }
 
         })

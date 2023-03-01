@@ -62,7 +62,8 @@ export default async function signup(req: NextApiRequest , res: NextApiResponse)
                         firstName: req.body.firstName,
                         lastName: req.body.lastName,
                         emailAddress: req.body.emailAddress,
-                        password: hash
+                        password: hash,
+                        wishlist: {create: {}}
                     }
                 })
                     .then(data => {
@@ -80,7 +81,7 @@ export default async function signup(req: NextApiRequest , res: NextApiResponse)
                 
                                 }
                                 else{
-                                    res.json({message: "Wrong Password"})
+                                    res.status(400).json({message: "Wrong Password"})
                                 }
                 
                         })
