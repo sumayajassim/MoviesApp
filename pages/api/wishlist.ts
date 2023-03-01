@@ -1,20 +1,27 @@
 import { NextApiRequest , NextApiResponse } from "next";
 import { prisma } from "../../lib/prisma";
+import jwtDecode from "jwt-decode";
 
 export default function(req: NextApiRequest , res: NextApiResponse){
-    prisma.wishlist.create({
-        data:{
-            userID: req.body.userID,
-            movieID: req.body.movieID
-        }
-    })
-    .then(data => {
+    
+    if(req.query.token){
+        let userDetails:any = jwtDecode(req.query.token  as string)
 
-        if(data){
-            res.json("Added To Wishlist Succesfuly")
-        }
-    })
-    .catch(err => {
-        console.log(err)
-    })
+        prisma.wishlist.update({
+            where: {
+                userID: userDetails.id
+            },
+            data : {
+                moviesIDs : {
+                    push: req.body.moviesIDs
+                }
+            }
+        })
+        .then( (data) => {
+            res.json(data)
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    }
 }
