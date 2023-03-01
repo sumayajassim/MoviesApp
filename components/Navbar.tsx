@@ -4,12 +4,9 @@ import { useRouter } from 'next/router'
 
 function Navbar(props: { isAuth: Boolean }) {
   const { isAuth } = props;
-  const [status, setStatus] = useState<Boolean>(false);
-  console.log(isAuth);
   const router = useRouter() 
+  const [status, setStatus] = useState<Boolean>(false);
   const clickHandler = (e: any) => {
-    console.log(e.target.id);
-
     if (e.target.id === "signin") {
       setStatus((status) => true);
     } else {
