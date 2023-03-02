@@ -169,12 +169,6 @@ export default async function landingpage(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-    
-  const _trendingMovies = await trendingMovies();
-  const _popularMoviesOfAllTime = await popularMoviesOfAllTime();
-  const _popularTvShows = await popularTvShows();
-  const _popularTvShowsOfAllTime = await popularTvShowsOfAllTime();
-
   res.json([
     {
       id: Math.floor(Math.random() * 10),

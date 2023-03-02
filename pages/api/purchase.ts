@@ -9,16 +9,25 @@ export default function purchase(req: NextApiRequest , res:NextApiResponse){
 
         if(req.body.amount >= 1 && req.body.amount <= 5){
 
-       prisma.purchases.update({
-        where: {
-            userID: userDetails.id
-        },
+   prisma.purchases.create({
         data:{
             moviesIDs: req.body.moviesIDs,
-            amount: req.body.amount
+            amount: +req.body.amount,
+            user: {
+                connect: {
+                    id: userDetails.id
+                }
+            }
         }
        })
+       .then( (data) => {
+        res.json(data)
+    })
+    .catch(err => {
+        console.log(err)
+    })
     }
     }
+
     }
     
