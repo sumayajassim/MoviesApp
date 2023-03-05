@@ -29,10 +29,10 @@ function Navbar(props: { isAuth: Boolean }) {
               <Link href="/movie" className="drawer-button btn">Movies</Link>
             </div>
             <div className="flex flex-row list-none">
-              <li className="p-1 btn--link">Cart</li>
-              <li className="p-1 btn--link">My Wishlist</li>
-              <li className="p-1 btn--link">My profile</li>
-              <li className="p-1 btn--link" onClick={logoutHandler}>Logout</li>
+              <li className="btn btn--link">Cart</li>
+              <li className="btn btn--link">My Wishlist</li>
+              <li className="btn btn--link">My profile</li>
+              <li className="btn btn--link" onClick={logoutHandler}>Logout</li>
             </div>
           </>
         ) : (

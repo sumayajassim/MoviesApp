@@ -2,6 +2,7 @@ import React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { LandingPage, Movie } from "@/types";
+import MovieComponent from './MovieComponent'
 
 function HomePage() {
   const queryClient = useQueryClient();
@@ -41,17 +42,7 @@ function HomePage() {
       </h1>
       <div className="flex flex-row overflow-x-scroll space-x-3 pl-5 pb-5 pt-5 ">
       {category.movies.map((movie) => (
-          <div className="h-96 min-w-fit rounded-md relative drop-shadow-md" key={movie.id} >
-            <img
-              className="h-96 w-60 object-fill rounded-md"
-              src={`https://image.tmdb.org/t/p/original/${movie.poster_path}`}
-              alt=""
-            />
-            <div className="absolute bottom-0 bg-white w-60 h-20 rounded-br-md rounded-bl-md p-4 flex justify-between">
-              <span className="text-red-700">{movie.title? movie.title : movie.name}</span>
-              <span>{movie.vote_average}</span>
-            </div>
-          </div>
+        <MovieComponent movie={movie}/>
       ))}
       </div>
     </div>
