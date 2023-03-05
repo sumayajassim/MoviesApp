@@ -9,7 +9,7 @@ export default function signin(req: NextApiRequest , res: NextApiResponse){
     prisma.user.findUniqueOrThrow({
         where:{
             emailAddress : req.body.emailAddress
-        }
+        },
     })
     .then(data => {
 
@@ -31,6 +31,8 @@ export default function signin(req: NextApiRequest , res: NextApiResponse){
         })
     })
     .catch(err => {
-        console.log(err)
+        res.status(404).json({message : "User not found"})
+        throw err
+        // res.status(404).json({message: `${err.data.message}`})
     })
 }

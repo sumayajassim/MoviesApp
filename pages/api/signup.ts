@@ -11,7 +11,7 @@ export default async function signup(req: NextApiRequest , res: NextApiResponse)
             return true
         }
         else{
-            res.json({message:"First Name Characters Must Be More Than 3 And Less Than 25"})
+            res.status(400).json({message:"First Name Characters Must Be More Than 3 And Less Than 25"})
         }
     }
 
@@ -21,7 +21,7 @@ export default async function signup(req: NextApiRequest , res: NextApiResponse)
             return true
         }
         else{
-            res.json({message:"Last Name Characters Must Be More Than 3 And Less Than 25"})
+            res.status(400).json({message:"Last Name Characters Must Be More Than 3 And Less Than 25"})
         }
     }
 
@@ -31,7 +31,7 @@ export default async function signup(req: NextApiRequest , res: NextApiResponse)
             return true
         }
         else{
-            res.json({message:"Invalid Email Addresse"})
+            res.status(400).json({message:"Invalid Email Addresse"})
             }
         }
 
@@ -43,7 +43,7 @@ export default async function signup(req: NextApiRequest , res: NextApiResponse)
             return true  
         }
         else{
-            res.json({message:"Password Must Conatin At Least One Special Character : @,#,$,%,&,* ... etc"})
+            res.status(400).json({message:"Password Must Conatin At Least One Special Character : @,#,$,%,&,* ... etc"})
         }
         }
 
@@ -63,7 +63,7 @@ export default async function signup(req: NextApiRequest , res: NextApiResponse)
                         lastName: req.body.lastName,
                         emailAddress: req.body.emailAddress,
                         password: hash,
-                        wishlist: {create: {}}
+                        // wishlist: {create: {}}
                     }
                 })
                     .then(data => {
@@ -89,6 +89,7 @@ export default async function signup(req: NextApiRequest , res: NextApiResponse)
                     })
                     .catch(err => {
                         console.log(err)
+                        // res.status(404).json({message : "User not found"})
                     })
 
             })

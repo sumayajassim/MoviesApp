@@ -38,8 +38,8 @@ function Navbar(props: { isAuth: Boolean }) {
         ) : (
           <>
             <div className="flex flex-row space-x-4 list-none">
-            <Link href="/" className=" btn">Home</Link>
-            <Link href="/movie" className="drawer-button btn">Movies</Link>
+              <Link href="/" className="drawer-button btn">Home</Link>
+              <Link href="/movie" className="drawer-button btn">Movies</Link>
             </div>
             <div className="flex flex-row space-x-4 list-none">
               <button

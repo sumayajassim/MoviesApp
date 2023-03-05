@@ -13,40 +13,50 @@ function AuthForms(props: { status: Boolean }) {
 	const [password, setPassword] = useState('')
 	const [firstName, setFirstName] = useState('')
 	const [lastName, setLastName] = useState('')
-
+  let formData = {};
+  let endPoint = "";
+ 
   const handleClick = () => {
-    if(status){
-      handleLogin()
-      
-    }else{
-      console.log('Sign up');
-      
-    }
+   if(status){
+    formData = {emailAddress, password }
+    endPoint = 'signin'
+   }else{
+    formData ={firstName, lastName, emailAddress, password }
+    endPoint = 'signup'
+   }
+   handleAuth()
   }
-  // const onClick = () => toast('Toast is good', { hideProgressBar: true, autoClose: 2000, type: 'success' })
 
  
-  const { mutate: handleLogin, isLoading: handleLoginLoading } = useMutation({
-		mutationFn: () => axios.post('/api/signin', { emailAddress, password }),
+  const { mutate: handleAuth, isLoading: handleLoginLoading } = useMutation({
+		mutationFn: () => axios.post(`/api/${endPoint}`, formData),
 		onSuccess: (res) => {
-      localStorage.setItem('token', res.data.token)
-      router.reload(); console.log('Logged in ')},
-		onError: () => toast('Invalid credentials')
+      if(res.data.token){
+        localStorage.setItem('token', res.data.token)
+        router.reload();
+      }
+      console.log('Logged in ')},
+    // onError: (err) => toast(`${err.message}`)
+    onError: (err) => {
+      console.log(err)
+      toast.error(`${err?.response?.data?.message}`)
+    }
 	})
 
-  const { mutate: handleRegister, isLoading: handleRegisterLoading } = useMutation({
-		mutationFn: () => axios.post('/api/signup', {firstName, lastName, emailAddress, password }),
-		onSuccess: (res) => {
-      localStorage.setItem('token', res.data.token)
-      router.reload(); console.log('Logged in ')},
-		onError: () => toast('Invalid credentials')
-	})
+  // const { mutate: handleRegister, isLoading: handleRegisterLoading } = useMutation({
+	// 	mutationFn: () => axios.post('/api/signup', {firstName, lastName, emailAddress, password }),
+	// 	onSuccess: (res) => {
+  //     localStorage.setItem('token', res.data.token)
+  //     // router.reload(); 
+  //     console.log('Logged in ')},
+	// 	onError: (err) => toast.error(`${err?.response?.data?.message}`)
+	// })
 
   return (
     <div
       id="drawer-right-example"
       className="fixed top-14 right-2 z-40 min-h-fit p-4 overflow-y-auto transition-transform translate-x-full bg-white w-80 dark:bg-gray-800 rounded-2xl"
-      tabIndex={"-1"}
+      tabIndex="-1"
       aria-labelledby="drawer-right-label"
     >
       <ul className="p-5 text-base-content">

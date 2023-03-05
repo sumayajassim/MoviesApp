@@ -1,18 +1,31 @@
 import React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { Movie } from "@/types";
+import { LandingPage, Movie } from "@/types";
 
 function HomePage() {
   const queryClient = useQueryClient();
 
 
-  const { data, isLoading } = useQuery<Data>({
-    queryKey: ["categories"],
-    queryFn: () => axios.get("http://localhost:8000/api/landingpage"),
-    keepPreviousData: false,
-    initialData:[]
-  });
+  // const { data, isLoading } = useQuery({
+  //   queryKey: ["categories"],
+  //   queryFn: () => axios.get<{data:LandingPage}>("http://localhost:8000/api/landingpage"),
+  //   keepPreviousData: false,
+  //   // refetchOnWindowFocus: false,
+  //   initialData:[]
+  // });
+
+  type Response = {data:LandingPage}
+
+  const query = (): Promise<Response> =>
+		axios.get('http://localhost:8000/api/landingpage')
+
+	const { data, isLoading } = useQuery<Response, Error>(
+		['categories'],
+		query,
+    {refetchOnWindowFocus: false}
+
+	)
 
 
 
