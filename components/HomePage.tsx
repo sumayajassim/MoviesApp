@@ -1,18 +1,32 @@
 import React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { Movie } from "@/types";
+import { LandingPage, Movie } from "@/types";
+import MovieComponent from './MovieComponent'
 
 function HomePage() {
   const queryClient = useQueryClient();
 
 
-  const { data, isLoading } = useQuery<Data>({
-    queryKey: ["categories"],
-    queryFn: () => axios.get("http://localhost:8000/api/landingpage"),
-    keepPreviousData: false,
-    initialData:[]
-  });
+  // const { data, isLoading } = useQuery({
+  //   queryKey: ["categories"],
+  //   queryFn: () => axios.get<{data:LandingPage}>("http://localhost:8000/api/landingpage"),
+  //   keepPreviousData: false,
+  //   // refetchOnWindowFocus: false,
+  //   initialData:[]
+  // });
+
+  type Response = {data:LandingPage}
+
+  const query = (): Promise<Response> =>
+		axios.get('http://localhost:8000/api/landingpage')
+
+	const { data, isLoading } = useQuery<Response, Error>(
+		['categories'],
+		query,
+    {refetchOnWindowFocus: false}
+
+	)
 
 
 
@@ -28,17 +42,7 @@ function HomePage() {
       </h1>
       <div className="flex flex-row overflow-x-scroll space-x-3 pl-5 pb-5 pt-5 ">
       {category.movies.map((movie) => (
-          <div className="h-96 min-w-fit rounded-md relative drop-shadow-md" key={movie.id} >
-            <img
-              className="h-96 w-60 object-fill rounded-md"
-              src={`https://image.tmdb.org/t/p/original/${movie.poster_path}`}
-              alt=""
-            />
-            <div className="absolute bottom-0 bg-white w-60 h-20 rounded-br-md rounded-bl-md p-4 flex justify-between">
-              <span className="text-red-700">{movie.title? movie.title : movie.name}</span>
-              <span>{movie.vote_average}</span>
-            </div>
-          </div>
+        <MovieComponent movie={movie}/>
       ))}
       </div>
     </div>
