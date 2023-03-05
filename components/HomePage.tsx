@@ -6,38 +6,29 @@ import { Movie } from "@/types";
 function HomePage() {
   const queryClient = useQueryClient();
 
-  // type Data = {
-  //   data: {
-  //     categories: any[];
-  //   };
-  // };
 
   const { data, isLoading } = useQuery<Data>({
     queryKey: ["categories"],
     queryFn: () => axios.get("http://localhost:8000/api/landingpage"),
-    initialData: []
+    keepPreviousData: false,
+    initialData:[]
   });
 
-  const categoriesTitle = [
-    {title:"TRENDING MOVIES", id: 1},
-    {title:"POPULAR MOVIES OF ALL THE TIME", id:2},
-    {title:"TRENDING TV SHOWS", id:3},
-    {title:"POPULAR TV SHOWS OF ALL THE TIME", id:4},
-  ];
+
 
   console.log('data',data)
   const loading = !data || isLoading;
 
   if (loading) return <div>Loading</div>;
 
-  const HomePageContent = data?.data?.map((category, index) => (
-    <>
+  const HomePageContent = data?.data?.map(category => (
+    <div key={category.id}>
       <h1 className="p-7 text-red-700 font-bold text-2xl">
-        {categoriesTitle[index]?.title}
+        {category.title}
       </h1>
-      <div className="flex flex-row overflow-x-scroll space-x-3 pl-5 pb-5 pt-5 " key={categoriesTitle[index].id}>
-      {category.map((movie) => (
-          <div className="h-96 min-w-fit rounded-md relative drop-shadow-md" key={movie.id}>
+      <div className="flex flex-row overflow-x-scroll space-x-3 pl-5 pb-5 pt-5 ">
+      {category.movies.map((movie) => (
+          <div className="h-96 min-w-fit rounded-md relative drop-shadow-md" key={movie.id} >
             <img
               className="h-96 w-60 object-fill rounded-md"
               src={`https://image.tmdb.org/t/p/original/${movie.poster_path}`}
@@ -50,7 +41,7 @@ function HomePage() {
           </div>
       ))}
       </div>
-    </>
+    </div>
   ));
 
   return <div>{HomePageContent}</div>;

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import AuthForms from "./AuthForms";
 import { useRouter } from 'next/router'
+import Link from "next/link";
 
 function Navbar(props: { isAuth: Boolean }) {
   const { isAuth } = props;
@@ -24,8 +25,8 @@ function Navbar(props: { isAuth: Boolean }) {
         {isAuth ? (
           <>
             <div className="flex flex-row space-x-4 list-none">
-              <li className=" btn">Home</li>
-              <li className="drawer-button btn">Movies</li>
+              <Link href="/" className=" btn">Home</Link>
+              <Link href="/movie" className="drawer-button btn">Movies</Link>
             </div>
             <div className="flex flex-row list-none">
               <li className="p-1 btn--link">Cart</li>
@@ -37,8 +38,8 @@ function Navbar(props: { isAuth: Boolean }) {
         ) : (
           <>
             <div className="flex flex-row space-x-4 list-none">
-              <li className="drawer-button btn">Home</li>
-              <li className="drawer-button btn">Movies</li>
+            <Link href="/" className=" btn">Home</Link>
+            <Link href="/movie" className="drawer-button btn">Movies</Link>
             </div>
             <div className="flex flex-row space-x-4 list-none">
               <button

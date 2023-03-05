@@ -13,16 +13,7 @@ function AuthForms(props: { status: Boolean }) {
 	const [password, setPassword] = useState('')
 	const [firstName, setFirstName] = useState('')
 	const [lastName, setLastName] = useState('')
-	// const [drawer, setDrawer] = useState(true)
-  // let drawer:DrawerInterface ;
 
-  // useEffect(() => {
-  //   if(document){
-  //     const targetEl: HTMLElement = document.getElementById('drawer-right-example')
-  //     drawer = new Drawer(targetEl);
-  //   }
-  // },[])
- 
   const handleClick = () => {
     if(status){
       handleLogin()
@@ -42,6 +33,15 @@ function AuthForms(props: { status: Boolean }) {
       router.reload(); console.log('Logged in ')},
 		onError: () => toast('Invalid credentials')
 	})
+
+  const { mutate: handleRegister, isLoading: handleRegisterLoading } = useMutation({
+		mutationFn: () => axios.post('/api/signup', {firstName, lastName, emailAddress, password }),
+		onSuccess: (res) => {
+      localStorage.setItem('token', res.data.token)
+      router.reload(); console.log('Logged in ')},
+		onError: () => toast('Invalid credentials')
+	})
+
   return (
     <div
       id="drawer-right-example"
