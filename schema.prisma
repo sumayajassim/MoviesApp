@@ -6,6 +6,7 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
+
 model User {
   id           String      @id @default(auto()) @map("_id") @db.ObjectId
   firstName    String
@@ -18,14 +19,13 @@ model User {
   wishlist     wishlist?
   purchases    Purchases[]
   reviews      review[]
+  cart         Cart?
 }
 
 model wishlist {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-
-  user   User   @relation(fields: [userID], references: [id], onDelete: Cascade)
-  userID String @unique @db.ObjectId
-
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  user      User     @relation(fields: [userID], references: [id], onDelete: Cascade)
+  userID    String   @unique @db.ObjectId
   moviesIDs String[]
 }
 
@@ -33,7 +33,7 @@ model Purchases {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   user      User     @relation(fields: [userID], references: [id], onDelete: Cascade)
   userID    String   @unique @db.ObjectId
-  moviesIDs   String[]
+  moviesIDs String[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   amount    Int
@@ -46,4 +46,11 @@ model review {
   movieID String
   rate    Int
   comment String
+}
+
+model Cart {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  user     User     @relation(fields: [userID], references: [id], onDelete: Cascade)
+  userID   String   @unique @db.ObjectId
+  movieIDs String[]
 }
