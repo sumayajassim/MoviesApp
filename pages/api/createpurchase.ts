@@ -20,7 +20,7 @@ export default function purchase(req: NextApiRequest , res:NextApiResponse){
             }
         }
        })
-       .then( (data) => {
+    .then( (data) => {
         res.json(data)
     })
     .catch(err => {
