@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../lib/prisma";
 import jwtDecode from "jwt-decode";
+import index from "../movie";
 
 export default async function addToCart(
   req: NextApiRequest,
@@ -8,21 +9,42 @@ export default async function addToCart(
 ) {
   if (req.query.token) {
     let userDetails: any = jwtDecode(req.query.token as string);
-    // console.log(userDetails);
+
     prisma.cart
-      .update({
+      .findUniqueOrThrow({
         where: {
           userID: userDetails.id,
         },
-        data: {
-          movieIDs: {
-            push: req.body.movieIDs,
-          },
-        },
       })
       .then((data) => {
-        res.json(data);
-        // res.json("added to cart")
+        let userCart: any[] = data?.movieIDs;
+        let i = 0;
+
+        for (i; i < req.body.movieIDs.length; i++) {
+          if (userCart.includes(req.body.movieIDs[i])) {
+            console.log();
+          } else {
+            userCart.push(req.body.movieIDs[i]);
+          }
+          //   console.log(req.body.movieIDs[i]);
+        }
+
+        prisma.cart
+          .update({
+            where: {
+              userID: userDetails.id,
+            },
+            data: {
+              movieIDs: userCart,
+            },
+          })
+          .then((data) => {
+            res.json(data);
+            // res.json("added to cart")
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       })
       .catch((err) => {
         console.log(err);
