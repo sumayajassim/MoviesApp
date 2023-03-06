@@ -10,33 +10,61 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User{
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  firstName String
-  lastName String
-  emailAddress String @unique
-  password String
-  balance Int @default(100)
+model User {
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  firstName    String
+  lastName     String
+  emailAddress String      @unique
+  password     String
+  balance      Int         @default(100)
+  wishlist     wishlist?
+  purchases    Purchases[]
+  reviews      Review[]
+  cart         Cart?
+  admin        Boolean?    @default(false)
 }
 
-model Wishlist{
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  userID String
-  movieID String
+model wishlist {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  user      User     @relation(fields: [userID], references: [id], onDelete: Cascade)
+  userID    String   @unique @db.ObjectId
+  moviesIDs String[]
 }
 
-model PreviousPurchases{
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  userID String
-  movieID String
-  date DateTime
-  amount Int
+model Purchases {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  user      User     @relation(fields: [userID], references: [id], onDelete: Cascade)
+  userID    String   @unique @db.ObjectId
+  moviesIDs String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  amount    Int
+  rate      Int
+  comment   String
 }
 
-model Review{
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  userID String
+model Review {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  user    User   @relation(fields: [userID], references: [id], onDelete: Cascade)
+  userID  String @unique @db.ObjectId
   movieID String
-  rate Int
+  rate    Int
   comment String
+}
+
+model Cart {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  user     User     @relation(fields: [userID], references: [id], onDelete: Cascade)
+  userID   String   @unique @db.ObjectId
+  movieIDs String[]
+}
+
+model Discount {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  code String
+}
+
+model Movie {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  price Int    @default(10)
 }

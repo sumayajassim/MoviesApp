@@ -1,9 +1,9 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useContext} from "react";
 import { useMutation } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { toast } from "react-toastify";
-import { Drawer } from "flowbite";
-import type { DrawerOptions, DrawerInterface } from "flowbite";
+import Context from "@/context/context";
+
 
 import axios from 'axios'
 function AuthForms(props: { status: Boolean }) {
@@ -13,9 +13,13 @@ function AuthForms(props: { status: Boolean }) {
 	const [password, setPassword] = useState('')
 	const [firstName, setFirstName] = useState('')
 	const [lastName, setLastName] = useState('')
+  const {isAuth, setIsAuth} = useContext(Context)
+  // const isAuth = context.isAuth
+  console.log('isAuth',isAuth)
   let formData = {};
   let endPoint = "";
  
+  // console.log('context', context)
   const handleClick = () => {
    if(status){
     formData = {emailAddress, password }
@@ -33,24 +37,15 @@ function AuthForms(props: { status: Boolean }) {
 		onSuccess: (res) => {
       if(res.data.token){
         localStorage.setItem('token', res.data.token)
-        router.reload();
+        setIsAuth((isAuth) => !isAuth )
+        // router.reload();
       }
       console.log('Logged in ')},
-    // onError: (err) => toast(`${err.message}`)
     onError: (err) => {
       console.log(err)
       toast.error(`${err?.response?.data?.message}`)
     }
 	})
-
-  // const { mutate: handleRegister, isLoading: handleRegisterLoading } = useMutation({
-	// 	mutationFn: () => axios.post('/api/signup', {firstName, lastName, emailAddress, password }),
-	// 	onSuccess: (res) => {
-  //     localStorage.setItem('token', res.data.token)
-  //     // router.reload(); 
-  //     console.log('Logged in ')},
-	// 	onError: (err) => toast.error(`${err?.response?.data?.message}`)
-	// })
 
   return (
     <div
