@@ -21,6 +21,7 @@ model User {
   purchases    Purchases[]
   reviews      Review[]
   cart         Cart?
+  admin        Boolean?    @default(false)
 }
 
 model wishlist {
@@ -56,4 +57,14 @@ model Cart {
   user     User     @relation(fields: [userID], references: [id], onDelete: Cascade)
   userID   String   @unique @db.ObjectId
   movieIDs String[]
+}
+
+model Discount {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  code String
+}
+
+model Movie {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  price Int    @default(10)
 }

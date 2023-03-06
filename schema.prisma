@@ -7,6 +7,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum Role {
+  ADMIN
+  DEFAULT
+}
+
 model User {
   id           String      @id @default(auto()) @map("_id") @db.ObjectId
   firstName    String
@@ -20,6 +25,7 @@ model User {
   purchases    Purchases[]
   reviews      review[]
   cart         Cart?
+  role         Role        @default(DEFAULT)
 }
 
 model wishlist {
@@ -53,4 +59,11 @@ model Cart {
   user     User     @relation(fields: [userID], references: [id], onDelete: Cascade)
   userID   String   @unique @db.ObjectId
   movieIDs String[]
+}
+
+model Discount {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userID String @db.ObjectId
+  amount Float  @default(30)
+  code   String
 }
