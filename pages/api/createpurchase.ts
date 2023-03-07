@@ -28,8 +28,6 @@ export default async function purchase(
       (id: string) => !purchased.includes(id)
     );
 
-    console.log(toBePurchased);
-
     if (req.body.discountCode) {
       const data = await prisma.discount.findFirstOrThrow({
         where: {
