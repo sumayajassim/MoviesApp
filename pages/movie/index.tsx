@@ -1,59 +1,124 @@
-import React , {useState} from 'react'
-import Navbar from '@/components/Navbar'
-import { useQueryClient , useQuery } from '@tanstack/react-query'
-import axios from 'axios'
-import PageNavigation from '@/components/PageNavigation';
+import React, { useState, useEffect } from "react";
+import Navbar from "@/components/Navbar";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import PageNavigation from "@/components/PageNavigation";
+import MovieComponent from "@/components/MovieComponent";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInView } from "react-intersection-observer";
 
+function index(props: any) {
+  const queryClient = useQueryClient();
+  const { ref, inView } = useInView();
+  const [search, setSearch] = useState("");
+  const [genre, setGenre] = useState("");
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    status,
+  } = useInfiniteQuery({
+    queryKey: ["movies", search, genre],
+    queryFn: async ({ pageParam = 1, genreId=genre, searchText = search }) => {
+      const res = await axios.get(
+        `/api/moviespage?page=${pageParam}&search=${searchText}&genre=${genreId}`
+      );
+      return res.data;
+    },
+    getNextPageParam: (lastPage, pages) => {
+      if (lastPage.total_pages === pages.length) return;
+      else return pages.length + 1;
+    },
+    refetchOnWindowFocus: false,
+  });
 
+  const {
+		data:genres,
+	} = useQuery({
+		queryKey: ['genres'],
+		queryFn: () => axios.get('/api/genres')
+	})
 
+  console.log('genres',genres);
 
-function index(props:any) {
+  useEffect(() => {
+    if (inView) {
+      fetchNextPage();
+    }
+  }, [inView]);
 
-  const [page , setPage] = useState(1)
+  console.log("pages", data);
 
-const queryClient = useQueryClient();
+  const changeHandler = (e: any) => {
+    setSearch((search) => e.target.value);
+  };
 
-const {error , isLoading , data} = useQuery<Data>({
-  queryKey: ['movies'],
-  queryFn: async () => await axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&sort_by=original_title.asc&include_adult=false&include_video=false&page=${page}&with_watch_monetization_types=flatrate`)
-})
+  const handleGenre = (e) =>{
+    setGenre(e.target.value)
+  }
 
-console.log(data)
-
-if (isLoading) return 'Loading...'
-
-if (error) return 'An error has occurred: ' + error?.message
+  console.log("selected genre", genre)
 
   return (
-    
-    <div>
-      <Navbar isAuth={props.isAuth}/>
-      <h1 className='text-6xl text-red-700 px-3 py-2'>All Movies</h1>
-      <div className='grid grid-rows-5 grid-flow-col-dense gap-20 justify-center'>
-        {data?.data?.results?.map((movies:any) => (
-          <>
-          <div className='flex flex-col h-72 w-60 gap-y-2 gap-x-2 bg-red-900 m-3 shadow-xl rounded'>
-            <img className='rounded bg-fit h-80 w-60' src={`https://image.tmdb.org/t/p/original/${movies.poster_path}`} alt="" />
-
-            <div className="absolute bottom-0 bg-white w-60 h-20 rounded-br-md rounded-bl-md p-4 flex justify-between">
-              <p>{movies.title}</p>
+    <>
+      <div>
+        <div className="w-fit mx-auto my-auto flex flex-col p-10">
+          <div className="w-full pb-5 flex">
+            <input
+              type="text"
+              name="searchBar"
+              id="searchBar"
+              placeholder="Search for a movie"
+              className="w-3/4 bg-gray-100 border-2 border-gray-200 rounded  py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:border-red-700"
+              onChange={changeHandler}
+            />
+            <div className="flex-1 ml-4">
+              <select
+                id="genre"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                onChange={handleGenre}
+              >
+                <option selected>Choose a genre</option>
+                {genres?.data?.map(genre => (
+                <option value={genre.id}>{genre.title}</option>
+                ))}
+              </select>
             </div>
-          
-            
-              {/* <p>{movies.id}</p>
-              <p>{movies.release_date}</p> */}
           </div>
-          </>
-        ))}
+          <div className="grid grid-cols-4 gap-4 max-w-fit">
+            {data?.pages?.map((page) => (
+              <React.Fragment key={page.page}>
+                {page?.results?.map((movie) => (
+                  <MovieComponent movie={movie} />
+                ))}
+              </React.Fragment>
+            ))}
+            <div>
+              <button
+                ref={ref}
+                onClick={() => fetchNextPage()}
+                disabled={!hasNextPage || isFetchingNextPage}
+              >
+                {isFetchingNextPage
+                  ? "Loading more..."
+                  : hasNextPage
+                  ? "Load Newer"
+                  : "Nothing more to load"}
+              </button>
+            </div>
+            <div>
+              {isFetching && !isFetchingNextPage
+                ? "Background Updating..."
+                : null}
+            </div>
+          </div>
+        </div>
       </div>
-      <br />
-      <div className='flex w-screen justify-center align-center gap-7 py-4'>
-        <p className='text-red-900 p-1 cursor-pointer' onClick={() => setPage(page-1)}>Previos Page</p>
-        <p className='text-red-900 p-1 cursor-default'>Page {page}</p>
-        <p className='text-red-900 p-1 cursor-pointer' onClick={() => setPage(page+1)}>Next Page</p>
-    </div>
-    </div>
-  )
+    </>
+  );
 }
 
-export default index
+export default index;

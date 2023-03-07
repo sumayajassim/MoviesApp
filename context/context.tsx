@@ -1,16 +1,16 @@
-import { createContext, useState } from "react";
+import { createContext } from "react";
 
 
-export const Message_data = createContext(null);
+const AppContext = createContext();
 
-function Context({ children }) {
-    const [message, setMessage] = useState();
+// function Context({ children }) {
+//     const [isAuth, setIsAuth] = useState();
   
-    return (
-      <Message_data.Provider value={{ message, setMessage }}>
-        {children}
-      </Message_data.Provider>
-    );
-  }
+//     return (
+//       <AppContext.Provider value={{ isAuth, setIsAuth }}>
+//         {children}
+//       </AppContext.Provider>
+//     );
+//   }
 
-export default Context
+export default AppContext
