@@ -42,7 +42,7 @@ model Purchases {
   moviesIDs String[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  amount    Int
+  amount    Float
 }
 
 model review {
