@@ -68,3 +68,4 @@ model Movie {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   price Int    @default(10)
 }
+
