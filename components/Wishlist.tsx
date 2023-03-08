@@ -1,33 +1,21 @@
-// import React, { useEffect } from 'react'
-// function Wishlist(props) {
-//     const {
-//         ref,
-//         isComponentVisible,
-//         setIsComponentVisible
-//       } = useComponentVisible(true);
+import React,{useContext} from 'react'
+import Context from "@/context/context";
 
-//   return (
-//     <div ref={ref}>
-// {isComponentVisible &&
-// <div  className="z-50  font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
-//     <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownNavbar" data-dropdown-menu="dropdownNavbar">
-//       <li>
-//         <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Dashboard</a>
-//       </li>
-//       <li>
-//         <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Settings</a>
-//       </li>
-//       <li>
-//         <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Earnings</a>
-//       </li>
-//       <li>
-//         <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Sign out</a>
-//       </li>
-//     </ul>
-// </div> 
-// }
-//     </div>
-//   )
-// }
+function Wishlist() {
+  const {data} = useContext(Context);
+  console.log('wishlist', data)
 
-// export default Wishlist
+  const wishlistItems = data.wishlist.map((movie) => 
+    <li key={movie.id} className="flex p-4 items-center">
+        <img className='h-20 w-20 object-fill rounded-md mr-4' src={movie.poster_path ? `https://image.tmdb.org/t/p/original/${movie.poster_path}` : 'https://www.altavod.com/assets/images/poster-placeholder.png'}/>
+        <span>{movie.title}</span>
+    </li>
+  )
+  return (
+    <div className="z-50 absolute top-12 right-20 mt-1 right-20 font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-96 dark:bg-gray-700 dark:divide-gray-600 overflow-auto max-h-128">
+        {wishlistItems}
+    </div>
+  )
+}
+
+export default Wishlist

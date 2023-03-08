@@ -1,16 +1,24 @@
-import React from 'react'
+import React, {useContext} from 'react'
 import Movie from '@/types' ;
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-
+import Context from "@/context/context";
+import { toast } from 'react-toastify';
 
 function MovieComponent(props) {
   const {movie} = props
+  const {data,setData} = useContext(Context);
 
   const { mutate: handleLikeClick, isLoading: handleSubmitTodoLoading } =
   useMutation({
-    mutationFn: (movieID: string) => axios.post('/api/createwishlist', {movieID}, {headers: {"Authorization" : localStorage.getItem("token") }}),
-    onSuccess: () =>{ console.log("Success")},
+    mutationFn: (movieID: any) => axios.post('/api/createwishlist',{movieID :[movieID.toString()]}, {headers: {"Authorization" : localStorage.getItem("token") }}),
+    onSuccess: (res) =>{
+      console.log('movie', res.data.movie)
+      console.log('data context', data)
+      setData((data) => {
+        return {...data, wishlist:[...data.wishlist, res.data.movie]}})
+      toast.success("Movie Added successfully to your wishlist!!")
+    },
   })
   return (
     <div className="h-96 min-w-fit max-w-fit rounded-md relative drop-shadow-md" key={movie.id} >
@@ -26,7 +34,7 @@ function MovieComponent(props) {
     <div className="absolute bottom-0 bg-red w-60 h-10 rounded-br-md rounded-bl-md p-4 flex justify-between">
       {/* <span className="text-red-700"></span> */}
       {/* <span>{movie.vote_average}</span> */}
-      <button className='' onClick={() => handleLikeClick(movie.id)}>Add</button>
+      <button className='' onClick={() => handleLikeClick(movie.id)}><i className="fa-regular fa-heart"></i></button>
     </div>
   </div>
   )

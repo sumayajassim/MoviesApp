@@ -20,7 +20,7 @@ export default async function moviePage(
     res.json(data);
     }else{
       const {data} = await axios.get(
-       `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&query=${searchText}&with_genres=${genreId}`
+        `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${searchText}`
        );
        res.json(data);
       }

@@ -21,7 +21,11 @@ module.exports = {
       'bubble-gum': '#ff77e9',
       'bermuda': '#78dcca',
     },
-    extend: {},
+    extend: {
+      maxHeight: {
+        '128': '32rem',
+      }
+    },
   },
   plugins: [
     // require('flowbite/plugin')

@@ -2,10 +2,12 @@ import { wishlist } from './../../node_modules/.prisma/client/index.d';
 import { NextApiRequest , NextApiResponse } from 'next'
 import {prisma} from '../../lib/prisma'
 import axios, { AxiosResponse } from 'axios'
+import isLoggedIn from '@/components/helpers/isLoggedIn';
 
+const API_KEY = process.env.API_KEY
+if(!API_KEY) throw Error('...')
 
-
-export default async function getUserDetails(req: NextApiRequest , res: NextApiResponse){
+async function getUserDetails(req: NextApiRequest , res: NextApiResponse){
 
     const user = await prisma.user.findUniqueOrThrow({
         where:{
@@ -20,13 +22,13 @@ export default async function getUserDetails(req: NextApiRequest , res: NextApiR
 
     if(user){
     
-        const wishlistMovies: any = await Promise.all(user.wishlist!.moviesIDs.map(async (id) => await getMovie(id)))
-        const cartMovies: any = await Promise.all(user.cart!.movieIDs.map(async (id) => await getMovie(id)))
+        const wishlistMovies: any =  (await Promise.all(user.wishlist!.moviesIDs.map(async (id) => await getMovie(id)))).filter(Boolean)
+        const cartMovies: any =  (await Promise.all(user.cart!.moviesIDs.map(async (id) => await getMovie(id)))).filter(Boolean)
         res.json({wishlist: wishlistMovies,cart: cartMovies, user})
 
 
     }else{
-        res.status(404).json({"Something wrong happened"!})
+        res.status(404).json({message:"Something wrong happened!"});
     }
 
    
@@ -34,7 +36,15 @@ export default async function getUserDetails(req: NextApiRequest , res: NextApiR
 }
 
 const getMovie = async (id: string) => {
-    const {data} = await axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}`)
-    return data
+    try {
+
+        const {data} = await axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}`)
+            return data
+    } catch {
+
+        return null
+
+    }
 }
 
+export default isLoggedIn(getUserDetails)

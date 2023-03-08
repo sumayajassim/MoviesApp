@@ -1,17 +1,23 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../lib/prisma";
-import jwtDecode from "jwt-decode";
-import isLoggedIn from "../../components/helpers/isLoggedIn"
+import isLoggedIn from "../../components/helpers/isLoggedIn";
+import axios from "axios";
+
+const API_KEY = process.env.API_KEY
+if(!API_KEY) throw Error('...')
 
 async function addToWishList(req: NextApiRequest, res: NextApiResponse) {
-  if (req.query.token) {
-    let userDetails: any = jwtDecode(req.query.token as string);
-
-    const movies = req.body.moviesIDs;
+  const getMovie = async (id: string) => {
+    const {data} = await axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}`)
+    return data
+  }
+  
+console.log(req.user.user.id)
+    const movies =  req.body.movieID;
 
     const purchased = await prisma.purchases.findMany({
       where: {
-        userID: userDetails.id,
+        userID: req.user.user.id,
         OR: movies.map((movieId: string) => ({
           moviesIDs: { has: movieId },
         })),
@@ -22,7 +28,7 @@ async function addToWishList(req: NextApiRequest, res: NextApiResponse) {
 
     const cart = await prisma.cart.findUniqueOrThrow({
       where: {
-        userID: userDetails.id,
+        userID: req.user.user.id,
       },
     });
 
@@ -30,7 +36,7 @@ async function addToWishList(req: NextApiRequest, res: NextApiResponse) {
 
     const wishlist = await prisma.wishlist.findUniqueOrThrow({
       where: {
-        userID: userDetails.id,
+        userID:req.user.user.id,
       },
     });
 
@@ -51,16 +57,24 @@ async function addToWishList(req: NextApiRequest, res: NextApiResponse) {
     if (!canBeAddedtoWishlist) {
       const update = await prisma.wishlist.update({
         where: {
-          userID: userDetails.id,
+          userID: req.user.user.id,
         },
         data: {
           moviesIDs: finalArray,
         },
       });
 
-      res.json(update);
+      if(update){
+        const movie = await getMovie(req.body.movieID[0])
+        res.json({movie});
+      }
+      else{res.status(400).json({message: "Something wrong happened"})}
+
     }
+  else{
+    res.status(400).json({message: "The movie already in your wishlist"})
   }
+
 }
 
 export default isLoggedIn(addToWishList)

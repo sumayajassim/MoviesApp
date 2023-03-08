@@ -5,6 +5,7 @@ import Link from "next/link";
 import Context from "@/context/context";
 import { toast } from "react-toastify";
 import useComponentVisible from "./helpers/useComponentVisible";
+import Wishlist from "./Wishlist";
 import Head from "next/head";
 
 function Navbar() {
@@ -12,9 +13,9 @@ function Navbar() {
   const { isAuth, setIsAuth } = useContext(Context);
   const context = useContext(Context);
   const [status, setStatus] = useState<Boolean>(false);
-  // const [wishlist, setWishlist] = useState<Boolean>(false);xw
-  const { ref, isComponentVisible, setIsComponentVisible } =
-    useComponentVisible(false);
+  const { ref, isComponentVisible, setIsComponentVisible } = useComponentVisible(false);
+  // const { userRef, isDropdownVisible, setIsDropDownVisible } = useComponentVisible(false);
+   
 
 
   const clickHandler = (e: any) => {
@@ -63,51 +64,11 @@ function Navbar() {
                   onClick={() => setIsComponentVisible(true)}
                   type="button"
                 >
-                  ❤️
+                <i className="fa-solid fa-heart"></i>
                 </button>
                 <div ref={ref}>
-                  {isComponentVisible && (
-                    <div className="z-50 absolute top-12 right-20 mt-1 right-20 font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-96 dark:bg-gray-700 dark:divide-gray-600">
-                      <ul
-                        className="py-2 text-sm text-gray-700 dark:text-gray-200"
-                        aria-labelledby="dropdownNavbar"
-                        data-dropdown-menu="dropdownNavbar"
-                      >
-                        <li>
-                          <a
-                            href="#"
-                            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                          >
-                            Dashboard
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                          >
-                            Settings
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                          >
-                            Earnings
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                          >
-                            Sign out
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                  )}
+                  {isComponentVisible && <Wishlist/>
+                  }
                 </div>
               </li>
               <li className="btn btn--link">My profile</li>
