@@ -38,7 +38,7 @@ function AuthForms(props: { status: Boolean }) {
       if(res.data.token){
         localStorage.setItem('token', res.data.token)
         setIsAuth((isAuth) => !isAuth )
-        // router.reload();
+        router.reload();
       }
       console.log('Logged in ')},
     onError: (err) => {

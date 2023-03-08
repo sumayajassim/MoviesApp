@@ -3,6 +3,9 @@ import { prisma } from "../../lib/prisma";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+const SECRET_KEY = process.env.SECRET_KEY
+if(!SECRET_KEY) throw Error('Secret key is not provided!')
+
 export default async function signup(
   req: NextApiRequest,
   res: NextApiResponse
@@ -83,12 +86,8 @@ export default async function signup(
           const verifired = bcrypt.compare(req.body.password, userPass);
 
           verifired.then((istrue) => {
-            if (istrue && process.env.SECRET_KEY != null) {
-              const token = jwt.sign(data, process.env.SECRET_KEY, {
-                expiresIn: 604800,
-              });
-
-              res.json({ token });
+            if (istrue && SECRET_KEY) {
+             getUserDetails(data);
             } else {
               res.status(400).json({ message: "Wrong Password" });
             }
@@ -99,4 +98,11 @@ export default async function signup(
         });
     });
   }
+
+  async function getUserDetails(user:any){
+    const token = jwt.sign({user} , SECRET_KEY, {expiresIn: 604800})
+    let wishlist = await prisma.wishlist.findFirstOrThrow({where :{userID:  user.id}, select:{moviesIDs: true }})
+    let cart = await prisma.cart.findFirstOrThrow({where :{userID:  user.id}, select: {movieIDs: true}})
+    res.json({token, wishlist: wishlist.moviesIDs,cart: cart.movieIDs, user})
+}
 }

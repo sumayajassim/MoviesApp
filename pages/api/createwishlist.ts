@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../lib/prisma";
 import jwtDecode from "jwt-decode";
+import isLoggedIn from "../../components/helpers/isLoggedIn"
 
-export default async function (req: NextApiRequest, res: NextApiResponse) {
+async function addToWishList(req: NextApiRequest, res: NextApiResponse) {
   if (req.query.token) {
     let userDetails: any = jwtDecode(req.query.token as string);
 
@@ -59,24 +60,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
       res.json(update);
     }
-
-    // let
-
-    // prisma.wishlist.update({
-    //     where: {
-    //         userID: userDetails.id
-    //     },
-    //     data : {
-    //         moviesIDs : {
-    //             push: req.body.moviesIDs
-    //         }
-    //     }
-    // })
-    // .then( (data) => {
-    //     res.json(data)
-    // })
-    // .catch(err => {
-    //     console.log(err)
-    // })
   }
 }
+
+export default isLoggedIn(addToWishList)

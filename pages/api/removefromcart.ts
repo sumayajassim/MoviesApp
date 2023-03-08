@@ -38,7 +38,7 @@ export default async function removeFromeCart(
         userID: userDetails.id,
       },
       data: {
-        movieIDs: test,
+        moviesIDs: test,
       },
     })
     .then((data) => {
