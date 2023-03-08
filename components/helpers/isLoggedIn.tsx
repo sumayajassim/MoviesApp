@@ -4,8 +4,8 @@ import  jwt from 'jsonwebtoken'
 const SECRET = process.env.SECRET_KEY
 if(!SECRET) throw Error('Secret key is not provided!')
 
-const isLoggedIn = (handler) => {
-    return async (req, res) => {
+const isLoggedIn = (handler:any) => {
+    return async (req :any, res :any) => {
         try {
             // const authorization = req.header
             const authorization = req.headers["authorization"]

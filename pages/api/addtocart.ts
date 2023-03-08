@@ -10,44 +10,52 @@ export default async function addToCart(
   if (req.query.token) {
     let userDetails: any = jwtDecode(req.query.token as string);
 
-    prisma.cart
-      .findUniqueOrThrow({
+    const movies = req.body.moviesIDs || [];
+
+    const purchased = (
+      await prisma.purchases.findMany({
         where: {
+          OR: movies.map((movieId: string) => ({
+            moviesIDs: { has: movieId },
+          })),
           userID: userDetails.id,
         },
       })
-      .then((data) => {
-        let userCart: any[] = data?.movieIDs;
-        let i = 0;
+    ).flatMap(({ moviesIDs }) => moviesIDs);
 
-        for (i; i < req.body.movieIDs.length; i++) {
-          if (userCart.includes(req.body.movieIDs[i])) {
-            console.log();
-          } else {
-            userCart.push(req.body.movieIDs[i]);
-          }
-          //   console.log(req.body.movieIDs[i]);
-        }
+    const alreadyInCart = await prisma.cart.findUniqueOrThrow({
+      where: {
+        userID: userDetails.id,
+      },
+    });
 
-        prisma.cart
-          .update({
-            where: {
-              userID: userDetails.id,
-            },
-            data: {
-              movieIDs: userCart,
-            },
-          })
-          .then((data) => {
-            res.json(data);
-            // res.json("added to cart")
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    let userMoviesInCart = alreadyInCart.moviesIDs;
+
+    let finalArray = movies.filter(
+      (x: any) => !purchased.includes(x) && !userMoviesInCart.includes(x)
+    );
+
+    const updateCart = await prisma.cart.update({
+      where: {
+        userID: userDetails.id,
+      },
+      data: {
+        moviesIDs: finalArray,
+      },
+    });
+
+    if (updateCart) {
+      res.status(200).json("movies added to cart");
+    } else {
+      res.status(401).json("movies already bought or in cart");
+    }
+
+    // console.log(movies, "sent movies Array");
+
+    // console.log(purchased, "purchased Array");
+
+    // console.log(userMoviesInCart, "user cart Array");
+
+    // console.log(finalArray, "final Array");
   }
 }
