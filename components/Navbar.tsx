@@ -14,16 +14,13 @@ function Navbar() {
   const [status, setStatus] = useState<Boolean>(false);
   // const [wishlist, setWishlist] = useState<Boolean>(false);xw
   const { ref, isComponentVisible, setIsComponentVisible } =
-    useComponentVisible(true);
+    useComponentVisible(false);
 
-  // const [showWishlist, setShowWishlist] = useState(false);
 
   const clickHandler = (e: any) => {
     if (e.target.id === "signin") {
       setStatus((status) => true);
-    } else if (e.target.id === "wishlist") {
-      setWishlist((wishlist) => true);
-    } else {
+    }else {
       setStatus((status) => false);
     }
   };

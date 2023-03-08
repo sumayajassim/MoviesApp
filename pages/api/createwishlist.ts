@@ -5,12 +5,12 @@ import isLoggedIn from "../../components/helpers/isLoggedIn"
 
 
 function addToWishList(req: NextApiRequest , res: NextApiResponse){
-        let userDetails:any = jwtDecode(req.headers.authorization  as string)
-
+    // console.log("request", req.user.user.id)
         prisma.wishlist.update({
             where: {
-                userID: userDetails.id
+                userID: req.user.user.id
             },
+            // data: {push : req.body.movieID}
             data : {
                 moviesIDs : {
                     push: req.body.movieID
@@ -19,10 +19,13 @@ function addToWishList(req: NextApiRequest , res: NextApiResponse){
         })
         .then( (data) => {
             res.json(data)
+            console.log('data', data)
         })
         .catch(err => {
            res.json(err)
         })
+
+        // res.send("hello")
 }
 
 export default isLoggedIn(addToWishList)
