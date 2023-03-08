@@ -36,25 +36,28 @@ export default async function purchase(
       });
 
       if (data) {
-        discountAmount = req.body.amount / (data.amount * 100);
+        discountAmount = (req.body.amount / (data.amount * 100)) * 1000;
       }
     }
-
-    const data = await prisma.purchases.create({
-      data: {
-        moviesIDs: toBePurchased,
-        amount: req.body.amount - discountAmount,
-        user: {
-          connect: {
-            id: userDetails.id,
+    if (toBePurchased.length >= 1) {
+      const data = await prisma.purchases.create({
+        data: {
+          moviesIDs: toBePurchased,
+          amount: req.body.amount - discountAmount,
+          user: {
+            connect: {
+              id: userDetails.id,
+            },
           },
         },
-      },
-    });
-    try {
-      res.json(data);
-    } catch (error) {
-      console.log(error);
+      });
+      try {
+        res.json(data);
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      res.status(401).json("please add items");
     }
   }
 }
