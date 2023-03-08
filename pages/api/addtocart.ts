@@ -44,7 +44,11 @@ export default async function addToCart(
       },
     });
 
-    res.json(updateCart);
+    if (updateCart) {
+      res.status(200).json("movies added to cart");
+    } else {
+      res.status(401).json("movies already bought or in cart");
+    }
 
     // console.log(movies, "sent movies Array");
 
