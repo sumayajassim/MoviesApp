@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../lib/prisma";
 import jwtDecode from "jwt-decode";
-import isLoggedIn from "../../components/helpers/isLoggedIn";
 
 async function addToWishList(req: NextApiRequest, res: NextApiResponse) {
   const token: any = req.headers["authorization"];

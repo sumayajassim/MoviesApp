@@ -6,20 +6,30 @@ export default async function removeFromWishlist(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.query.token) {
-    const userDetails: any = jwtDecode(req.query.token as string);
+  const token: any = req.headers["authorization"];
+
+  if (token) {
+    let userDetails: any = jwtDecode(token as string);
     const movies = req.body.moviesIDs;
 
     const wishlist = await prisma.wishlist.findUniqueOrThrow({
       where: {
-        userID: userDetails.id,
+        userID: userDetails.data.id,
       },
     });
 
     const moviesInWishlist = wishlist.moviesIDs;
 
-    const finalArray = movies.filter((x: any) => !moviesInWishlist.includes(x));
+    const finalArray = moviesInWishlist.filter((x: any) => !movies.includes(x));
 
-    console.log(finalArray);
+    const removeWishList = await prisma.wishlist.update({
+      where: {
+        userID: userDetails.data.id,
+      },
+      data: {
+        moviesIDs: finalArray,
+      },
+    });
+    res.json(removeWishList);
   }
 }
