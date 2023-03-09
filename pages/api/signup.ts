@@ -82,29 +82,24 @@ export default async function signup(
           },
         })
         .then((data) => {
-          // res.json({ data })
-
+        
           const userPass = data.password;
           const verifired = bcrypt.compare(req.body.password, userPass);
 
           verifired.then((istrue) => {
             if (istrue && SECRET_KEY) {
-             getUserDetails(data);
+              const token = jwt.sign({data} , SECRET_KEY, {expiresIn: 604800})
+            //  getUserDetails(data);
+            res.json({token})
             } else {
               res.status(400).json({ message: "Wrong Password" });
             }
           });
         })
         .catch((err) => {
-          toast.error('Email is already registered')
+          res.status(400).json({message: 'Email is already registered '})
         });
     });
   }
 
-  async function getUserDetails(user:any){
-    const token = jwt.sign({user} , SECRET_KEY, {expiresIn: 604800})
-    let wishlist = await prisma.wishlist.findFirstOrThrow({where :{userID:  user.id}, select:{moviesIDs: true }})
-    let cart = await prisma.cart.findFirstOrThrow({where :{userID:  user.id}, select: {moviesIDs: true}})
-    res.json({token, wishlist: wishlist.moviesIDs,cart: cart.moviesIDs, user})
-}
 }

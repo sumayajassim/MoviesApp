@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 // import { request } from "http";
 const API_KEY = process.env.API_KEY
-if(!API_KEY) throw Error('...')
+if(!API_KEY) throw Error('API key is not provided!')
 
 export default async function moviePage(
   req: NextApiRequest,

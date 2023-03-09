@@ -17,7 +17,7 @@ function App() {
     if (typeof window !== "undefined") {
        token = localStorage.getItem("token")
        if(token){
-       axios.get('/api/getUserDetails' , {headers: {"Authorization" : token}})
+       axios.get('/api/getUserDetails' , {headers: {"authorization" : token}})
        .then((res) => {
           context.setData(res.data)
        })

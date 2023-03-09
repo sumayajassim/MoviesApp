@@ -8,10 +8,9 @@ const API_KEY = process.env.API_KEY
 if(!API_KEY) throw Error('...')
 
 async function getUserDetails(req: NextApiRequest , res: NextApiResponse){
-
     const user = await prisma.user.findUniqueOrThrow({
         where:{
-            id :req.user.user.id
+            id :req.user.id
         },
         include: {
             wishlist: true,
