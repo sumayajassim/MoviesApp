@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../lib/prisma";
 import jwtDecode from "jwt-decode";
-import index from "../movie";
 
 export default async function addToCart(
   req: NextApiRequest,
