@@ -21,7 +21,7 @@ function HomePage() {
   if (loading) return <div>Loading</div>;
 
   const HomePageContent = data?.data?.map((category) => (
-    <div key={category.id}>
+    <div className="pt-10" key={category.id}>
       <h1 className="p-7 text-red-700 font-bold text-2xl">{category.title}</h1>
       <div className="flex flex-row overflow-x-scroll space-x-3 pl-5 pb-5 pt-5 ">
         {category.movies.map((movie) => (
