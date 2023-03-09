@@ -9,17 +9,27 @@ function MovieComponent(props) {
   const {movie} = props
   const {data,setData} = useContext(Context);
 
-  const { mutate: handleLikeClick, isLoading: handleSubmitTodoLoading } =
+  const { mutate: handleLikeClick, isLoading: handleAddWishlistLoading } =
   useMutation({
-    mutationFn: (movieID: any) => axios.post('/api/createwishlist',{movieID :[movieID.toString()]}, {headers: {"Authorization" : localStorage.getItem("token") }}),
+    mutationFn: (movieID: any) => axios.post('/api/createwishlist',{moviesIDs :[movieID.toString()]}, {headers: {"authorization" : localStorage.getItem("token") }}),
     onSuccess: (res) =>{
-      console.log('movie', res.data.movie)
-      console.log('data context', data)
       setData((data) => {
-        return {...data, wishlist:[...data.wishlist, res.data.movie]}})
+        return {...data, wishlist:[...data.wishlist, res.data]}})
       toast.success("Movie Added successfully to your wishlist!!")
     },
   })
+
+  const { mutate: handleAddToCartClick, isLoading: handleAddToCartLoading } =
+  useMutation({
+    mutationFn: (movieID: any) => axios.post('/api/addtocart',{moviesIDs :[movieID.toString()]}, {headers: {"authorization" : localStorage.getItem("token") }}),
+    onSuccess: (res) =>{
+      setData((data) => {
+        return {...data, cart:[...data.cart, res.data]}})
+      toast.success("Movie Added successfully to your cart")
+    },
+  })
+  
+  
   return (
     <div className="h-96 min-w-fit max-w-fit rounded-md relative drop-shadow-md" key={movie.id} >
     <img
@@ -28,13 +38,16 @@ function MovieComponent(props) {
       alt=""
     />
     <div className="absolute bottom-0 bg-white w-60 h-20 rounded-br-md rounded-bl-md p-4 flex justify-between">
-      <span className="text-red-700">{movie.title? movie.title : movie.name}</span>
-      <span>{movie.vote_average}</span>
+      <span className="text-red-700 truncate w-40">{movie.title? movie.title : movie.name}</span>
+      <span>
+        <i className="fa-solid fa-star text-yellow mr-1"></i>
+        {movie.vote_average}</span>
     </div>
     <div className="absolute bottom-0 bg-red w-60 h-10 rounded-br-md rounded-bl-md p-4 flex justify-between">
       {/* <span className="text-red-700"></span> */}
       {/* <span>{movie.vote_average}</span> */}
       <button className='' onClick={() => handleLikeClick(movie.id)}><i className="fa-regular fa-heart"></i></button>
+      <button className='' onClick={() => handleAddToCartClick(movie.id)}><i className="fa-solid fa-cart-plus"></i></button>
     </div>
   </div>
   )

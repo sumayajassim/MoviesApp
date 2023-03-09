@@ -1,23 +1,22 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../lib/prisma";
-import isLoggedIn from "../../components/helpers/isLoggedIn";
+import jwtDecode from "jwt-decode";
 import axios from "axios";
 
-const API_KEY = process.env.API_KEY
-if(!API_KEY) throw Error('...')
-
 async function addToWishList(req: NextApiRequest, res: NextApiResponse) {
-  const getMovie = async (id: string) => {
-    const {data} = await axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}`)
-    return data
-  }
-  
-console.log(req.user.user.id)
-    const movies =  req.body.movieID;
+  const token: any = req.headers["authorization"];
+  const API_KEY = process.env.API_KEY;
+
+  if (token) {
+    let userDetails: any = jwtDecode(token as string);
+
+    const movies = req.body.moviesIDs;
+
+    console.log(userDetails.data.id);
 
     const purchased = await prisma.purchases.findMany({
       where: {
-        userID: req.user.user.id,
+        userID: userDetails.data.id,
         OR: movies.map((movieId: string) => ({
           moviesIDs: { has: movieId },
         })),
@@ -28,7 +27,7 @@ console.log(req.user.user.id)
 
     const cart = await prisma.cart.findUniqueOrThrow({
       where: {
-        userID: req.user.user.id,
+        userID: userDetails.data.id,
       },
     });
 
@@ -36,7 +35,7 @@ console.log(req.user.user.id)
 
     const wishlist = await prisma.wishlist.findUniqueOrThrow({
       where: {
-        userID:req.user.user.id,
+        userID: userDetails.data.id,
       },
     });
 
@@ -49,32 +48,26 @@ console.log(req.user.user.id)
         !moviesInWishList.includes(x)
     );
 
-    const canBeAddedtoWishlist = !finalArray;
+    const canBeAddedtoWishlist = finalArray;
 
-    console.log(finalArray);
-    console.log(!canBeAddedtoWishlist);
-
-    if (!canBeAddedtoWishlist) {
-      const update = await prisma.wishlist.update({
-        where: {
-          userID: req.user.user.id,
+    const update = await prisma.wishlist.update({
+      where: {
+        userID: userDetails.data.id,
+      },
+      data: {
+        moviesIDs: {
+          push: finalArray,
         },
-        data: {
-          moviesIDs: finalArray,
-        },
-      });
+      },
+    });
 
-      if(update){
-        const movie = await getMovie(req.body.movieID[0])
-        res.json({movie});
-      }
-      else{res.status(400).json({message: "Something wrong happened"})}
+    // res.json(update);
+    const { data } = await axios.get(
+      `https://api.themoviedb.org/3/movie/${req.body.moviesIDs[0]}?api_key=${API_KEY}`
+    );
 
-    }
-  else{
-    res.status(400).json({message: "The movie already in your wishlist"})
+    res.json(data);
   }
-
 }
 
-export default isLoggedIn(addToWishList)
+export default addToWishList;

@@ -1,9 +1,24 @@
 import React,{useContext} from 'react'
 import Context from "@/context/context";
+import { useMutation } from '@tanstack/react-query';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 function Wishlist() {
-  const {data} = useContext(Context);
+  const {data, setData} = useContext(Context);
   console.log('wishlist', data)
+
+  const { mutate: removeHandler, isLoading: removeHandlerLoading } =
+  useMutation({
+    mutationFn: (movieID: any) => axios.post('/api/removewishlist',{moviesIDs :[movieID.toString()]}, {headers: {"Authorization" : localStorage.getItem("token") }}),
+    onSuccess: (res, movieID) =>{
+      const newWishlist = data.wishlist.filter((movie:any) => movie.id !== movieID)
+      console.log('newWishlist', newWishlist)
+      setData((data) => {
+        return {...data, wishlist: newWishlist}})
+      toast.success("Movie removed successfully from your wishlist!!")
+    },
+  })
 
   const wishlistItems = data.wishlist.map((movie) => 
     <li key={movie.id} className="flex p-4 items-center justify-between">
@@ -12,8 +27,8 @@ function Wishlist() {
           <span className='truncate w-56'>{movie.title}</span>
         </div>
         <div className='flex space-x-4'>
-        <i className="fa-solid fa-heart"></i>
-        <i className="fa-solid fa-cart-plus"></i>
+          <i className="fa-solid fa-heart cursor-pointer hover:text-red-900" onClick={() => removeHandler(movie.id)}></i>
+          <i className="fa-solid fa-cart-plus cursor-pointer"></i>
         </div>
     </li>
   )

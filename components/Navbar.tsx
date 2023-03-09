@@ -6,7 +6,8 @@ import Context from "@/context/context";
 import { toast } from "react-toastify";
 import useComponentVisible from "./helpers/useComponentVisible";
 import Wishlist from "./Wishlist";
-import Head from "next/head";
+import Cart from "./Cart";
+import { type } from "os";
 
 function Navbar() {
   const router = useRouter();
@@ -15,7 +16,7 @@ function Navbar() {
   const [status, setStatus] = useState<Boolean>(false);
   const { ref, isComponentVisible, setIsComponentVisible } = useComponentVisible(false);
   // const { userRef, isDropdownVisible, setIsDropDownVisible } = useComponentVisible(false);
-   
+	const [showModal, setShowModal] = useState(false)
 
 
   const clickHandler = (e: any) => {
@@ -57,7 +58,7 @@ function Navbar() {
               </Link>
             </div>
             <div className="flex flex-row list-none">
-              <li className="btn btn--link">Cart</li>
+              <li className="btn btn--link"><button onClick={()=> setShowModal(true)} type="button">Cart</button></li>
               <li className="btn btn--link ">
                 <button
                   id="wishlist"
@@ -115,7 +116,7 @@ function Navbar() {
         )}
       </div>
       <AuthForms status={status} />
-      {/* {<Wishlist wishlist={showWishlist} />} */}
+			<Cart showModal={showModal} setShowModal={setShowModal}/>
     </>
   );
 }

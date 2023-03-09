@@ -16,11 +16,11 @@ export default function signin(req: NextApiRequest, res: NextApiResponse) {
 
       verifired.then((istrue) => {
         if (istrue && process.env.SECRET_KEY != null) {
-          const token = jwt.sign(data, process.env.SECRET_KEY, {
+          const token = jwt.sign({data}, process.env.SECRET_KEY, {
             expiresIn: 604800,
           });
 
-          res.json({ token });
+          res.json({token});
         } else {
           res.status(400).json({ message: "Wrong Password" });
         }

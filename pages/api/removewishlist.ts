@@ -1,26 +1,35 @@
-import { NextApiRequest , NextApiResponse } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 import jwtDecode from "jwt-decode";
-import {prisma} from '../../lib/prisma'
+import { prisma } from "../../lib/prisma";
 
-export default async function removeFromWishlist(req:NextApiRequest , res: NextApiResponse) {
-    if(req.query.token){
-        const userDetails:any = jwtDecode(req.query.token as string)
-        const movies = req.body.moviesIDs
+export default async function removeFromWishlist(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  const token: any = req.headers["authorization"];
 
-        const wishlist = await prisma.wishlist.findUniqueOrThrow({
-            where:{
-                userID: userDetails.id
-            }
-        })
+  if (token) {
+    let userDetails: any = jwtDecode(token as string);
+    const movies = req.body.moviesIDs;
 
-      const moviesInWishlist = wishlist.moviesIDs
+    const wishlist = await prisma.wishlist.findUniqueOrThrow({
+      where: {
+        userID: userDetails.data.id,
+      },
+    });
 
+    const moviesInWishlist = wishlist.moviesIDs;
 
-        const finalArray = movies.filter((x:any) => !moviesInWishlist.includes(x))
+    const finalArray = moviesInWishlist.filter((x: any) => !movies.includes(x));
 
-        console.log(finalArray)
-
-
-
-    }
+    const removeWishList = await prisma.wishlist.update({
+      where: {
+        userID: userDetails.data.id,
+      },
+      data: {
+        moviesIDs: finalArray,
+      },
+    });
+    res.json(removeWishList);
+  }
 }

@@ -1,49 +1,44 @@
-import { wishlist } from './../../node_modules/.prisma/client/index.d';
-import { NextApiRequest , NextApiResponse } from 'next'
-import {prisma} from '../../lib/prisma'
-import axios, { AxiosResponse } from 'axios'
-import isLoggedIn from '@/components/helpers/isLoggedIn';
+import { NextApiRequest, NextApiResponse } from "next";
+import { prisma } from "../../lib/prisma";
+import axios, { AxiosResponse } from "axios";
+import jwtDecode from "jwt-decode";
 
-const API_KEY = process.env.API_KEY
-if(!API_KEY) throw Error('...')
+export default async function getUserDetails(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  const token: any = req.headers["authorization"];
+  const API_KEY = process.env.API_KEY;
 
-async function getUserDetails(req: NextApiRequest , res: NextApiResponse){
+  if (token) {
+    let userDetails: any = jwtDecode(token as string);
     const user = await prisma.user.findUniqueOrThrow({
-        where:{
-            id :req.user.id
-        },
-        include: {
-            wishlist: true,
-            cart: true
-        }
-    })
+      where: {
+        id: userDetails.data.id,
+      },
+      include: {
+        wishlist: true,
+        cart: true,
+      },
+    });
 
+    const getMovie = async (id: string) => {
+      const { data } = await axios.get(
+        `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}`
+      );
+      return data;
+    };
 
-    if(user){
-    
-        const wishlistMovies: any =  (await Promise.all(user.wishlist!.moviesIDs.map(async (id) => await getMovie(id)))).filter(Boolean)
-        const cartMovies: any =  (await Promise.all(user.cart!.moviesIDs.map(async (id) => await getMovie(id)))).filter(Boolean)
-        res.json({wishlist: wishlistMovies,cart: cartMovies, user})
-
-
-    }else{
-        res.status(404).json({message:"Something wrong happened!"});
+    if (user) {
+      const wishlistMovies: any = await Promise.all(
+        user.wishlist!.moviesIDs.map(async (id) => await getMovie(id))
+      );
+      const cartMovies: any = await Promise.all(
+        user.cart!.moviesIDs.map(async (id) => await getMovie(id))
+      );
+      res.json({ wishlist: wishlistMovies, cart: cartMovies, user });
+    } else {
+      res.status(404).json("Something wrong happened");
     }
-
-   
-
+  }
 }
-
-const getMovie = async (id: string) => {
-    try {
-
-        const {data} = await axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}`)
-            return data
-    } catch {
-
-        return null
-
-    }
-}
-
-export default isLoggedIn(getUserDetails)
