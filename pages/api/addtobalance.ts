@@ -6,12 +6,14 @@ export default async function addToBalance(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.query.token) {
-    let userDetails: any = jwtDecode(req.query.token as string);
+  const token: any = req.headers["authorization"];
+
+  if (token) {
+    let userDetails: any = jwtDecode(token as string);
 
     const addBalance = await prisma.user.update({
       where: {
-        id: userDetails.id,
+        id: userDetails.data.id,
       },
       data: {
         balance: req.body.addBalance + 100,

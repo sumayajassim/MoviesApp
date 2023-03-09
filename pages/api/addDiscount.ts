@@ -6,8 +6,10 @@ export default async function addDiscount(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.query.token) {
-    let userDetails: any = jwtDecode(req.query.token as string);
+  const token: any = req.headers["authorization"];
+
+  if (token) {
+    let userDetails: any = jwtDecode(token as string);
 
     if (userDetails.role !== "ADMIN") {
       res.status(401).json({ message: "Not an admin" });
@@ -16,7 +18,7 @@ export default async function addDiscount(
     try {
       const data = await prisma.discount.create({
         data: {
-          userID: userDetails.id,
+          userID: userDetails.data.id,
           amount: req.body.amount,
           code: req.body.code,
         },

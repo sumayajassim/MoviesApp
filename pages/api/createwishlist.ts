@@ -1,9 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../lib/prisma";
 import jwtDecode from "jwt-decode";
+import axios from "axios";
 
 async function addToWishList(req: NextApiRequest, res: NextApiResponse) {
   const token: any = req.headers["authorization"];
+  const API_KEY = process.env.API_KEY;
 
   if (token) {
     let userDetails: any = jwtDecode(token as string);
@@ -60,6 +62,11 @@ async function addToWishList(req: NextApiRequest, res: NextApiResponse) {
     });
 
     res.json(update);
+    // const { data } = await axios.get(
+    //   `https://api.themoviedb.org/3/movie/${req.body.moviesIDs[0]}?api_key=${API_KEY}`
+    // );
+
+    // res.json(data);
   }
 }
 
