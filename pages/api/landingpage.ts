@@ -15,20 +15,21 @@ export default async function landingpage(
       movies: await trendingMovies(),
     },
     {
+      id: Math.floor(Math.random() * 10000),
+      title: "TOP RATED ",
+      movies: await topRated(),
+    },
+    {
       id: Math.floor(Math.random() * 100),
-      title: "LATEST MOVIES",
-      movies: await latestMovies(),
+      title: "UPCOMING MOVIES",
+      movies: await UpcomingMovies(),
     },
     {
       id: Math.floor(Math.random() * 1000),
       title: "NOW PLAYING IN THEATRES",
       movies: await nowPlaying(),
-    },
-    {
-      id: Math.floor(Math.random() * 10000),
-      title: "TOP RATED ",
-      movies: await topRated(),
-    },
+    }
+    
   ]);
 }
 
@@ -40,27 +41,17 @@ async function trendingMovies() {
   return data.results;
 }
 
-async function latestMovies() {
-  const { data } = await axios.get(
-  `https://api.themoviedb.org/3/movie/latest?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US`
-  );
-
+async function UpcomingMovies() {
+  const { data } = await axios.get(`https://api.themoviedb.org/3/movie/upcoming?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&page=1`);
   return data.results;
 }
 
 async function nowPlaying() {
-  const { data } = await axios.get(
-   `
-   https://api.themoviedb.org/3/movie/latest?api_key=${API_KEY}&language=en-US`
-  );
-
+  const { data } = await axios.get(`https://api.themoviedb.org/3/movie/now_playing?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US`);
   return data.results;
 }
 
 async function topRated() {
-  const { data } = await axios.get(
-   `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&language=en-US&page=1`
-  );
-
+  const { data } = await axios.get(`https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&language=en-US&page=1`);
   return data.results;
 }
