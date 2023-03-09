@@ -53,10 +53,10 @@ model Review {
 }
 
 model Cart {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  user     User     @relation(fields: [userID], references: [id], onDelete: Cascade)
-  userID   String   @unique @db.ObjectId
-  movieIDs String[]
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  user      User     @relation(fields: [userID], references: [id], onDelete: Cascade)
+  userID    String   @unique @db.ObjectId
+  moviesIDs String[]
 }
 
 model Discount {
@@ -68,4 +68,3 @@ model Movie {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   price Int    @default(10)
 }
-

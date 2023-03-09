@@ -1,15 +1,16 @@
+import { toast } from "react-toastify";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../lib/prisma";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-const SECRET_KEY = process.env.SECRET_KEY
-if(!SECRET_KEY) throw Error('Secret key is not provided!')
-
 export default async function signup(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const SECRET_KEY = process.env.SECRET_KEY;
+  if (!SECRET_KEY) throw Error("Secret key is not provided!");
+
   function validFirstName() {
     if (req.body.firstName.length > 3 && req.body.firstName.length < 25) {
       return true;
@@ -80,29 +81,24 @@ export default async function signup(
           },
         })
         .then((data) => {
-          // res.json({ data })
-
           const userPass = data.password;
           const verifired = bcrypt.compare(req.body.password, userPass);
 
           verifired.then((istrue) => {
             if (istrue && SECRET_KEY) {
-             getUserDetails(data);
+              const token = jwt.sign({ data }, SECRET_KEY, {
+                expiresIn: 604800,
+              });
+              //  getUserDetails(data);
+              res.json({ token });
             } else {
               res.status(400).json({ message: "Wrong Password" });
             }
           });
         })
         .catch((err) => {
-          console.log(err);
+          res.status(400).json({ message: "Email is already registered " });
         });
     });
   }
-
-  async function getUserDetails(user:any){
-    const token = jwt.sign({user} , SECRET_KEY, {expiresIn: 604800})
-    let wishlist = await prisma.wishlist.findFirstOrThrow({where :{userID:  user.id}, select:{moviesIDs: true }})
-    let cart = await prisma.cart.findFirstOrThrow({where :{userID:  user.id}, select: {movieIDs: true}})
-    res.json({token, wishlist: wishlist.moviesIDs,cart: cart.movieIDs, user})
-}
 }

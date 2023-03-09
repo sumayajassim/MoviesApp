@@ -6,8 +6,10 @@ export default async function addToCart(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.query.token) {
-    let userDetails: any = jwtDecode(req.query.token as string);
+  const token: any = req.headers["authorization"];
+
+  if (token) {
+    let userDetails: any = jwtDecode(token as string);
 
     const movies = req.body.moviesIDs || [];
 
@@ -17,14 +19,14 @@ export default async function addToCart(
           OR: movies.map((movieId: string) => ({
             moviesIDs: { has: movieId },
           })),
-          userID: userDetails.id,
+          userID: userDetails.data.id,
         },
       })
     ).flatMap(({ moviesIDs }) => moviesIDs);
 
     const alreadyInCart = await prisma.cart.findUniqueOrThrow({
       where: {
-        userID: userDetails.id,
+        userID: userDetails.data.id,
       },
     });
 
@@ -36,14 +38,17 @@ export default async function addToCart(
 
     const updateCart = await prisma.cart.update({
       where: {
-        userID: userDetails.id,
+        userID: userDetails.data.id,
       },
       data: {
-        moviesIDs: finalArray,
+        moviesIDs: {
+          push: finalArray,
+        },
       },
     });
 
     if (updateCart) {
+      // res.json(updateCart);
       res.status(200).json("movies added to cart");
     } else {
       res.status(401).json("movies already bought or in cart");

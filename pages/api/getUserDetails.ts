@@ -1,8 +1,8 @@
-import { wishlist } from './../../node_modules/.prisma/client/index.d';
+import { wishlist } from '.prisma/client';
 import { NextApiRequest , NextApiResponse } from 'next'
 import {prisma} from '../../lib/prisma'
 import axios, { AxiosResponse } from 'axios'
-
+import isLoggedIn from "../../components/helpers/isLoggedIn";
 
 
 export default async function getUserDetails(req: NextApiRequest , res: NextApiResponse){
@@ -21,7 +21,7 @@ export default async function getUserDetails(req: NextApiRequest , res: NextApiR
     if(user){
     
         const wishlistMovies: any = await Promise.all(user.wishlist!.moviesIDs.map(async (id) => await getMovie(id)))
-        const cartMovies: any = await Promise.all(user.cart!.movieIDs.map(async (id) => await getMovie(id)))
+        const cartMovies: any = await Promise.all(user.cart!.moviesIDs.map(async (id) => await getMovie(id)))
         res.json({wishlist: wishlistMovies,cart: cartMovies, user})
 
 

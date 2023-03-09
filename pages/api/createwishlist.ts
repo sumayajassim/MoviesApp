@@ -1,17 +1,21 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../lib/prisma";
 import jwtDecode from "jwt-decode";
-import isLoggedIn from "../../components/helpers/isLoggedIn"
+import isLoggedIn from "../../components/helpers/isLoggedIn";
 
 async function addToWishList(req: NextApiRequest, res: NextApiResponse) {
-  if (req.query.token) {
-    let userDetails: any = jwtDecode(req.query.token as string);
+  const token: any = req.headers["authorization"];
+
+  if (token) {
+    let userDetails: any = jwtDecode(token as string);
 
     const movies = req.body.moviesIDs;
 
+    console.log(userDetails.data.id);
+
     const purchased = await prisma.purchases.findMany({
       where: {
-        userID: userDetails.id,
+        userID: userDetails.data.id,
         OR: movies.map((movieId: string) => ({
           moviesIDs: { has: movieId },
         })),
@@ -22,7 +26,7 @@ async function addToWishList(req: NextApiRequest, res: NextApiResponse) {
 
     const cart = await prisma.cart.findUniqueOrThrow({
       where: {
-        userID: userDetails.id,
+        userID: userDetails.data.id,
       },
     });
 
@@ -30,7 +34,7 @@ async function addToWishList(req: NextApiRequest, res: NextApiResponse) {
 
     const wishlist = await prisma.wishlist.findUniqueOrThrow({
       where: {
-        userID: userDetails.id,
+        userID: userDetails.data.id,
       },
     });
 
@@ -43,24 +47,21 @@ async function addToWishList(req: NextApiRequest, res: NextApiResponse) {
         !moviesInWishList.includes(x)
     );
 
-    const canBeAddedtoWishlist = !finalArray;
+    const canBeAddedtoWishlist = finalArray;
 
-    console.log(finalArray);
-    console.log(!canBeAddedtoWishlist);
-
-    if (!canBeAddedtoWishlist) {
-      const update = await prisma.wishlist.update({
-        where: {
-          userID: userDetails.id,
+    const update = await prisma.wishlist.update({
+      where: {
+        userID: userDetails.data.id,
+      },
+      data: {
+        moviesIDs: {
+          push: finalArray,
         },
-        data: {
-          moviesIDs: finalArray,
-        },
-      });
+      },
+    });
 
-      res.json(update);
-    }
+    res.json(update);
   }
 }
 
-export default isLoggedIn(addToWishList)
+export default addToWishList;
