@@ -67,3 +67,8 @@ model Discount {
   amount Float  @default(30)
   code   String
 }
+
+model Movie {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  price Int    @default(10)
+}

@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../lib/prisma";
 import axios, { AxiosResponse } from "axios";
 import jwtDecode from "jwt-decode";
+import getMovie from "@/components/helpers/getmovie";
 
 export default async function getUserDetails(
   req: NextApiRequest,
@@ -49,14 +50,3 @@ export default async function getUserDetails(
     console.log(purchasedMovies);
   }
 }
-
-const getMovie = async (id: string) => {
-  try {
-    const { data } = await axios.get(
-      `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}`
-    );
-    return data;
-  } catch {
-    return null;
-  }
-};

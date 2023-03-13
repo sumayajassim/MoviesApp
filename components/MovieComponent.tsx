@@ -3,7 +3,7 @@ import Movie from "@/types";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import Context from "@/context/context";
-import { toast } from "react-toastify";
+import { toast } from "react-toastify"
 import Image from "next/image";
 
 function MovieComponent(props) {

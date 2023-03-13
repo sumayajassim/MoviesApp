@@ -6,8 +6,7 @@ import Head from "next/head";
 import Link from "next/link"
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import Context from "@/context/context";
-import axios from 'axios'
-
+import axios from 'axios';
 
 function App() {
   const queryClient = useQueryClient()

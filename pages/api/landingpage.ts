@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
+import { prisma } from "../../lib/prisma";
 
 const API_KEY = process.env.API_KEY;
 if (!API_KEY) throw Error("API key is not provided");
