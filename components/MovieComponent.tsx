@@ -54,10 +54,13 @@ function MovieComponent(props) {
       },
     });
 
+  const handleMovieClick = (id: string) => {};
+
   return (
     <div
       className="h-96 min-w-fit max-w-fit rounded-md relative drop-shadow-md"
       key={movie.id}
+      onClick={() => handleMovieClick(movie.id)}
     >
       <img
         className="h-96 w-60 object-fill rounded-md"
