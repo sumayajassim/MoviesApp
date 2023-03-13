@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { prisma } from "../../lib/prisma";
+import { prisma } from "../../../lib/prisma";
 import jwtDecode from "jwt-decode";
 
 export default async function addToCart(
@@ -21,9 +21,6 @@ export default async function addToCart(
           OR: movies.map((movieId) => ({
             moviesIDs: { has: movieId },
           })),
-          // moviesIDs: {
-          //   has: movie
-          // },
           userID: userDetails.user.id,
         },
       })

@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import jwtDecode from "jwt-decode";
-import { prisma } from "../../lib/prisma";
+import { prisma } from "../../../lib/prisma";
 
 export default async function removeFromWishlist(
   req: NextApiRequest,

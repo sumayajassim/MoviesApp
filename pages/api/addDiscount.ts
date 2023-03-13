@@ -22,7 +22,7 @@ export default async function addDiscount(
   try {
     const data = await prisma.discount.create({
       data: {
-        user: { connect: { id } },
+        userID: { connect: id },
         amount: req.body.amount,
         code: req.body.code,
       },
