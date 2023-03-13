@@ -34,7 +34,7 @@ function Wishlist() {
   )
   return (
     <div className="z-50 w-110 absolute top-12 right-20 mt-1 font-normal bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600 overflow-auto max-h-128">
-        {wishlistItems}
+      {data.wishlist.length > 0 ? wishlistItems : (<p className='min-w-110 p-5 text-dark-grey'>You have nothing in your wishlist! </p>)}
     </div>
   )
 }

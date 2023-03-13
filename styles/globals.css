@@ -1,7 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
 .overflow{
     overflow-x: hidden;
@@ -19,17 +18,32 @@
   }
 } */
 
+/* @keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.box {
+  transition: opacity 3s;
+  animation: fadeIn 3s;
+} */
+
 @layer components {
   .btn-blue {
-    @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded;
+    /* @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded; */
   }
   .btn {
     @apply font-bold py-2 px-4 rounded cursor-pointer;
   }
   .btn-red {
-    /* @apply bg-red-700 text-white; */
+    @apply bg-red-700 text-white;
   }
-  .btn-red {
-    @apply bg-metal
-  }
+
+  /* input[type=text] {
+    @apply bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-red-700
+  } */
 }

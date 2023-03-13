@@ -12,6 +12,7 @@ export default async function getUserDetails(
 
   if (token) {
     let userDetails: any = jwtDecode(token as string);
+    console.log(userDetails)
     const user = await prisma.user.findUniqueOrThrow({
       where: {
         id: userDetails.data.id,
@@ -22,12 +23,6 @@ export default async function getUserDetails(
       },
     });
 
-    const getMovie = async (id: string) => {
-      const { data } = await axios.get(
-        `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}`
-      );
-      return data;
-    };
 
     if (user) {
       const wishlistMovies: any = await Promise.all(
@@ -36,7 +31,7 @@ export default async function getUserDetails(
       const cartMovies: any = await Promise.all(
         user.cart!.moviesIDs.map(async (id) => await getMovie(id))
       );
-      res.json({ wishlist: wishlistMovies, cart: cartMovies, user });
+      res.json({ wishlist: wishlistMovies.filter(Boolean), cart: cartMovies.filter(Boolean), user });
     } else {
       res.status(404).json("Something wrong happened");
     }
@@ -50,3 +45,16 @@ export default async function getUserDetails(
     console.log(purchasedMovies);
   }
 }
+
+
+const getMovie = async (id: string) => {
+  try{
+
+  const { data } = await axios.get(
+    `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}`
+  );
+  return data;
+} catch{
+  return null
+}
+};

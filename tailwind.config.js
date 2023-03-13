@@ -1,38 +1,62 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+// module.exports = {
   // mode: 'jit',
-  content: [
-    "./app/**/*.{js,ts,jsx,tsx}",
-    "./pages/**/*.{js,ts,jsx,tsx}",
-    './components/**/*.{js,ts,jsx,tsx}',
-    // "./node_modules/flowbite/**/*.js",
-    // Or if using `src` directory:
-  ],
+//   content: [
+//     "./app/**/*.{js,ts,jsx,tsx}",
+//     "./pages/**/*.{js,ts,jsx,tsx}",
+//     './components/**/*.{js,ts,jsx,tsx}',
+//     // "./node_modules/flowbite/**/*.js",
+//     // Or if using `src` directory:
+//   ],
+//   theme: {
+//     colors: {
+//       'white': '#ffffff',
+//       'grey' : '#e5e5e5',
+//       'black': '#000000',
+//       'yellow': '#ffd43b'
+//     },
+//     extend: {
+//       maxHeight: {
+//         '128': '32rem',
+//       },
+//       width:{
+//         '110': '27rem'
+//       }
+//     },
+//   },
+//   plugins: [
+//     // require("@tailwindcss/typography"),require('@tailwindcss/forms')
+//   ],
+// }
+
+module.exports = {
+  content: ['./pages/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
   theme: {
-    colors: {
-      transparent: 'transparent',
-      current: 'currentColor',
-      'white': '#ffffff',
-      'purple': '#3f3cbb',
-      'midnight': '#121063',
-      'metal': '#565584',
-      'tahiti': '#3ab7bf',
-      'silver': '#ecebff',
-      'bubble-gum': '#ff77e9',
-      'bermuda': '#78dcca',
-      'black': '#000000',
-      'yellow': '#ffd43b'
+    borderWidth: {
+      '1': '1px',
     },
     extend: {
+      colors: {
+        'white': '#ffffff',
+        'dark-grey' : '#808080',
+        'black': '#000000',
+        'yellow': '#ffd43b'
+      },
       maxHeight: {
         '128': '32rem',
       },
       width:{
-        '110': '27rem'
+        '110': '27rem',
+        '200': '35rem'
+      },
+      height: {
+        "50v": "50vh"
       }
     },
+   
   },
-  plugins: [
-    // require('flowbite/plugin')
-  ],
+  variants: {
+    extend: {},
+  },
+  plugins: [],
 }

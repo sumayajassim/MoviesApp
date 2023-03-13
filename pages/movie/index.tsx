@@ -5,13 +5,14 @@ import Context from "@/context/context";
 import MovieComponent from "@/components/MovieComponent";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
+import { useDebounce } from 'use-debounce';
 
 function index(props: any) {
   const queryClient = useQueryClient();
   const { ref, inView } = useInView();
   const [search, setSearch] = useState("");
   const [genre, setGenre] = useState("");
-
+  const [value] = useDebounce(search, 1000);
 
   const context = useContext(Context);
   let token:string = ''
