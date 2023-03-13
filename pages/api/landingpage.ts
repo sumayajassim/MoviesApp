@@ -14,21 +14,25 @@ export default async function landingpage(
       id: Math.floor(Math.random() * 10),
       title: "TRENDING MOVIES",
       movies: await trendingMovies(),
+      price : 10
     },
     {
       id: Math.floor(Math.random() * 10000),
       title: "TOP RATED ",
       movies: await topRated(),
+      price : 10
     },
     {
       id: Math.floor(Math.random() * 100),
       title: "UPCOMING MOVIES",
       movies: await UpcomingMovies(),
+      price : 10
     },
     {
       id: Math.floor(Math.random() * 1000),
       title: "NOW PLAYING IN THEATRES",
       movies: await nowPlaying(),
+      price : 10
     },
   ]);
 }
