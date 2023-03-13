@@ -79,13 +79,13 @@ export default async function signup(
             cart: { create: {} },
           },
         })
-        .then((data: any) => {
-          const userPass = data.password;
+        .then((user: any) => {
+          const userPass = user.password;
           const verifired = bcrypt.compare(req.body.password, userPass);
 
           verifired.then((istrue) => {
             if (istrue && SECRET_KEY) {
-              const token = jwt.sign({ data }, SECRET_KEY, {
+              const token = jwt.sign({ user }, SECRET_KEY, {
                 expiresIn: 604800,
               });
               //  getUserDetails(data);
