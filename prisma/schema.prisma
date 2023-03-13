@@ -1,13 +1,15 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
 
 generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
+enum Role {
+  ADMIN
+  DEFAULT
 }
 
 model User {
@@ -17,11 +19,13 @@ model User {
   emailAddress String      @unique
   password     String
   balance      Int         @default(100)
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
   wishlist     wishlist?
   purchases    Purchases[]
-  reviews      Review[]
+  reviews      review[]
   cart         Cart?
-  admin        Boolean?    @default(false)
+  role         Role        @default(DEFAULT)
 }
 
 model wishlist {
@@ -38,12 +42,10 @@ model Purchases {
   moviesIDs String[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  amount    Int
-  rate      Int
-  comment   String
+  amount    Float
 }
 
-model Review {
+model review {
   id      String @id @default(auto()) @map("_id") @db.ObjectId
   user    User   @relation(fields: [userID], references: [id], onDelete: Cascade)
   userID  String @unique @db.ObjectId
@@ -53,19 +55,15 @@ model Review {
 }
 
 model Cart {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  user     User     @relation(fields: [userID], references: [id], onDelete: Cascade)
-  userID   String   @unique @db.ObjectId
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  user      User     @relation(fields: [userID], references: [id], onDelete: Cascade)
+  userID    String   @unique @db.ObjectId
   moviesIDs String[]
 }
 
 model Discount {
-  id   String @id @default(auto()) @map("_id") @db.ObjectId
-  code String
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userID String @db.ObjectId
+  amount Float  @default(30)
+  code   String
 }
-
-model Movie {
-  id    String @id @default(auto()) @map("_id") @db.ObjectId
-  price Int    @default(10)
-}
-

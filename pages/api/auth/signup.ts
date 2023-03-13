@@ -1,16 +1,14 @@
-import { toast } from 'react-toastify';
 import type { NextApiRequest, NextApiResponse } from "next";
-import { prisma } from "../../lib/prisma";
+import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-
 
 export default async function signup(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const SECRET_KEY = process.env.SECRET_KEY
-  if(!SECRET_KEY) throw Error('Secret key is not provided!')
+  const SECRET_KEY = process.env.SECRET_KEY;
+  if (!SECRET_KEY) throw Error("Secret key is not provided!");
 
   function validFirstName() {
     if (req.body.firstName.length > 3 && req.body.firstName.length < 25) {
@@ -81,25 +79,25 @@ export default async function signup(
             cart: { create: {} },
           },
         })
-        .then((data) => {
-        
+        .then((data: any) => {
           const userPass = data.password;
           const verifired = bcrypt.compare(req.body.password, userPass);
 
           verifired.then((istrue) => {
             if (istrue && SECRET_KEY) {
-              const token = jwt.sign({data} , SECRET_KEY, {expiresIn: 604800})
-            //  getUserDetails(data);
-            res.json({token})
+              const token = jwt.sign({ data }, SECRET_KEY, {
+                expiresIn: 604800,
+              });
+              //  getUserDetails(data);
+              res.json({ token });
             } else {
               res.status(400).json({ message: "Wrong Password" });
             }
           });
         })
-        .catch((err) => {
-          res.status(400).json({message: 'Email is already registered '})
+        .catch((err: any) => {
+          res.status(400).json({ message: "Email is already registered " });
         });
     });
   }
-
 }

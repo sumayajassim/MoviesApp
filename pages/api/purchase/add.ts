@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { prisma } from "../../lib/prisma";
+import { prisma } from "../../../lib/prisma";
 import jwtDecode from "jwt-decode";
 
 export default async function purchase(
@@ -21,8 +21,6 @@ export default async function purchase(
         },
       })
     ).flatMap(({ moviesIDs }) => moviesIDs);
-
-    const isPurchasedBefore = !!purchased;
 
     const toBePurchased = movies.filter(
       (id: string) => !purchased.includes(id)
@@ -54,26 +52,22 @@ export default async function purchase(
       try {
         res.json(data);
 
-      const userBudget  = userDetails.balance
-      let priceAfterdiscount = req.body.amount - discountAmount
+        const userBudget = userDetails.balance;
+        let priceAfterdiscount = req.body.amount - discountAmount;
 
-      const deduction = await prisma.user.update({
-        where:{
-          id: userDetails.id
-        },
-        data:{
-          balance : userBudget - priceAfterdiscount
-        }
-      })
-
+        const deduction = await prisma.user.update({
+          where: {
+            id: userDetails.id,
+          },
+          data: {
+            balance: userBudget - priceAfterdiscount,
+          },
+        });
       } catch (error) {
         console.log(error);
       }
     } else {
       res.status(401).json("please add items");
     }
-
-
-
   }
 }
