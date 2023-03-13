@@ -40,7 +40,7 @@ export default async function userDetails(
   res.json({
     user: {
       username: userDetails.user.firstName + " " + userDetails.user.firstName,
-      userEmail: userDetails.useremailAddress,
+      userEmail: userDetails.user.emailAddress,
       userBalance: userDetails.user.balance,
     },
     wishlist: userWishlistMovieDetails.filter(Boolean),
