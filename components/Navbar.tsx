@@ -28,12 +28,16 @@ function Navbar() {
     }
   };
 
-  console.log({ isLoggedIn });
+  // console.log({ isLoggedIn });
 
   return (
     <>
-      <div className="bg-white drop-shadow flex fixed z-50 place-items-center w-full px-8 text-red-700 h-12 flex-row justify-between">
-        <div className={` ${isLoggedIn ? "flex" : "hidden"}`}>
+      <div className="bg-white drop-shadow flex fixed z-50 place-items-center w-full px-8 text-red-700 h-12 flex-row">
+        <div
+          className={` ${
+            isLoggedIn ? "flex" : "hidden"
+          } justify-between w-full`}
+        >
           <div className={`flex-row space-x-4 list-none flex`}>
             <Link href="/" className=" btn">
               Home
@@ -42,7 +46,7 @@ function Navbar() {
               Movies
             </Link>
           </div>
-          <div className="flex flex-row list-none">
+          <div className="flex flex-row list-none justify-end">
             <li className="btn btn--link">
               <button onClick={() => setShowModal(true)} type="button">
                 Cart
@@ -65,7 +69,11 @@ function Navbar() {
           </div>
         </div>
 
-        <div className={`${!isLoggedIn ? "flex" : "hidden"}`}>
+        <div
+          className={`${
+            !isLoggedIn ? "flex" : "hidden"
+          } justify-between w-full`}
+        >
           <div className={`flex flex-row space-x-4 list-none`}>
             <Link href="/" className="drawer-button btn">
               Home

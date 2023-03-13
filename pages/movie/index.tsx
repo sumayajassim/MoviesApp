@@ -1,11 +1,11 @@
-import React, { useState, useEffect , useContext} from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Context from "@/context/context";
 import MovieComponent from "@/components/MovieComponent";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
-import { useDebounce } from 'use-debounce';
+import { useDebounce } from "use-debounce";
 
 function index(props: any) {
   const queryClient = useQueryClient();
@@ -15,18 +15,19 @@ function index(props: any) {
   const [value] = useDebounce(search, 1000);
 
   const context = useContext(Context);
-  let token:string = ''
+  let token: string = "";
   useEffect(() => {
     if (typeof window !== "undefined") {
-       token = localStorage.getItem("token");
-       axios.get('/api/getUserDetails' , {headers: {"Authorization" : token }})
-       .then((res) => {
-          context.setData(res.data)
-       })
-    }else{
-      console.log('no token for you ')
+      token = localStorage.getItem("token");
+      axios
+        .get("/api/getUserDetails", { headers: { Authorization: token } })
+        .then((res) => {
+          context.setData(res.data);
+        });
+    } else {
+      console.log("no token for you ");
     }
-  },[])
+  }, []);
 
   const {
     data,
@@ -44,7 +45,7 @@ function index(props: any) {
       searchText = search,
     }) => {
       const res = await axios.get(
-        `/api/moviespage?page=${pageParam}&search=${searchText}&genre=${genreId}`
+        `/api/movie?page=${pageParam}&search=${searchText}&genre=${genreId}`
       );
       return res.data;
     },
@@ -57,7 +58,7 @@ function index(props: any) {
 
   const { data: genres } = useQuery({
     queryKey: ["genres"],
-    queryFn: () => axios.get("/api/genres"),
+    queryFn: () => axios.get("/api/movie/genres"),
   });
 
   console.log("genres", genres);

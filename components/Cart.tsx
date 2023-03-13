@@ -36,7 +36,7 @@ export default function Modal(props) {
         className="w-20 h-32 drop-shadow-lg rounded"
         src={
           item.poster_path
-            ? `https://image.tmdb.org/t/p/original/${item.poster_path}`
+            ? `${item.poster_path}`
             : "https://www.altavod.com/assets/images/poster-placeholder.png"
         }
         alt=""
