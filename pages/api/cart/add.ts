@@ -10,7 +10,7 @@ export default async function addToCart(
 
   if (token) {
     let userDetails: any = jwtDecode(token as string);
-    const id = userDetails.data.id
+    const id = userDetails.data.id;
 
     const movies: string[] = req.body.moviesIDs || [];
 
@@ -42,16 +42,16 @@ export default async function addToCart(
     );
 
     if (purchased.includes(movies[0])) {
-      res.status(401).json({message: "Movie Is Already Purchased"});
+      res.status(401).json({ message: "Movie Is Already Purchased" });
     } else if (userMoviesInCart.includes(movies[0])) {
-      res.status(401).json({message :"Movie Is Already In Cart"});
+      res.status(401).json({ message: "Movie Is Already In Cart" });
     } else if (
       !purchased.includes(movies[0]) &&
       !userMoviesInCart.includes(movies[0])
     ) {
       const updateCart = await prisma.cart.update({
         where: {
-          userID: id
+          userID: id,
         },
         data: {
           moviesIDs: {
@@ -62,5 +62,7 @@ export default async function addToCart(
 
       res.json({ message: "Movie Added To Cart", updateCart });
     }
+  } else {
+    res.json("UnAuthorized - sign in if you have an account or sign up");
   }
 }
