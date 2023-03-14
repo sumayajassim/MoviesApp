@@ -45,7 +45,7 @@ function index(props: any) {
       searchText = search,
     }) => {
       const res = await axios.get(
-        `/api/movie?page=${pageParam}&search=${searchText}&genre=${genreId}`
+        `/api/movie/test?page=${pageParam}&search=${searchText}&genre=${genreId}`
       );
       return res.data;
     },

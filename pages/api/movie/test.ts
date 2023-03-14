@@ -2,7 +2,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 import { prisma } from "../../../lib/prisma";
 import jwtDecode from "jwt-decode";
-import movie from "./[id]";
 
 const API_KEY = process.env.API_KEY;
 
