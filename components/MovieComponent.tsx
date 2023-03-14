@@ -3,11 +3,12 @@ import Movie from "@/types";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import Context from "@/context/context";
-import { toast } from "react-toastify"
-import Image from "next/image";
+import { toast } from "react-toastify";
+import { useRouter } from "next/router";
 
 function MovieComponent(props) {
   const { movie } = props;
+  const router = useRouter();
   const { data, setData } = useContext(Context);
 
   const { mutate: handleLikeClick, isLoading: handleAddWishlistLoading } =
@@ -54,8 +55,9 @@ function MovieComponent(props) {
       },
     });
 
-  const handleMovieClick = (id: string) => {};
-
+  const handleMovieClick = (id: string) => {
+    router.push(`movie/${id}`);
+  };
   return (
     <div
       className="h-96 min-w-fit max-w-fit rounded-md relative drop-shadow-md"
@@ -66,7 +68,7 @@ function MovieComponent(props) {
         className="h-96 w-60 object-fill rounded-md"
         src={
           movie.poster_path
-            ? movie.poster_path
+            ? `https://image.tmdb.org/t/p/original/${movie.poster_path}`
             : "https://www.altavod.com/assets/images/poster-placeholder.png"
         }
         alt=""
