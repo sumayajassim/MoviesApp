@@ -1,6 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
-import { DarkThemeToggle } from "flowbite-react";
+import { prisma } from "../../../lib/prisma";
+import jwtDecode from "jwt-decode";
+import movie from "./[id]";
 
 const API_KEY = process.env.API_KEY;
 
@@ -8,45 +10,121 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
   const pageNumber = req.query.page;
   const genreId = req.query.genre;
 
-  const { data } = await axios.get(
-    `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=original_title.asc&include_adult=false&include_video=false&page=${pageNumber}&with_watch_monetization_types=flatrate&with_genres=${genreId}`
-  );
+  const token = req.headers["authorization"];
 
-  const movieIdsArray = data.results.map(
-    (movie: string, index: any) => data.results[index].id
-  );
+  if (!token) {
+    const { data } = await axios.get(
+      `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=original_title.asc&include_adult=false&include_video=false&page=${pageNumber}&with_watch_monetization_types=flatrate&with_genres=${genreId}`
+    );
 
-  const trendingMovies = await axios.get(
-    "https://api.themoviedb.org/3/discover/movie?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1"
-  );
+    const movieIdsArray = data.results.map(
+      (movie: string, index: any) => data.results[index].id
+    );
 
-  const trendingMoviesArray = data.results.map(
-    (movie: string, index: any) => trendingMovies.data.results[index].id
-  );
+    const trendingMovies = await axios.get(
+      "https://api.themoviedb.org/3/discover/movie?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1"
+    );
 
-  const topRatedMovies = await axios.get(
-    `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&language=en-US&page=1`
-  );
+    const trendingMoviesArray = data.results.map(
+      (movie: string, index: any) => trendingMovies.data.results[index].id
+    );
 
-  const topRatedMoviesArray = data.results.map(
-    (movie: string, index: any) => topRatedMovies.data.results[index].id
-  );
+    const topRatedMovies = await axios.get(
+      `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&language=en-US&page=1`
+    );
 
-  const UpcomingMovies = await axios.get(
-    `https://api.themoviedb.org/3/movie/upcoming?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&page=1`
-  );
+    const topRatedMoviesArray = data.results.map(
+      (movie: string, index: any) => topRatedMovies.data.results[index].id
+    );
 
-  const UpcomingMoviesArray = data.results.map(
-    (movie: string, index: any) => UpcomingMovies.data.results[index].id
-  );
+    const UpcomingMovies = await axios.get(
+      `https://api.themoviedb.org/3/movie/upcoming?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&page=1`
+    );
 
-  movieIdsArray.map((movie: string, index: any) => {
-    trendingMoviesArray.includes(movie) ||
-    topRatedMoviesArray.includes(movie) ||
-    UpcomingMoviesArray.includes(movie)
-      ? (data.results[index].price = 10)
-      : (data.results[index].price = 5);
+    const UpcomingMoviesArray = data.results.map(
+      (movie: string, index: any) => UpcomingMovies.data.results[index].id
+    );
+
+    movieIdsArray.map((movie: string, index: any) => {
+      trendingMoviesArray.includes(movie) ||
+      topRatedMoviesArray.includes(movie) ||
+      UpcomingMoviesArray.includes(movie)
+        ? (data.results[index].price = 10)
+        : (data.results[index].price = 5);
+    });
+
+    return res.json(data.results);
+  }
+
+  // authorized
+
+  const userDetails: any = jwtDecode(token as string);
+  //   console.log(userDetails);
+
+  //   const { data } = await axios.get(
+  //     `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=original_title.asc&include_adult=false&include_video=false&page=${pageNumber}&with_watch_monetization_types=flatrate&with_genres=${genreId}`
+  //   );
+
+  //   const movieIdsArray = data.results.map(
+  //     (movie: string, index: any) => data.results[index].id
+  //   );
+
+  //   const trendingMovies = await axios.get(
+  //     "https://api.themoviedb.org/3/discover/movie?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1"
+  //   );
+
+  //   const trendingMoviesArray = data.results.map(
+  //     (movie: string, index: any) => trendingMovies.data.results[index].id
+  //   );
+
+  //   const topRatedMovies = await axios.get(
+  //     `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&language=en-US&page=1`
+  //   );
+
+  //   const topRatedMoviesArray = data.results.map(
+  //     (movie: string, index: any) => topRatedMovies.data.results[index].id
+  //   );
+
+  //   const UpcomingMovies = await axios.get(
+  //     `https://api.themoviedb.org/3/movie/upcoming?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&page=1`
+  //   );
+
+  //   const UpcomingMoviesArray = data.results.map(
+  //     (movie: string, index: any) => UpcomingMovies.data.results[index].id
+  //   );
+
+  //   movieIdsArray.map((movie: string, index: any) => {
+  //     trendingMoviesArray.includes(movie) ||
+  //     topRatedMoviesArray.includes(movie) ||
+  //     UpcomingMoviesArray.includes(movie)
+  //       ? (data.results[index].price = 10)
+  //       : (data.results[index].price = 5);
+  //   });
+
+  const purchases = await prisma.purchases.findMany({
+    where: {
+      userID: userDetails.user.id,
+    },
   });
 
-  res.json(data.results);
+  purchases.flatMap((x) => x.moviesIDs);
+  console.log(purchases);
+
+  //   const cart = await prisma.cart.findUniqueOrThrow({
+  //     where: {
+  //       userID: userDetails.user.id,
+  //     },
+  //   });
+
+  //  const userCart = cart.moviesIDs
+
+  //  const wishlist = await prisma.wishlist.findUniqueOrThrow({
+  //     where:{
+  //         userID: userDetails.user.id
+  //     }
+  //  })
+
+  //  const userWishlist = wishlist.moviesIDs
+
+  //   res.json(data.results);
 }

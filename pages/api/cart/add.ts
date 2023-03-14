@@ -63,6 +63,8 @@ export default async function addToCart(
       res.json({ message: "Movie Added To Cart", updateCart });
     }
   } else {
-    res.json("UnAuthorized - sign in if you have an account or sign up");
+    res
+      .status(401)
+      .json("UnAuthorized - sign in if you have an account or sign up");
   }
 }
