@@ -44,7 +44,7 @@ function AuthForms(props: { status: Boolean }) {
   return (
     <div
       id="drawer-right-example"
-      className="fixed top-14 right-2 z-40 min-h-fit p-4 overflow-y-auto transition-transform translate-x-full bg-white w-80 dark:bg-gray-800 rounded-2xl"
+      className="fixed top-14 right-0 z-40 min-h-fit p-4 overflow-y-auto transition-transform translate-x-full bg-white w-80 dark:bg-gray-800 rounded-2xl"
       tabIndex="-1"
       aria-labelledby="drawer-right-label"
     >
