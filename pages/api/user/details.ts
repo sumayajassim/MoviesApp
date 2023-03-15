@@ -20,18 +20,28 @@ export default async function details2(
     },
   });
 
-  //   res.json(user.purchases.length);
-
-  const userWishlist = userDetails.user.wishlist.moviesIDs;
+  const userWishlist = await prisma.wishlist.findUniqueOrThrow({
+    where: {
+      userID: userDetails.user.id,
+    },
+  });
 
   const userWishlistMovieDetails = await Promise.all(
-    userWishlist.map(async (movieID: string) => await getMovie(movieID))
+    userWishlist.moviesIDs.map(
+      async (movieID: string) => await getMovie(movieID)
+    )
   );
 
-  const userCartMovies = userDetails.user.cart.moviesIDs;
+  const userCartMovies = await prisma.cart.findUniqueOrThrow({
+    where: {
+      userID: userDetails.user.id,
+    },
+  });
 
   const userCartMoviesDetails = await Promise.all(
-    userCartMovies.map(async (movieID: string) => await getMovie(movieID))
+    userCartMovies.moviesIDs.map(
+      async (movieID: string) => await getMovie(movieID)
+    )
   );
 
   if (user.purchases.length > 0) {
