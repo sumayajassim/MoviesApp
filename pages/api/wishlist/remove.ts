@@ -14,7 +14,7 @@ export default async function removeFromWishlist(
 
     const wishlist = await prisma.wishlist.findUniqueOrThrow({
       where: {
-        userID: userDetails.data.id,
+        userID: userDetails.user.id,
       },
     });
 
@@ -24,7 +24,7 @@ export default async function removeFromWishlist(
 
     const removeWishList = await prisma.wishlist.update({
       where: {
-        userID: userDetails.data.id,
+        userID: userDetails.user.id,
       },
       data: {
         moviesIDs: finalArray,
