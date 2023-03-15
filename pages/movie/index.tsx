@@ -45,7 +45,8 @@ function index(props: any) {
       searchText = search,
     }) => {
       const res = await axios.get(
-        `/api/movie/test?page=${pageParam}&search=${searchText}&genre=${genreId}`
+        `/api/movie/test?page=${pageParam}&search=${searchText}&genre=${genreId}`,
+        { headers: { Authorization: localStorage.getItem("token") } }
       );
       return res.data;
     },

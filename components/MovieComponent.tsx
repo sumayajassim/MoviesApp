@@ -87,10 +87,24 @@ function MovieComponent(props) {
       <div className="absolute bottom-0 bg-red w-60 h-10 rounded-br-md rounded-bl-md p-4 flex justify-between">
         {/* <span className="text-red-700"></span> */}
         {/* <span>{movie.vote_average}</span> */}
-        <button className="" onClick={() => handleLikeClick(movie.id)}>
+        <button
+          className=""
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleLikeClick(movie.id);
+          }}
+        >
           <i className="fa-regular fa-heart"></i>
         </button>
-        <button className="" onClick={() => handleAddToCartClick(movie)}>
+        <button
+          className=""
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleAddToCartClick(movie);
+          }}
+        >
           <i className="fa-solid fa-cart-plus"></i>
         </button>
       </div>
