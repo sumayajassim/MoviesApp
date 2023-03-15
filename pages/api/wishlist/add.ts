@@ -42,11 +42,11 @@ async function addToWishList(req: NextApiRequest, res: NextApiResponse) {
     const moviesInWishList = wishlist.moviesIDs;
 
     if (moviesInWishList.includes(req.body.moviesIDs[0])) {
-      res.status(409).json("Movie Is ALready In the Wishlist");
+      res.status(409).json({ message: "Movie Is ALready In the Wishlist" });
     } else if (moviesInCart.includes(req.body.moviesIDs[0])) {
-      res.status(409).json("Movie Is ALready In Cart");
+      res.status(409).json({ message: "Movie Is ALready In Cart" });
     } else if (purchasedMovies.includes(req.body.moviesIDs[0])) {
-      res.status(409).json("Movie Is ALready Purchased");
+      res.status(409).json({ message: "Movie Is ALready Purchased" });
     } else if (
       !moviesInWishList.includes(req.body.moviesIDs[0]) &&
       !moviesInCart.includes(req.body.moviesIDs[0]) &&
