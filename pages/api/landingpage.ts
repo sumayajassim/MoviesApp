@@ -57,18 +57,126 @@ export default async function landingpage(
 
   const trendingMovies1 = await trendingMovies();
 
-  const trendingMoviesArray = trendingMovies1.map((movie: any) => movie.id);
+  trendingMovies1.map((x: any, index: any) => {
+    purchasedMovies.includes(x.id)
+      ? (trendingMovies1[index].isPurchased = true)
+      : (trendingMovies1[index].isPurchased = false);
+  });
 
-  console.log(trendingMoviesArray.has(10));
+  const cart = await prisma.cart.findUniqueOrThrow({
+    where: {
+      userID: userDetails.user.id,
+    },
+  });
 
-  // purchasedMovies.map((x: any, index: number) => {
-  //   // trendingMoviesArray.includes(x)
-  //   //   ? (trendingMovies1[index].isPurchased = true)
-  //   //   : (trendingMovies1[index].isPurchased = false);
-  //   console.log(trendingMovies1[index]);
-  // });
+  const moviesInCart = cart.moviesIDs;
 
-  // res.json(trendingMovies1);
+  trendingMovies1.map((x: any, index: any) => {
+    moviesInCart.includes(x)
+      ? (trendingMovies1[index].inCart = true)
+      : (trendingMovies1[index].inCart = false);
+  });
+
+  const wishlist = await prisma.wishlist.findUniqueOrThrow({
+    where: {
+      userID: userDetails.user.id,
+    },
+  });
+
+  const moviesInWishlist = wishlist.moviesIDs;
+
+  trendingMovies1.map((x: any, index: any) => {
+    moviesInWishlist.includes(x)
+      ? (trendingMovies1[index].inWishlist = true)
+      : (trendingMovies1[index].inWishlist = false);
+  });
+
+  const upcomingMovies1 = await UpcomingMovies();
+
+  upcomingMovies1.map((x: any, index: any) => {
+    purchasedMovies.includes(x.id)
+      ? (upcomingMovies1[index].isPurchased = true)
+      : (upcomingMovies1[index].isPurchased = false);
+  });
+
+  upcomingMovies1.map((x: any, index: any) => {
+    moviesInCart.includes(x)
+      ? (upcomingMovies1[index].inCart = true)
+      : (upcomingMovies1[index].inCart = false);
+  });
+
+  upcomingMovies1.map((x: any, index: any) => {
+    moviesInWishlist.includes(x)
+      ? (upcomingMovies1[index].inWishlist = true)
+      : (upcomingMovies1[index].inWishlist = false);
+  });
+
+  const nowPlayingMovies = await nowPlaying();
+
+  nowPlayingMovies.map((x: any, index: any) => {
+    purchasedMovies.includes(x.id)
+      ? (nowPlayingMovies[index].isPurchased = true)
+      : (nowPlayingMovies[index].isPurchased = false);
+  });
+
+  nowPlayingMovies.map((x: any, index: any) => {
+    moviesInCart.includes(x)
+      ? (nowPlayingMovies[index].inCart = true)
+      : (nowPlayingMovies[index].inCart = false);
+  });
+
+  nowPlayingMovies.map((x: any, index: any) => {
+    moviesInWishlist.includes(x)
+      ? (nowPlayingMovies[index].inWishlist = true)
+      : (nowPlayingMovies[index].inWishlist = false);
+  });
+
+  const topRatedMovies = await topRated();
+
+  topRatedMovies.map((x: any, index: any) => {
+    purchasedMovies.includes(x.id)
+      ? (topRatedMovies[index].isPurchased = true)
+      : (topRatedMovies[index].isPurchased = false);
+  });
+
+  topRatedMovies.map((x: any, index: any) => {
+    moviesInCart.includes(x)
+      ? (topRatedMovies[index].inCart = true)
+      : (topRatedMovies[index].inCart = false);
+  });
+
+  topRatedMovies.map((x: any, index: any) => {
+    moviesInWishlist.includes(x)
+      ? (topRatedMovies[index].inWishlist = true)
+      : (topRatedMovies[index].inWishlist = false);
+  });
+
+  res.json([
+    {
+      id: Math.floor(Math.random() * 10),
+      title: "TRENDING MOVIES",
+      movies: trendingMovies1,
+      price: 10,
+    },
+    {
+      id: Math.floor(Math.random() * 10000),
+      title: "TOP RATED ",
+      movies: topRatedMovies,
+      price: 10,
+    },
+    {
+      id: Math.floor(Math.random() * 100),
+      title: "UPCOMING MOVIES",
+      movies: upcomingMovies1,
+      price: 10,
+    },
+    {
+      id: Math.floor(Math.random() * 1000),
+      title: "NOW PLAYING IN THEATRES",
+      movies: nowPlayingMovies,
+      price: 10,
+    },
+  ]);
 }
 
 async function trendingMovies() {
