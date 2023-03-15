@@ -5,7 +5,7 @@ import Context from "@/context/context";
 import MovieComponent from "@/components/MovieComponent";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
-import { useDebounce } from "use-debounce";
+import { useDebounce } from "use-debounce"
 
 function index(props: any) {
   const queryClient = useQueryClient();

@@ -19,34 +19,33 @@ export default async function getUserDetails(
       where: {
         id: id,
       },
-      include: {
-        wishlist: true,
-        cart: true,
-      },
     });
 
-    if (user) {
-      const wishlistMovies: any = await Promise.all(
-        user.wishlist!.moviesIDs.map(async (id) => await getMovie(id))
-      );
-      const cartMovies: any = await Promise.all(
-        user.cart!.moviesIDs.map(async (id) => await getMovie(id))
-      );
-      res.json({
-        wishlist: wishlistMovies.filter(Boolean),
-        cart: cartMovies.filter(Boolean),
-        user,
-      });
-    } else {
-      res.status(404).json("Something wrong happened");
-    }
+    res.json(user);
 
-    const purchasedMovies = await prisma.purchases.findUniqueOrThrow({
-      where: {
-        userID: id,
-      },
-    });
+    //   if (user) {
+    //     const wishlistMovies: any = await Promise.all(
+    //       user.wishlist!.moviesIDs.map(async (id) => await getMovie(id))
+    //     );
+    //     const cartMovies: any = await Promise.all(
+    //       user.cart!.moviesIDs.map(async (id) => await getMovie(id))
+    //     );
+    //     res.json({
+    //       wishlist: wishlistMovies.filter(Boolean),
+    //       cart: cartMovies.filter(Boolean),
+    //       user,
+    //     });
+    //   } else {
+    //     res.status(404).json("Something wrong happened");
+    //   }
 
-    console.log(purchasedMovies);
+    //   const purchasedMovies = await prisma.purchases.findUniqueOrThrow({
+    //     where: {
+    //       userID: id,
+    //     },
+    //   });
+
+    //   console.log(purchasedMovies);
+    // }
   }
 }
