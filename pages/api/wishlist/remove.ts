@@ -10,6 +10,7 @@ export default async function removeFromWishlist(
 
   if (token) {
     let userDetails: any = jwtDecode(token as string);
+    // res.json(userDetails.user.wishlist.moviesIDs);
     const movies = req.body.moviesIDs;
 
     const wishlist = await prisma.wishlist.findUniqueOrThrow({
@@ -20,7 +21,10 @@ export default async function removeFromWishlist(
 
     const moviesInWishlist = wishlist.moviesIDs;
 
+    console.log(movies);
+
     const finalArray = moviesInWishlist.filter((x: any) => !movies.includes(x));
+    console.log(finalArray);
 
     const removeWishList = await prisma.wishlist.update({
       where: {
