@@ -18,7 +18,7 @@ model User {
   lastName     String
   emailAddress String      @unique
   password     String
-  balance      Int         @default(100)
+  balance      Float       @default(100)
   createdAt    DateTime    @default(now()) @map("created_at")
   updatedAt    DateTime    @updatedAt @map("updated_at")
   wishlist     wishlist?
@@ -38,7 +38,7 @@ model wishlist {
 model Purchases {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   user      User     @relation(fields: [userID], references: [id], onDelete: Cascade)
-  userID    String   @unique @db.ObjectId
+  userID    String   @db.ObjectId
   moviesIDs String[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
