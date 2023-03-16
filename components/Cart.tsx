@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import AppContext from "@/context/context";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -10,6 +10,14 @@ export default function Modal(props) {
   const [discount, setDiscount] = useState(false);
   const [coupon, setCoupon] = useState("");
 
+  const queryClient = useQueryClient();
+  const { data: userDetails, isLoading: userDetailsLoading } = useQuery({
+    queryKey: ["userDetails"],
+    queryFn: () =>
+      axios.get("/api/user/details", {
+        headers: { Authorization: localStorage.getItem("token") },
+      }),
+  });
   const { mutate: handelRemoveFromCart, isLoading: removeHandlerLoading } =
     useMutation({
       mutationFn: (movieID: any) =>
@@ -19,19 +27,13 @@ export default function Modal(props) {
           { headers: { Authorization: localStorage.getItem("token") } }
         ),
       onSuccess: (res, movieID) => {
-        const newCartItems = data.cart.filter(
-          (movie: any) => movie.id !== movieID
-        );
-        // console.log('newWishlist', newWishlist)
-        setData((data) => {
-          return { ...data, wishlist: newCartItems };
-        });
+        queryClient.invalidateQueries(["userDetails"]);
         toast.success("Movie removed successfully from your cart!");
       },
     });
 
-  const cartItems = data.cart?.map((item) => (
-    <li className="border-t-1 border-b-1 list-none p-4 flex items-center">
+  const cartItems = userDetails?.data.cart?.map((item) => (
+    <li className="border-t-1 border-b-1 list-none py-4 px-8 flex items-center">
       <img
         className="w-20 h-32 drop-shadow-lg rounded"
         src={
@@ -51,14 +53,16 @@ export default function Modal(props) {
           ))}
         </div>
         <div className="">
-          <i
-            className="fa-solid fa-trash text-red-500 text-sm btn pl-0"
-            onClick={() => handleRemoveFromCart(item.id)}
-          ></i>
-          <i className="fa-solid fa-heart text-red-500 text-sm btn"></i>
+          {/* <i className="fa-solid fa-heart text-red-500 text-sm btn" ></i> */}
         </div>
       </div>
-      <span className="text-2xl font-bold ">$50</span>
+      <span className="flex flex-col text-2xl font-bold grow items-end">
+        $50
+        <i
+          className="fa-solid fa-trash text-red-500 text-xl pl-0"
+          onClick={() => handelRemoveFromCart(item.id)}
+        ></i>
+      </span>
     </li>
   ));
 
@@ -67,7 +71,7 @@ export default function Modal(props) {
       {props.showModal ? (
         <>
           <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-non box">
-            <div className="relative w-auto my-6 mx-auto max-w-4xl ">
+            <div className="relative  my-6 mx-auto min-w-[50rem] ">
               {/*content*/}
               <div className="border-0 rounded-lg shadow-lg  relative flex flex-col w-full bg-white outline-none focus:outline-none">
                 {/*header*/}

@@ -30,3 +30,9 @@ export interface Movie {
 export type AuthorizedUser {
     id: string
 }
+
+export interface User {
+    userName: string;
+    email:    string;
+    balance:  number;
+}

@@ -5,7 +5,7 @@ import Context from "@/context/context";
 import MovieComponent from "@/components/MovieComponent";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
-import { useDebounce } from "use-debounce"
+import { useDebounce } from "use-debounce";
 
 function index(props: any) {
   const queryClient = useQueryClient();
@@ -14,20 +14,20 @@ function index(props: any) {
   const [genre, setGenre] = useState("");
   const [value] = useDebounce(search, 1000);
 
-  const context = useContext(Context);
-  let token: string = "";
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      token = localStorage.getItem("token");
-      axios
-        .get("/api/getUserDetails", { headers: { Authorization: token } })
-        .then((res) => {
-          context.setData(res.data);
-        });
-    } else {
-      console.log("no token for you ");
-    }
-  }, []);
+  // const context = useContext(Context);
+  // let token: string = "";
+  // useEffect(() => {
+  //   if (typeof window !== "undefined") {
+  //     token = localStorage.getItem("token");
+  //     axios
+  //       .get("/api/getUserDetails", { headers: { Authorization: token } })
+  //       .then((res) => {
+  //         context.setData(res.data);
+  //       });
+  //   } else {
+  //     console.log("no token for you ");
+  //   }
+  // }, []);
 
   const {
     data,

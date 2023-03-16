@@ -1,14 +1,12 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, Fragment } from "react";
 import AuthForms from "./AuthForms";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import Context from "@/context/context";
-import { toast } from "react-toastify";
 import useComponentVisible from "./helpers/useComponentVisible";
 import Wishlist from "./Wishlist";
 import Cart from "./Cart";
-import { type } from "os";
 import { useAuth } from "@/context/auth";
+import { Menu, Transition } from "@headlessui/react";
 
 function Navbar() {
   const router = useRouter();
@@ -55,14 +53,106 @@ function Navbar() {
             <li className="btn btn--link ">
               <button
                 id="wishlist"
-                onClick={() => setIsComponentVisible(true)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsComponentVisible(true);
+                }}
                 type="button"
               >
                 <i className="fa-solid fa-heart"></i>
               </button>
               <div ref={ref}>{isComponentVisible && <Wishlist />}</div>
             </li>
-            <li className="btn btn--link">My profile</li>
+            <li className="btn btn--link">
+              <Menu>
+                <Menu.Button>My profile</Menu.Button>
+                <Transition
+                  as={Fragment}
+                  enter="transition ease-out duration-100"
+                  enterFrom="transform opacity-0 scale-95"
+                  enterTo="transform opacity-100 scale-100"
+                  leave="transition ease-in duration-75"
+                  leaveFrom="transform opacity-100 scale-100"
+                  leaveTo="transform opacity-0 scale-95"
+                >
+                  <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <div className="px-1 py-1 ">
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            className={`${
+                              active
+                                ? "bg-violet-500 text-white"
+                                : "text-gray-900"
+                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                          >
+                            Edit
+                          </button>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            className={`${
+                              active
+                                ? "bg-violet-500 text-white"
+                                : "text-gray-900"
+                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                          >
+                            Duplicate
+                          </button>
+                        )}
+                      </Menu.Item>
+                    </div>
+                    <div className="px-1 py-1">
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            className={`${
+                              active
+                                ? "bg-violet-500 text-white"
+                                : "text-gray-900"
+                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                          >
+                            Archive
+                          </button>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            className={`${
+                              active
+                                ? "bg-violet-500 text-white"
+                                : "text-gray-900"
+                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                          >
+                            Move
+                          </button>
+                        )}
+                      </Menu.Item>
+                    </div>
+                    <div className="px-1 py-1">
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            className={`${
+                              active
+                                ? "bg-violet-500 text-white"
+                                : "text-gray-900"
+                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </Menu.Item>
+                    </div>
+                  </Menu.Items>
+                </Transition>
+              </Menu>
+              {/* <a href="/profile">My profile</a> */}
+            </li>
             <li className="btn btn--link" onClick={logout}>
               Logout
             </li>

@@ -9,6 +9,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@headlessui/react": "^1.7.13",
     "@prisma/client": "^4.10.1",
     "@reduxjs/toolkit": "^1.9.3",
     "@tanstack/react-query": "^4.24.10",

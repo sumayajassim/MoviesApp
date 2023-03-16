@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import Movie from "@/types";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import Context from "@/context/context";
 import { toast } from "react-toastify";
@@ -11,6 +11,9 @@ function MovieComponent(props) {
   const router = useRouter();
   const { data, setData } = useContext(Context);
 
+  const queryClient = useQueryClient();
+
+  // console.log("token", localStorage.getItem("token"));
   const { mutate: handleLikeClick, isLoading: handleAddWishlistLoading } =
     useMutation({
       mutationFn: (movieID: any) =>
@@ -20,12 +23,7 @@ function MovieComponent(props) {
           { headers: { Authorization: localStorage.getItem("token") } }
         ),
       onSuccess: (res) => {
-        setData((data) => {
-          return { ...data, wishlist: [...data.wishlist, res.data] };
-        });
-        toast.success("Movie Added successfully to your wishlist!!", {
-          toastId: 1,
-        });
+        toast.success(res.data.message);
       },
       onError: (err) => {
         console.log(err);
@@ -37,16 +35,14 @@ function MovieComponent(props) {
 
   const { mutate: handleAddToCartClick, isLoading: handleAddToCartLoading } =
     useMutation({
-      mutationFn: (movie: any) =>
+      mutationFn: (movieID: any) =>
         axios.post(
           "/api/cart/add",
-          { moviesIDs: [movie.id.toString()] },
-          { headers: { authorization: localStorage.getItem("token") } }
+          { moviesIDs: [movieID.toString()] },
+          { headers: { Authorization: localStorage.getItem("token") } }
         ),
       onSuccess: () => {
-        setData((data) => {
-          return { ...data, cart: [...data.cart, movie] };
-        });
+        queryClient.invalidateQueries(["userDetails"]);
         toast.success("Movie Added successfully to your cart");
       },
       onError: (err) => {
@@ -102,7 +98,7 @@ function MovieComponent(props) {
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            handleAddToCartClick(movie);
+            handleAddToCartClick(movie.id);
           }}
         >
           <i className="fa-solid fa-cart-plus"></i>

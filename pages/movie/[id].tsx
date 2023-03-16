@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { GetStaticProps, GetStaticPaths } from "next";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
@@ -11,11 +11,11 @@ function Movie({}) {
   const router = useRouter();
   let formatedDate = "";
   let newRate;
-  const { id = "" } = router.query;
+  const { id } = router.query;
   console.log({ id });
 
-  const { data: movie } = useQuery<Movie>({
-    queryKey: ["movie"],
+  const { data: movie, refetch } = useQuery<Movie>({
+    queryKey: ["movie", id],
     queryFn: () => axios.get(`/api/movie/${id}`),
     enabled: !!id,
   });
@@ -46,8 +46,6 @@ function Movie({}) {
   function padToTwoDigits(num) {
     return num.toString().padStart(2);
   }
-
-  // return null;
   return (
     <div>
       <style>{`

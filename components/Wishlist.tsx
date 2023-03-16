@@ -1,12 +1,21 @@
 import React, { useContext } from "react";
 import Context from "@/context/context";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 function Wishlist() {
-  const { data, setData } = useContext(Context);
-  console.log("wishlist", data);
+  const router = useRouter();
+
+  const queryClient = useQueryClient();
+  const { data: userDetails, isLoading: userDetailsLoading } = useQuery({
+    queryKey: ["userDetails"],
+    queryFn: () =>
+      axios.get("/api/user/details", {
+        headers: { Authorization: localStorage.getItem("token") },
+      }),
+  });
 
   const { mutate: removeHandler, isLoading: removeHandlerLoading } =
     useMutation({
@@ -17,19 +26,23 @@ function Wishlist() {
           { headers: { Authorization: localStorage.getItem("token") } }
         ),
       onSuccess: (res, movieID) => {
-        const newWishlist = data.wishlist.filter(
-          (movie: any) => movie.id !== movieID
-        );
-        console.log("newWishlist", newWishlist);
-        setData((data) => {
-          return { ...data, wishlist: newWishlist };
-        });
+        queryClient.invalidateQueries(["userDetails"]);
         toast.success("Movie removed successfully from your wishlist!!");
       },
     });
 
-  const wishlistItems = data.wishlist.map((movie) => (
-    <li key={movie.id} className="flex p-4 items-center justify-between">
+  console.log("userDetails", userDetails);
+  const wishlistItems = userDetails?.data?.wishlist.map((movie) => (
+    <li
+      key={movie.id}
+      className="flex p-4 items-center justify-between"
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        router.push(`/movie/${movie.id}`);
+        // router.refresh();
+      }}
+    >
       <div className="flex items-center">
         <img
           className="h-20 w-20 object-fill rounded-md mr-4"
@@ -44,7 +57,11 @@ function Wishlist() {
       <div className="flex space-x-4">
         <i
           className="fa-solid fa-heart cursor-pointer hover:text-red-900"
-          onClick={() => removeHandler(movie.id)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            removeHandler(movie.id);
+          }}
         ></i>
         <i className="fa-solid fa-cart-plus cursor-pointer"></i>
       </div>
@@ -52,12 +69,21 @@ function Wishlist() {
   ));
   return (
     <div className="z-50 w-110 absolute top-12 right-20 mt-1 font-normal bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600 overflow-auto max-h-128">
-      {data.wishlist.length > 0 ? (
-        wishlistItems
+      {!userDetailsLoading ? (
+        userDetails?.data?.wishlist.length > 0 ? (
+          wishlistItems
+        ) : (
+          <p className="min-w-110 p-5 text-dark-grey">
+            You have nothing in your wishlist!{" "}
+          </p>
+        )
       ) : (
-        <p className="min-w-110 p-5 text-dark-grey">
-          You have nothing in your wishlist!{" "}
-        </p>
+        <div className="flex items-center justify-center min-w-110 p-5">
+          <div
+            className="w-12 h-12 rounded-full animate-spin
+                    border border-solid border-red-700 border-t-transparent shadow-md"
+          ></div>
+        </div>
       )}
     </div>
   );

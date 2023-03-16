@@ -10,7 +10,7 @@ export default async function addToCart(
 
   if (token) {
     let userDetails: any = jwtDecode(token as string);
-    const id = userDetails.data.id;
+    const id = userDetails.user.id;
 
     const movies: string[] = req.body.moviesIDs || [];
 
