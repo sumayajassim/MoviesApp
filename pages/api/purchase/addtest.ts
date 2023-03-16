@@ -142,7 +142,7 @@ export default async function addtest(
         id: userDetails.user.id,
       },
       data: {
-        balance: Math.ceil(balance - total - discount),
+        balance: balance - total - discount,
       },
     });
 
@@ -151,7 +151,7 @@ export default async function addtest(
       newPurchase,
       update,
     });
-  } else {
+  } else if (req.body.confirm === true && !req.body.code) {
     const newPurchase = await prisma.purchases.create({
       data: {
         moviesIDs: req.body.moviesIDs,
@@ -169,7 +169,7 @@ export default async function addtest(
         id: userDetails.user.id,
       },
       data: {
-        balance: Math.ceil(balance - total),
+        balance: balance - total,
       },
     });
 

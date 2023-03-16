@@ -70,5 +70,5 @@ model Discount {
 
 model Movie {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
-  price Int    @default(10)
+  price Float  @default(10)
 }
