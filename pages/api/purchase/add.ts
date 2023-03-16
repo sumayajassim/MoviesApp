@@ -17,7 +17,7 @@ export default async function purchase(
           OR: movies.map((movieId: string) => ({
             moviesIDs: { has: movieId },
           })),
-          userID: userDetails.id,
+          userID: userDetails.user.id,
         },
       })
     ).flatMap(({ moviesIDs }) => moviesIDs);
@@ -44,7 +44,7 @@ export default async function purchase(
           amount: req.body.amount - discountAmount,
           user: {
             connect: {
-              id: userDetails.id,
+              id: userDetails.user.id,
             },
           },
         },
@@ -57,7 +57,7 @@ export default async function purchase(
 
         const deduction = await prisma.user.update({
           where: {
-            id: userDetails.id,
+            id: userDetails.user.id,
           },
           data: {
             balance: userBudget - priceAfterdiscount,

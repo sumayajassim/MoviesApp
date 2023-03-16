@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/prisma";
 import jwtDecode from "jwt-decode";
+import getMovie from "@/components/helpers/getmovie";
 
 export default async function addtest(
   req: NextApiRequest,
@@ -12,38 +13,30 @@ export default async function addtest(
   const discount = req.body.discount;
 
   let userMistakeArray: any[] = [];
-
-  const userDetails: any = jwtDecode(req.headers["authorization"] as string);
-
   if (!req.headers["authorization"]) {
     res.json("UnAuthorized");
   }
-
-  if (!req.body.movieIDs) {
+  if ((req.body.movieIDs.length = 0)) {
     res.json("No Movie's Added!");
   }
+  const userDetails: any = jwtDecode(req.headers["authorization"] as string);
 
-  if (!req.body.total) {
-    res.json("No Movie's Added!");
-  }
-
-  const movies = req.body.moviesIDs;
-  const cartMovies = userDetails.user.cart.moviesIDs;
-  const cartWishlist = userDetails.user.wishlist.moviesIDs;
-
-  const purchases = await prisma.purchases.findMany({
+  const { purchases } = await prisma.user.findUniqueOrThrow({
     where: {
-      userID: userDetails.user.id,
+      id: userDetails.user.id,
+    },
+    include: {
+      purchases: true,
+      cart: true,
+      wishlist: true,
     },
   });
 
-  const purchasedMovies = purchases
-    .map((movie: any) => movie.moviesIDs)
-    .flatMap((x: any) => x);
+  if (purchases.length > 0) {
+    moviesToBePurchased.map(async (movie: any) => {
+      purchases.includes(movie) ? userMistakeArray.push(movie) : console.log();
+    });
+  }
 
-  movies.map((movie: any, index: any) => {
-    moviesToBePurchased.includes(movie)
-      ? userMistakeArray.push(movie)
-      : console.log();
-  });
+  res.json({ message: "please remove set movies", userMistakeArray });
 }
