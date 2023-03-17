@@ -115,23 +115,23 @@ export default async function details2(
  let userPurchasesLength =  purchasedMovies.length || 0
 
 
- if(userPurchasesLength > 0){
+ if(userPurchasesLength >= 0){
   badges = [BADGES.obama.url]
  }
 
- if(userPurchasesLength > 1){
+ if(userPurchasesLength >= 1){
   badges = [BADGES.obama.url,BADGES.putin.url]
  }
  
- if(userPurchasesLength > 2){
+ if(userPurchasesLength >= 2){
   badges = [BADGES.obama.url,BADGES.putin.url,BADGES.ramen.url]
  }
 
- if(userPurchasesLength > 5){
+ if(userPurchasesLength >= 5){
   badges = [BADGES.obama.url,BADGES.putin.url,BADGES.ramen.url,BADGES.phoenix.url]
  }
 
- if(userPurchasesLength > 10){
+ if(userPurchasesLength >= 10){
   badges = [BADGES.obama.url,BADGES.putin.url,BADGES.ramen.url,BADGES.phoenix.url,BADGES.yuda.url]
  }
 

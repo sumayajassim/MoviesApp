@@ -111,10 +111,19 @@ export default async function addtest(req: NextApiRequest , res: NextApiResponse
         moviesIDs : []
     }
   }) 
+
+ await prisma.user.update({
+  where:{
+    id : userDetails.user.id
+  },
+  data:{
+    balance : balance - Math.floor(cartPrice - discount)
+  }
+ })
   
   res.json({
     message: `Purchase Succesfull ${
-      Math.floor(cartPrice - discount)
+      balance - Math.floor(cartPrice - discount)
     } and your balance is ${balance}`,
     makePurchase,
     removeFromCart
