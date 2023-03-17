@@ -20,31 +20,59 @@ export default async function details2(
     },
   });
 
-  const userWishlist = await prisma.wishlist.findUniqueOrThrow({
+
+  const userWishlistLength = user.wishlist?.moviesIDs.length || []
+  const userCartLength = user.cart?.moviesIDs.length || []
+  
+  let wishlistLength = user.wishlist?.moviesIDs.length || []
+  let purchasedMovies = []
+  let userWishlistMovieDetails =  [] 
+  let userCartMoviesDetails = []
+
+
+
+  if(user.purchases.length > 0){
+    purchasedMovies = user.purchases.map((movie: any) => movie.moviesIDs).flatMap((x:any) => x)
+  }
+
+
+  if(userWishlistLength > 0){
+    console.log(true)
+  }
+
+  if(wishlistLength > 0){
+ const userWishlist = await prisma.wishlist.findUniqueOrThrow({
     where: {
       userID: userDetails.user.id,
     },
   });
 
-  const userWishlistMovieDetails = await Promise.all(
+  userWishlistMovieDetails = await Promise.all(
     userWishlist.moviesIDs.map(
       async (movieID: string) => await getMovie(movieID)
     )
   );
+  }
 
-  const userCartMovies = await prisma.cart.findUniqueOrThrow({
+  if(wishlistLength > 0){
+    const userCartMovies = await prisma.cart.findUniqueOrThrow({
     where: {
       userID: userDetails.user.id,
     },
   });
 
-  const userCartMoviesDetails = await Promise.all(
+  userCartMoviesDetails = await Promise.all(
     userCartMovies.moviesIDs.map(
       async (movieID: string) => await getMovie(movieID)
     )
   );
+  }
+ let userPurchasesLength =  userCartMoviesDetails.length || 0
 
-  if (user.purchases.length > 0) {
+console.log(userPurchasesLength)
+  
+
+  if (userPurchasesLength > 0) {
     let badges = ["/badges/obama.png"];
 
     const { moviesIDs } = await prisma.purchases.findUniqueOrThrow({
@@ -115,6 +143,22 @@ export default async function details2(
     }
   }
 
+  const userr = {
+    userName: userDetails.user.firstName + " " + userDetails.user.firstName,
+    email: userDetails.user.emailAddress,
+    balance: userDetails.user.balance,
+    
+  };
+
+
+  res.json({
+    userr,
+    wishlist: userWishlistMovieDetails.filter(Boolean),
+    cart: userCartMoviesDetails.filter(Boolean),
+    purchases: purchasedMovies,
+  });
+
+
   const BADGES = {
     obama: {
       id: 1,
@@ -138,3 +182,4 @@ export default async function details2(
     },
   };
 }
+
