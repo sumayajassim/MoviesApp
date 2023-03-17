@@ -4,24 +4,14 @@ import jwtDecode from "jwt-decode";
 import getMovie from "@/components/helpers/getmovie";
 import axios from "axios";
 
-export default async function addtest(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  const API_KEY = process.env.API_KEY;
-  const moviesToBePurchased = req.body.movie || [];
-  let total = 0;
-  const discountCode = req.body.discount;
-  let price = 5;
-  let discount = 0;
+export default async function addtest(req: NextApiRequest , res: NextApiResponse){
 
-  let userMistakeArray: any[] = [];
+  const API_KEY = process.env.API_KEY;
+
   if (!req.headers["authorization"]) {
     res.json("UnAuthorized");
   }
-  if (req.body.moviesIDs.length < 1) {
-    res.json("No Movie's Added!");
-  }
+
   const userDetails: any = jwtDecode(req.headers["authorization"] as string);
 
   const { purchases, balance } = await prisma.user.findUniqueOrThrow({
@@ -33,37 +23,15 @@ export default async function addtest(
     },
   });
 
-  if (purchases.length > 0) {
-    moviesToBePurchased.map(async (movie: any) => {
-      purchases.includes(movie) ? userMistakeArray.push(movie) : console.log();
-    });
+  let cartPrice = 0
 
-    const purchases = await prisma.purchases.findMany({
-      where: {
-        userID: userDetails.user.id,
-      },
-    });
+  const cart = await prisma.cart.findUniqueOrThrow({
+    where:{
+        userID: userDetails.user.id
+    }
+  })
 
-    // to check if the movies is bought before buying
-
-    // const purchasedMovies = purchases
-    //   .map((x: any) => x.moviesIDs)
-    //   .flatMap((x: any) => x);
-
-    // req.body.moviesIDs.map((movie: any) => {
-    //   purchasedMovies.includes(movie)
-    //     ? userMistakeArray.push(movie)
-    //     : console.log();
-    // });
-
-    // if(userMistakeArray.length > 0){
-    //     const userPurchasedMoviesDetails = await Promise.all(
-    //         purchasedMovies.map(async (movieID: string) => await getMovie(movieID))
-    //     );
-
-    //  res.json({message: "please remove the following movies before buying" , movies: userPurchasedMoviesDetails.filter(Boolean)})
-    // }
-  }
+  const cartMovies = cart.moviesIDs
 
   const trendingMovies = await axios.get(
     "https://api.themoviedb.org/3/discover/movie?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1"
@@ -89,100 +57,69 @@ export default async function addtest(
     (id: any) => id.id
   );
 
-  req.body.moviesIDs.map((id: any) => {
+
+  cartMovies.map((id: any) => {
     trendingMoviesArray.includes(id * 1) ||
     upcomingMoviesArray.includes(id * 1) ||
     topRatedMoviesArray.includes(id * 1)
-      ? (total = total + 10)
-      : (total = total + 5);
+      ? (cartPrice = cartPrice + 10)
+      : (cartPrice = cartPrice + 5);
   });
 
-  if (req.body.code && req.body.confirm === false) {
-    const { code, amount } = await prisma.discount.findFirstOrThrow({
-      where: {
-        code: discountCode,
-      },
-    });
-    code ? (discount = (amount / 100) * total) : discount;
-    res.json({
-      message: `Your Total Will Be ${
-        Math.floor(total - discount)
-      } and your balance is ${balance}`,
-    });
-  } else if (!req.body.code && req.body.confirm === false) {
-    res.json({
-      message: `Your Total Will Be ${
-        total - discount
-      } and your balance is ${balance}`,
-    });
+  let discount = 0
+
+  if(req.body.code){
+    const discountCode = await prisma.discount.findFirstOrThrow({
+        where:{
+            code: req.body.code
+        }
+    })
+
+    if(discountCode){
+        discount = (discountCode.amount / 100) * cartPrice
+    }
+
   }
 
-  if (req.body.confirm === true && req.body.code) {
-    const { code, amount } = await prisma.discount.findFirstOrThrow({
-      where: {
-        code: discountCode,
-      },
-    });
-    code ? (discount = (amount / 100) * total) : discount;
-    // console.log(balance - total - discount, balance, total, discount);
-    const newPurchase = await prisma.purchases.create({
-      data: {
-        moviesIDs: req.body.moviesIDs,
-        amount: Math.floor(total - discount),
-        user: {
-          connect: {
-            id: userDetails.user.id,
-          },
-        },
-      },
-    });
 
-    const update = await prisma.user.update({
-      where: {
-        id: userDetails.user.id,
-      },
-      data: {
-        balance: Math.floor(balance - total - discount),
-      },
-    });
-
+ if(req.body.confirm == false){
     res.json({
-      message: "Succesful Purchase",
-      newPurchase,
-      update,
-    });
-  } else if (req.body.confirm === true && !req.body.code) {
-    const newPurchase = await prisma.purchases.create({
-      data: {
-        moviesIDs: req.body.moviesIDs,
-        amount: total,
-        user: {
-          connect: {
-            id: userDetails.user.id,
-          },
-        },
-      },
-    });
+        message: `Your Total Will Be ${
+          Math.floor(cartPrice - discount)
+        } and your balance is ${balance}`,
+      });
+ }
 
-    const update = await prisma.user.update({
-      where: {
-        id: userDetails.user.id,
-      },
-      data: {
-        balance: balance - total,
-      },
-    });
+ else if(req.body.confirm == true){
+    const makePurchase = await prisma.purchases.create({
+    data:{
+        moviesIDs: cartMovies,
+        amount: Math.floor(cartPrice - discount),
+        user:{
+            connect:{
+                id: userDetails.user.id
+            }
+        }
+    }
+  })
 
-    res.json({
-      message: "Succesful Purchase",
-      newPurchase,
-      update,
-    });
-  }
+  const removeFromCart = await prisma.cart.update({
+    where:{
+        userID: userDetails.user.id
+    },
+    data:{
+        moviesIDs : []
+    }
+  }) 
+  
+  res.json({
+    message: `Purchase Succesfull ${
+      Math.floor(cartPrice - discount)
+    } and your balance is ${balance}`,
+    makePurchase,
+    removeFromCart
+  });
 
-  //   const userToBePurchasedMoviesDetails = await Promise.all(
-  //     req.body.moviesIDs.map(async (movieID: string) => await getMovie(movieID))
-  //   );
+ }
 
-  //   const toBePurchasedMoviesIDs = userToBePurchasedMoviesDetails.map((x:any) => x.id)
 }
