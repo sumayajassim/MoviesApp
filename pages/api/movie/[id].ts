@@ -5,17 +5,19 @@ import getMovie from "@/components/helpers/getmovie";
 import jwtDecode from "jwt-decode";
 
 export default async function movie(req: NextApiRequest, res: NextApiResponse) {
-  const userDetails: any = jwtDecode(req.headers["authorization"] as string);
+  
+req.headers["authorization"] ? console.log(true) : console.log(false)
 
   const movieID: any = req.query;
 
   const movie = await getMovie(movieID.id);
 
-  console.log(movie);
-
-  if (!userDetails) {
-    res.json(movie);
+  if(!req.headers["authorization"]){
+    res.json(movie)
   }
+  else{
+
+const userDetails: any = jwtDecode(req?.headers["authorization"] as string);
 
   const { purchases, wishlist, cart } = await prisma.user.findUniqueOrThrow({
     where: {
@@ -80,5 +82,7 @@ export default async function movie(req: NextApiRequest, res: NextApiResponse) {
     price = 10;
   }
 
-  res.json({ movie, isPurchased, inCart, inWishlist, price });
+  res.json({ movie, isPurchased, inCart, inWishlist, price }); 
+  }
+ 
 }
