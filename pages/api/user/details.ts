@@ -3,6 +3,34 @@ import { prisma } from "../../../lib/prisma";
 import jwtDecode from "jwt-decode";
 import getMovie from "@/components/helpers/getmovie";
 
+const BADGES = {
+  obama: {
+    id: 1,
+    name: "Obama",
+    url: "/badges/obama.png",
+  },
+  phoenix: {
+    id: 2,
+    name: "/Phoenix",
+    url: "/badges/phoenix.jpg",
+  },
+  putin: {
+    id: 3,
+    name: "/Putin",
+    url: "/badges/phoenix.jpg",
+  },
+  yuda: {
+    id: 4,
+    name: "/Yuda",
+    url: "/badges/yuda.webp",
+  },
+  ramen: {
+    id: 4,
+    name: "/Yuda",
+    url: "/badges/ramen.png",
+  }
+};
+
 export default async function details2(
   req: NextApiRequest,
   res: NextApiResponse
@@ -20,7 +48,6 @@ export default async function details2(
     },
   });
 
-
   const userWishlistLength = user.wishlist?.moviesIDs.length || []
   const userCartLength = user.cart?.moviesIDs.length || []
   
@@ -28,17 +55,29 @@ export default async function details2(
   let purchasedMovies = []
   let userWishlistMovieDetails =  [] 
   let userCartMoviesDetails = []
-
+  let badges:any = []
 
 
   if(user.purchases.length > 0){
     purchasedMovies = user.purchases.map((movie: any) => movie.moviesIDs).flatMap((x:any) => x)
+
+    
+
+    const { moviesIDs } = await prisma.purchases.findUniqueOrThrow({
+      where: {
+        userID: userDetails.user.id,
+      },
+    });
+
+    const userPurchasedMoviesDetails = await Promise.all(
+      purchasedMovies.map(async (movieID: string) => await getMovie(movieID))
+    );
+
+    purchasedMovies =  userPurchasedMoviesDetails
+
   }
 
-
-  if(userWishlistLength > 0){
-    console.log(true)
-  }
+  // console.log(purchasedMovies)
 
   if(wishlistLength > 0){
  const userWishlist = await prisma.wishlist.findUniqueOrThrow({
@@ -52,9 +91,13 @@ export default async function details2(
       async (movieID: string) => await getMovie(movieID)
     )
   );
+  console.log(userWishlistMovieDetails)
+
   }
 
-  if(wishlistLength > 0){
+  console.log(userWishlistMovieDetails)
+
+  if(userCartLength > 0){
     const userCartMovies = await prisma.cart.findUniqueOrThrow({
     where: {
       userID: userDetails.user.id,
@@ -67,119 +110,47 @@ export default async function details2(
     )
   );
   }
- let userPurchasesLength =  userCartMoviesDetails.length || 0
 
-console.log(userPurchasesLength)
   
+ let userPurchasesLength =  purchasedMovies.length || 0
 
-  if (userPurchasesLength > 0) {
-    let badges = ["/badges/obama.png"];
 
-    const { moviesIDs } = await prisma.purchases.findUniqueOrThrow({
-      where: {
-        userID: userDetails.user.id,
-      },
-    });
+ if(userPurchasesLength > 0){
+  badges = [BADGES.obama.url]
+ }
 
-    const purchasedMovies = moviesIDs.flatMap((x: any) => x);
+ if(userPurchasesLength > 1){
+  badges = [BADGES.obama.url,BADGES.putin.url]
+ }
+ 
+ if(userPurchasesLength > 2){
+  badges = [BADGES.obama.url,BADGES.putin.url,BADGES.ramen.url]
+ }
 
-    const userPurchasedMoviesDetails = await Promise.all(
-      purchasedMovies.map(async (movieID: string) => await getMovie(movieID))
-    );
+ if(userPurchasesLength > 5){
+  badges = [BADGES.obama.url,BADGES.putin.url,BADGES.ramen.url,BADGES.phoenix.url]
+ }
 
-    if (purchasedMovies.length > 1) {
-      badges = ["/badges/obama.png", "/badges/putin.png"];
-    }
+ if(userPurchasesLength > 10){
+  badges = [BADGES.obama.url,BADGES.putin.url,BADGES.ramen.url,BADGES.phoenix.url,BADGES.yuda.url]
+ }
 
-    if (purchasedMovies.length > 2) {
-      badges = ["/badges/obama.png", "/badges/putin.png", "/badges/ramen.png"];
-    }
-
-    if (purchasedMovies.length > 5) {
-      badges = [
-        "/badges/obama.png",
-        "/badges/putin.png",
-        "/badges/ramen.png",
-        "/badges/phoenix.png",
-      ];
-
-      if (purchasedMovies.length > 5) {
-        badges = [
-          "/badges/obama.png",
-          "/badges/putin.png",
-          "/badges/ramen.png",
-          "/badges/phoenix.png",
-          "/badges/yuda.png",
-        ];
-      }
-
-      const userr = {
-        userName: userDetails.user.firstName + " " + userDetails.user.firstName,
-        email: userDetails.user.emailAddress,
-        balance: userDetails.user.balance,
-        badges,
-      };
-
-      res.json({
-        userr,
-        wishlist: userWishlistMovieDetails.filter(Boolean),
-        cart: userCartMoviesDetails.filter(Boolean),
-        purchases: userPurchasedMoviesDetails.filter(Boolean),
-      });
-    } else {
-      const userr = {
-        userName: userDetails.user.firstName + " " + userDetails.user.firstName,
-        email: userDetails.user.emailAddress,
-        balance: userDetails.user.balance,
-        badges,
-      };
-
-      res.json({
-        userr,
-        wishlist: userWishlistMovieDetails.filter(Boolean),
-        cart: userCartMoviesDetails.filter(Boolean),
-        purchases: userDetails.user.moviesIDs,
-      });
-    }
-  }
 
   const userr = {
     userName: userDetails.user.firstName + " " + userDetails.user.firstName,
     email: userDetails.user.emailAddress,
     balance: userDetails.user.balance,
-    
+    badges
   };
-
 
   res.json({
     userr,
-    wishlist: userWishlistMovieDetails.filter(Boolean),
-    cart: userCartMoviesDetails.filter(Boolean),
+    wishlist: userWishlistMovieDetails,
+    cart: userCartMoviesDetails,
     purchases: purchasedMovies,
   });
 
 
-  const BADGES = {
-    obama: {
-      id: 1,
-      name: "Obama",
-      url: "/badges/obama.png",
-    },
-    phoenix: {
-      id: 2,
-      name: "/Phoenix",
-      url: "/badges/phoenix.jpg",
-    },
-    putin: {
-      id: 3,
-      name: "/Putin",
-      url: "/badges/phoenix.jpg",
-    },
-    yuda: {
-      id: 2,
-      name: "/Yuda",
-      url: "/badges/yuda.webp",
-    },
-  };
+
 }
 
