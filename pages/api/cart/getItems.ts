@@ -9,13 +9,13 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     let userDetails: any = jwtDecode(token as string);
     const userCart = await prisma.cart.findUniqueOrThrow({
       where: {
-        userID: userDetails.data.id,
+        userID: userDetails.user.id,
       },
     });
 
     const userBalance = await prisma.user.findUniqueOrThrow({
       where: {
-        id: userDetails.data.id,
+        id: userDetails.user.id,
       },
     });
 

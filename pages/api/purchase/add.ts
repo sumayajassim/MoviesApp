@@ -125,9 +125,8 @@ export default async function addtest(req: NextApiRequest , res: NextApiResponse
  })
   
   res.json({
-    message: `Purchase Succesfull ${
-      balance -Math.floor(cartPrice - discount)
-    } and your balance is ${balance}`,
+    balance: balance,
+    total : balance - Math.floor(cartPrice - discount),
     makePurchase,
     removeFromCart
   });
