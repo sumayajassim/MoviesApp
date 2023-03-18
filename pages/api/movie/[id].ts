@@ -6,11 +6,14 @@ import jwtDecode from "jwt-decode";
 
 export default async function movie(req: NextApiRequest, res: NextApiResponse) {
   
-req.headers["authorization"] ? console.log(true) : console.log(false)
+// req.headers["authorization"] ? console.log(true) : console.log(false)
 
   const movieID: any = req.query;
+  console.log(movieID)
+  console.log(movieID.id * 1)
 
-  const movie = await getMovie(movieID.id);
+
+  const movie:any = await getMovie(movieID.id);
 
   if(!req.headers["authorization"]){
     res.json(movie)
@@ -29,7 +32,7 @@ const userDetails: any = jwtDecode(req?.headers["authorization"] as string);
       purchases: true,
     },
   });
-
+  
   let isPurchased = false;
   let inCart = false;
   let inWishlist = false;
@@ -39,15 +42,16 @@ const userDetails: any = jwtDecode(req?.headers["authorization"] as string);
   const cartMoviesLength = cart?.moviesIDs?.length || 0;
 
   if (purchases.length > 0) {
-    purchases.includes(movie.id) ? (isPurchased = true) : (isPurchased = false);
+      let purchasedMOviesArray = purchases.map((movie:any) => movie.moviesIDs).flatMap((x:any) => x)
+      purchasedMOviesArray.includes(movieID.id) ? (isPurchased = true) : (isPurchased = false);
   }
   if (wishlistMoviesLength > 0) {
-    wishlist?.moviesIDs.includes(movie.id)
+    wishlist?.moviesIDs.includes(movieID.id)
       ? (inWishlist = true)
       : (inWishlist = false);
   }
   if (cartMoviesLength > 0) {
-    cart?.moviesIDs.includes(movie.id) ? (inCart = true) : (inCart = false);
+    cart?.moviesIDs.includes(movieID.id) ? (inCart = true) : (inCart = false);
   }
 
   const trendingMovies = await axios.get(

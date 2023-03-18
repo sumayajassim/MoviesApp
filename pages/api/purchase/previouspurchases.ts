@@ -13,7 +13,7 @@ export default async function previousPurchases(
     await prisma.purchases
       .findMany({
         where: {
-          userID: userDetails.data.id,
+          userID: userDetails.user.id,
         },
       })
       .then((data) => {
