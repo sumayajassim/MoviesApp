@@ -42,7 +42,7 @@ export default async function reAdd(req: NextApiRequest, res: NextApiResponse) {
         },
       });
 
-      res.json(updateCart);
+      res.json({message: "Added To Wishlist"});
     }
   }
 }

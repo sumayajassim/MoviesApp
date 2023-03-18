@@ -78,6 +78,9 @@ export default async function addtest(req: NextApiRequest , res: NextApiResponse
     if(discountCode){
         discount = (discountCode.amount / 100) * cartPrice
     }
+    else{
+      discount = 0
+    }
 
   }
 
@@ -123,7 +126,7 @@ export default async function addtest(req: NextApiRequest , res: NextApiResponse
   
   res.json({
     message: `Purchase Succesfull ${
-      balance - Math.floor(cartPrice - discount)
+      balance -Math.floor(cartPrice - discount)
     } and your balance is ${balance}`,
     makePurchase,
     removeFromCart
