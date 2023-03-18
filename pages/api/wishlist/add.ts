@@ -80,11 +80,10 @@ async function addToWishList(req: NextApiRequest, res: NextApiResponse) {
       res.json({ message: "Movie Added To Wishlist", data });
     }
   } else {
-    res
-      .status(401)
-      .json(
-        "UnAuthorized - Sign in if you have an account or sign up to add to the wishlist"
-      );
+    res.status(401).json({
+      message:
+        "Unauthorized - Sign in if you have an account or sign up to add to the wishlist",
+    });
   }
 }
 

@@ -13,9 +13,7 @@ function Navbar() {
   const [status, setStatus] = useState<Boolean>(false);
   const { ref, isComponentVisible, setIsComponentVisible } =
     useComponentVisible(false);
-  // const { userRef, isDropdownVisible, setIsDropDownVisible } = useComponentVisible(false);
   const [showModal, setShowModal] = useState(false);
-
   const { isLoggedIn, logout } = useAuth();
 
   const clickHandler = (e: any) => {
@@ -25,8 +23,6 @@ function Navbar() {
       setStatus((status) => false);
     }
   };
-
-  // console.log({ isLoggedIn });
 
   return (
     <>
@@ -81,69 +77,14 @@ function Navbar() {
                       <Menu.Item>
                         {({ active }) => (
                           <button
+                            onClick={logout}
                             className={`${
                               active
                                 ? "bg-violet-500 text-white"
                                 : "text-gray-900"
                             } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                           >
-                            Edit
-                          </button>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <button
-                            className={`${
-                              active
-                                ? "bg-violet-500 text-white"
-                                : "text-gray-900"
-                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                          >
-                            Duplicate
-                          </button>
-                        )}
-                      </Menu.Item>
-                    </div>
-                    <div className="px-1 py-1">
-                      <Menu.Item>
-                        {({ active }) => (
-                          <button
-                            className={`${
-                              active
-                                ? "bg-violet-500 text-white"
-                                : "text-gray-900"
-                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                          >
-                            Archive
-                          </button>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <button
-                            className={`${
-                              active
-                                ? "bg-violet-500 text-white"
-                                : "text-gray-900"
-                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                          >
-                            Move
-                          </button>
-                        )}
-                      </Menu.Item>
-                    </div>
-                    <div className="px-1 py-1">
-                      <Menu.Item>
-                        {({ active }) => (
-                          <button
-                            className={`${
-                              active
-                                ? "bg-violet-500 text-white"
-                                : "text-gray-900"
-                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                          >
-                            Delete
+                            logout
                           </button>
                         )}
                       </Menu.Item>
@@ -153,9 +94,9 @@ function Navbar() {
               </Menu>
               {/* <a href="/profile">My profile</a> */}
             </li>
-            <li className="btn btn--link" onClick={logout}>
+            {/* <li className="btn btn--link" onClick={logout}>
               Logout
-            </li>
+            </li> */}
           </div>
         </div>
 

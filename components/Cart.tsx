@@ -3,9 +3,11 @@ import AppContext from "@/context/context";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useRouter } from "next/router";
 
 export default function Modal(props) {
   const { data, setData } = useContext(AppContext);
+  const router = useRouter();
   console.log("cart data", data.cart);
   const [discount, setDiscount] = useState(false);
   const [coupon, setCoupon] = useState("");
@@ -31,9 +33,26 @@ export default function Modal(props) {
         toast.success("Movie removed successfully from your cart!");
       },
     });
+  const { mutate: handelCheckout, isLoading: checkoutHandlerLoading } =
+    useMutation({
+      mutationFn: () =>
+        axios.post(
+          "/api/purchase/add",
+          { confirm: true },
+          { headers: { Authorization: localStorage.getItem("token") } }
+        ),
+      onSuccess: (res, movieID) => {
+        queryClient.invalidateQueries(["userDetails"]);
+      },
+    });
 
   const cartItems = userDetails?.data.cart?.map((item) => (
-    <li className="border-t-1 border-b-1 list-none py-4 px-8 flex items-center">
+    <li
+      className="border-t-1 border-b-1 list-none py-4 px-8 flex items-center"
+      onClick={() => {
+        router.push(`/movie/${item.id}`);
+      }}
+    >
       <img
         className="w-20 h-32 drop-shadow-lg rounded"
         src={
@@ -57,7 +76,7 @@ export default function Modal(props) {
         </div>
       </div>
       <span className="flex flex-col text-2xl font-bold grow items-end">
-        $50
+        $10
         <i
           className="fa-solid fa-trash text-red-500 text-xl pl-0"
           onClick={() => handelRemoveFromCart(item.id)}
@@ -90,14 +109,14 @@ export default function Modal(props) {
                 </div>
                 {/*body*/}
                 <div className="relative p-0 flex-auto overflow-auto max-h-[50vh] min-h-[50vh] max-w-4xl min-w-[60%]">
-                  {cartItems.length > 0 ? (
+                  {cartItems?.length > 0 ? (
                     cartItems
                   ) : (
                     <div className="p-5 w-72 h-44">Your cart is empty</div>
                   )}
                 </div>
                 {/*footer*/}
-                {cartItems.length > 0 && (
+                {cartItems?.length > 0 && (
                   <div className="flex flex-col items-end justify-center p-6 border-solid rounded-b">
                     <div className="flex items-center self-center">
                       <input
@@ -152,7 +171,10 @@ export default function Modal(props) {
                       <button
                         className="btn btn-red hover:shadow-lg active:bg-red-900 ease-linear transition-all duration-150"
                         type="button"
-                        onClick={() => props.setShowModal(false)}
+                        onClick={() => {
+                          handelCheckout();
+                          props.setShowModal(false);
+                        }}
                       >
                         Checkout
                       </button>

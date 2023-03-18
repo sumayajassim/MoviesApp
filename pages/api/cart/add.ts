@@ -65,6 +65,8 @@ export default async function addToCart(
   } else {
     res
       .status(401)
-      .json("UnAuthorized - sign in if you have an account or sign up");
+      .json({
+        message: "UnAuthorized - sign in if you have an account or sign up",
+      });
   }
 }

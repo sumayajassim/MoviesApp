@@ -1,24 +1,34 @@
 import React, { useEffect } from "react";
 import { GetStaticProps, GetStaticPaths } from "next";
 import { useRouter } from "next/router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { Movie } from "@/types";
 import { parseISO, format } from "date-fns";
+import addToWishList from "../api/wishlist/add";
 
 function Movie({}) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   let formatedDate = "";
   let newRate;
   const { id } = router.query;
   console.log({ id });
 
-  const { data: movie, refetch } = useQuery<Movie>({
+  const { data: movie } = useQuery<Movie>({
     queryKey: ["movie", id],
     queryFn: () => axios.get(`/api/movie/${id}`),
     enabled: !!id,
   });
+
+  // const { data: userDetails, isLoading: userDetailsLoading } = useQuery({
+  //   queryKey: ["cartDetails"],
+  //   queryFn: () =>
+  //     axios.get("/api/user/details", {
+  //       headers: { Authorization: localStorage.getItem("token") },
+  //     }),
+  // });
   console.log("movie", movie);
 
   if (!id) return "NOT FOUND - NO ID";
@@ -31,7 +41,7 @@ function Movie({}) {
   }
 
   const genres = movie?.data.genres.map((genre, index) => (
-    <span>
+    <span className="font-semibold">
       {genre.name} {index !== movie?.data.genres.length - 1 ? ", " : ""}{" "}
     </span>
   ));
@@ -46,6 +56,65 @@ function Movie({}) {
   function padToTwoDigits(num) {
     return num.toString().padStart(2);
   }
+
+  const {
+    data: handleAddToWishlist,
+    mutate: addToWishlist,
+    isLoading: handleAddWishlistLoading,
+  } = useMutation({
+    mutationFn: (movieID: any) =>
+      axios.post(
+        "/api/wishlist/add",
+        { moviesIDs: [movieID.toString()] },
+        { headers: { Authorization: localStorage.getItem("token") } }
+      ),
+    onSuccess: (res) => {
+      // queryClient.invalidateQueries(["userDetails"]);
+      toast.success(res.data.message);
+    },
+    onError: (err) => {
+      console.log(err);
+      toast.error(`${err?.response?.data?.message}`, {
+        toastId: 1,
+      });
+    },
+  });
+
+  const {
+    data: HandelAddToCart,
+    mutate: addToCart,
+    isLoading: handleAddToCartLoading,
+  } = useMutation({
+    mutationFn: (movieID: any) =>
+      axios.post(
+        "/api/cart/add",
+        { moviesIDs: [movieID.toString()] },
+        { headers: { Authorization: localStorage.getItem("token") } }
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["cartDetails"]);
+      toast.success("Movie Added successfully to your cart");
+    },
+    onError: (err) => {
+      console.log(err);
+      toast.error(`${err?.response?.data?.message}`);
+    },
+  });
+
+  const { mutate: removeFromWishlist, isLoading: removeHandlerLoading } =
+    useMutation({
+      mutationFn: (movieID: any) =>
+        axios.post(
+          "/api/wishlist/remove",
+          { moviesIDs: [movieID.toString()] },
+          { headers: { Authorization: localStorage.getItem("token") } }
+        ),
+      onSuccess: (res, movieID) => {
+        queryClient.invalidateQueries(["cartDetails"]);
+        toast.success("Movie removed successfully from your wishlist!!");
+      },
+    });
+
   return (
     <div>
       <style>{`
@@ -73,34 +142,58 @@ function Movie({}) {
       `}</style>
       <div className="pt-12">
         <div className="image-overlay w-full"></div>
-        <div className="w-200 h-[calc(100vh-48px)] card-overlay p-10">
-          <div className="text-3xl font-bold text-white flex justify-between">
-            <span className="">
-              {movie?.data?.title} ({toHoursAndMinutes(movie?.data.runtime)})
-            </span>
-            <div className="min-w-fit">
-              <i className="fa-solid fa-star text-yellow mx-2"></i>
-              {newRate}
+        <div className="w-200 h-[calc(100vh-48px)] card-overlay p-10 flex items-center">
+          <div className="rounded-lg w-fit flex  flex-col ">
+            <div className="text-3xl font-bold text-white flex justify-between">
+              <span className="">
+                {movie?.data?.title} ({toHoursAndMinutes(movie?.data.runtime)})
+              </span>
+              <div className="min-w-fit">
+                <i className="fa-solid fa-star text-yellow mx-2"></i>
+                {newRate}
+              </div>
+            </div>
+            <p className="text-white p-1">
+              {formatedDate} ● <span className="ml-1">{genres}</span>
+            </p>
+            <p className="text-white py-4">{movie?.data?.overview}</p>
+            <div>
+              <span className="text-4xl text-yellow float-right font-bold">
+                $10
+              </span>
+              <button
+                className="btn rounded  bg-[rgba(255,255,255,.5)]"
+                onClick={(e) => {
+                  e.preventDefault();
+                  addToWishlist(movie?.data?.id);
+                }}
+              >
+                {movie?.data.inWishlist ? (
+                  <span>
+                    <span> Remove from wishlist</span>{" "}
+                    <i className="fa-solid fa-heart text-red-600 text-xl ml-1"></i>
+                  </span>
+                ) : (
+                  <span>
+                    <span>Add to Wishlist</span>
+                    <i className="fa-regular fa-heart text-red-600 text-xl ml-1"></i>
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => addToCart(movie?.data?.id)}
+                disabled={!!movie?.data.inCart}
+                className="btn rounded bg-[rgba(255,255,255,.5)] ml-2"
+              >
+                {/* <i class="fa-regular fa-cart-shopping"></i> */}
+                {/* <i class="fa-regular fa-cart"></i> */}
+                <span>
+                  <span>Add to Cart</span>
+                  <i className="fa-solid fa-cart-shopping text-red-600 text-xl ml-1"></i>
+                </span>
+              </button>
             </div>
           </div>
-          <p className="text-white p-1">
-            {formatedDate} ● <span className="ml-1">{genres}</span>
-          </p>
-          <p className="text-white py-4">{movie?.data?.overview}</p>
-
-          <button>
-            {movie?.data.inWishlist ? (
-              <i className="fa-solid fa-heart text-red-600"></i>
-            ) : (
-              <i className="fa-regular fa-heart text-red-600 text-2xl"></i>
-            )}
-          </button>
-          <button disabled={!!movie?.data.inCart}>
-            {/* <i class="fa-regular fa-cart-shopping"></i> */}
-            {/* <i class="fa-regular fa-cart"></i> */}
-            <i class="fa-regular fa-cart-shopping"></i>
-            <i className="fa-regular fa-cart-shopping text-white text-2xl"></i>
-          </button>
         </div>
       </div>
     </div>

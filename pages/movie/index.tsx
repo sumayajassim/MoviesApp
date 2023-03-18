@@ -14,21 +14,6 @@ function index(props: any) {
   const [genre, setGenre] = useState("");
   const [value] = useDebounce(search, 1000);
 
-  // const context = useContext(Context);
-  // let token: string = "";
-  // useEffect(() => {
-  //   if (typeof window !== "undefined") {
-  //     token = localStorage.getItem("token");
-  //     axios
-  //       .get("/api/getUserDetails", { headers: { Authorization: token } })
-  //       .then((res) => {
-  //         context.setData(res.data);
-  //       });
-  //   } else {
-  //     console.log("no token for you ");
-  //   }
-  // }, []);
-
   const {
     data,
     error,
