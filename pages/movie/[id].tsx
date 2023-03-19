@@ -18,7 +18,10 @@ function Movie({}) {
 
   const { data: movie } = useQuery<Movie>({
     queryKey: ["movie", id],
-    queryFn: () => axios.get(`/api/movie/${id}`),
+    queryFn: () =>
+      axios.get(`/api/movie/${id}`, {
+        headers: { Authorization: localStorage.getItem("token") },
+      }),
     enabled: !!id,
   });
 

@@ -35,10 +35,10 @@ export default function Modal(props) {
     });
   const { mutate: handelCheckout, isLoading: checkoutHandlerLoading } =
     useMutation({
-      mutationFn: () =>
+      mutationFn: (confirm: boolean) =>
         axios.post(
           "/api/purchase/add",
-          { confirm: true },
+          { confirm },
           { headers: { Authorization: localStorage.getItem("token") } }
         ),
       onSuccess: (res, movieID) => {
@@ -121,12 +121,14 @@ export default function Modal(props) {
                     <div className="flex items-center self-center">
                       <input
                         type="text"
-                        id="discount"
-                        name="discount"
+                        id="coupon"
+                        name="coupon"
+                        onChange={(e) => setCoupon(e.target.value)}
                         placeholder="You have a voucher?"
                         className="bg-gray-200 appearance-none border-2 w-48 border-gray-200 rounded py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:border-none active:border-none focus:border-red-700 rounded-br-none rounded-tr-none"
                       />
                       <button
+                        onClick={() => handelCheckout(false)}
                         disabled={!coupon}
                         className="btn btn-red hover:shadow-lg disabled:bg-red-300 disabled:shadow-none active:bg-red-900 ease-linear transition-all duration-150 rounded-bl-none rounded-tl-none"
                       >
@@ -172,12 +174,13 @@ export default function Modal(props) {
                         className="btn btn-red hover:shadow-lg active:bg-red-900 ease-linear transition-all duration-150"
                         type="button"
                         onClick={() => {
-                          handelCheckout();
+                          handelCheckout(true);
                           props.setShowModal(false);
                         }}
                       >
                         Checkout
                       </button>
+                      s
                     </div>
                   </div>
                 )}

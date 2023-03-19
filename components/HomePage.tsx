@@ -43,7 +43,6 @@ function HomePage() {
       {isLoading ? (
         <div className="flex w-full h-[calc(100vh-45px)] justify-center items-center">
           {" "}
-          <Spinner />{" "}
         </div>
       ) : (
         HomePageContent

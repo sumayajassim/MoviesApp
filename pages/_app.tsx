@@ -27,7 +27,7 @@ export default function App({ Component, pageProps }: AppProps) {
           <Navbar />
           <Component {...pageProps} />
           <ToastContainer closeButton={false} autoClose={1500} />
-          <ReactQueryDevtools initialIsOpen={true} />
+          {/* <ReactQueryDevtools initialIsOpen={true} /> */}
         </QueryClientProvider>
       </AppContext.Provider>
     </AuthProvider>

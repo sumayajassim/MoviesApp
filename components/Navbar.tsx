@@ -7,6 +7,8 @@ import Wishlist from "./Wishlist";
 import Cart from "./Cart";
 import { useAuth } from "@/context/auth";
 import { Menu, Transition } from "@headlessui/react";
+import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
 
 function Navbar() {
   const router = useRouter();
@@ -23,6 +25,14 @@ function Navbar() {
       setStatus((status) => false);
     }
   };
+
+  const { data: userDetails, isLoading: userDetailsLoading } = useQuery({
+    queryKey: ["userDetails"],
+    queryFn: () =>
+      axios.get("/api/user/details", {
+        headers: { Authorization: localStorage.getItem("token") },
+      }),
+  });
 
   return (
     <>
@@ -62,7 +72,15 @@ function Navbar() {
             </li>
             <li className="btn btn--link">
               <Menu>
-                <Menu.Button>My profile</Menu.Button>
+                <Menu.Button>
+                  <div className="flex ">
+                    <img
+                      src={userDetails?.data?.userr.badges[0]}
+                      className="w-6 h-6 mr-1"
+                    />{" "}
+                    {userDetails?.data?.userr.userName}
+                  </div>
+                </Menu.Button>
                 <Transition
                   as={Fragment}
                   enter="transition ease-out duration-100"
@@ -75,14 +93,22 @@ function Navbar() {
                   <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div className="px-1 py-1 ">
                       <Menu.Item>
+                        <button
+                          onClick={() => router.push("/Purchases")}
+                          className={`
+                         
+                            group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                        >
+                          Previously purchased
+                        </button>
+                      </Menu.Item>
+                      <Menu.Item>
                         {({ active }) => (
                           <button
                             onClick={logout}
-                            className={`${
-                              active
-                                ? "bg-violet-500 text-white"
-                                : "text-gray-900"
-                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                            className={`
+                         
+                            group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                           >
                             logout
                           </button>
