@@ -31,7 +31,7 @@ function Wishlist() {
       },
     });
 
-  console.log("userDetails", userDetails);
+  // console.log("userDetails", userDetails);
   const wishlistItems = userDetails?.data?.wishlist.map((movie) => (
     <li
       key={movie.id}

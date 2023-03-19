@@ -7,16 +7,15 @@ import axios from "axios";
 import { Movie } from "@/types";
 import { parseISO, format } from "date-fns";
 import addToWishList from "../api/wishlist/add";
+import dayjs from "dayjs";
 
 function Movie({}) {
   const router = useRouter();
   const queryClient = useQueryClient();
-  let formatedDate = "";
-  let newRate;
   const { id } = router.query;
   console.log({ id });
 
-  const { data: movie } = useQuery<Movie>({
+  const { data: movie } = useQuery<{ data?: Movie }>({
     queryKey: ["movie", id],
     queryFn: () =>
       axios.get(`/api/movie/${id}`, {
@@ -24,24 +23,6 @@ function Movie({}) {
       }),
     enabled: !!id,
   });
-
-  // const { data: userDetails, isLoading: userDetailsLoading } = useQuery({
-  //   queryKey: ["cartDetails"],
-  //   queryFn: () =>
-  //     axios.get("/api/user/details", {
-  //       headers: { Authorization: localStorage.getItem("token") },
-  //     }),
-  // });
-  console.log("movie", movie);
-
-  if (!id) return "NOT FOUND - NO ID";
-
-  if (movie) {
-    const date = Date.parse(`${movie?.data?.release_date} GMT`);
-    formatedDate = format(date, "LLLL d, yyyy");
-    console.log({ formatedDate });
-    newRate = movie?.data.vote_average.toPrecision(2);
-  }
 
   const genres = movie?.data.genres.map((genre, index) => (
     <span className="font-semibold">
@@ -72,7 +53,7 @@ function Movie({}) {
         { headers: { Authorization: localStorage.getItem("token") } }
       ),
     onSuccess: (res) => {
-      // queryClient.invalidateQueries(["userDetails"]);
+      queryClient.invalidateQueries(["movie"]);
       toast.success(res.data.message);
     },
     onError: (err) => {
@@ -95,7 +76,7 @@ function Movie({}) {
         { headers: { Authorization: localStorage.getItem("token") } }
       ),
     onSuccess: () => {
-      queryClient.invalidateQueries(["cartDetails"]);
+      queryClient.invalidateQueries(["userDetails"]);
       toast.success("Movie Added successfully to your cart");
     },
     onError: (err) => {
@@ -113,10 +94,12 @@ function Movie({}) {
           { headers: { Authorization: localStorage.getItem("token") } }
         ),
       onSuccess: (res, movieID) => {
-        queryClient.invalidateQueries(["cartDetails"]);
-        toast.success("Movie removed successfully from your wishlist!!");
+        queryClient.invalidateQueries(["movie"]);
+        toast.success(res.data.message);
       },
     });
+
+  if (!id) return "NOT FOUND - NO ID";
 
   return (
     <div>
@@ -153,48 +136,73 @@ function Movie({}) {
               </span>
               <div className="min-w-fit">
                 <i className="fa-solid fa-star text-yellow mx-2"></i>
-                {newRate}
+                {movie?.data.vote_average.toPrecision(2)}
               </div>
             </div>
             <p className="text-white p-1">
-              {formatedDate} ● <span className="ml-1">{genres}</span>
+              {dayjs(movie?.data?.release_date).format("MMM DD, YYYY")} ●{" "}
+              <span className="ml-1">{genres}</span>
             </p>
-            <p className="text-white py-4">{movie?.data?.overview}</p>
+            <p className="text-white py-4 font-semibold">
+              {movie?.data?.overview}
+            </p>
             <div>
-              <span className="text-4xl text-yellow float-right font-bold">
-                $10
-              </span>
-              <button
-                className="btn rounded  bg-[rgba(255,255,255,.5)]"
-                onClick={(e) => {
-                  e.preventDefault();
-                  addToWishlist(movie?.data?.id);
-                }}
-              >
-                {movie?.data.inWishlist ? (
+              {movie?.data?.isPurchased ? (
+                <button className="btn rounded bg-[rgba(255,255,255,.5)]">
                   <span>
-                    <span> Remove from wishlist</span>{" "}
-                    <i className="fa-solid fa-heart text-red-600 text-xl ml-1"></i>
+                    <span>Watch now</span>
+                    <i className="fa-solid fa-video text-red-700 text-xl ml-1"></i>
+
+                    {/* <i className="fa-solid fa-cart-shopping text-red-600 text-xl ml-1"></i> */}
                   </span>
-                ) : (
-                  <span>
-                    <span>Add to Wishlist</span>
-                    <i className="fa-regular fa-heart text-red-600 text-xl ml-1"></i>
+                </button>
+              ) : (
+                <>
+                  {" "}
+                  <span className="text-4xl text-yellow float-right font-bold">
+                    ${movie?.data?.price}
                   </span>
-                )}
-              </button>
-              <button
-                onClick={() => addToCart(movie?.data?.id)}
-                disabled={!!movie?.data.inCart}
-                className="btn rounded bg-[rgba(255,255,255,.5)] ml-2"
-              >
-                {/* <i class="fa-regular fa-cart-shopping"></i> */}
-                {/* <i class="fa-regular fa-cart"></i> */}
-                <span>
-                  <span>Add to Cart</span>
-                  <i className="fa-solid fa-cart-shopping text-red-600 text-xl ml-1"></i>
-                </span>
-              </button>
+                  {movie?.data.inWishlist ? (
+                    <button
+                      className="btn rounded  bg-[rgba(255,255,255,.5)]"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        removeFromWishlist(movie?.data?.id);
+                      }}
+                    >
+                      <span>
+                        <span>Remove from Wishlist</span>
+                        <i className="fa-solid fa-heart text-red-600 text-xl ml-1"></i>
+                      </span>
+                    </button>
+                  ) : (
+                    <button
+                      className="btn rounded  bg-[rgba(255,255,255,.5)]"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        addToWishlist(movie?.data?.id);
+                      }}
+                    >
+                      <span>
+                        <span>Add to Wishlist</span>
+                        <i className="fa-regular fa-heart text-red-600 text-xl ml-1"></i>
+                      </span>
+                    </button>
+                  )}
+                  <button
+                    onClick={() => addToCart(movie?.data?.id)}
+                    // disabled={!!movie?.data.inCart}
+                    className="btn rounded bg-[rgba(255,255,255,.5)] ml-2"
+                  >
+                    {/* <i class="fa-regular fa-cart-shopping"></i> */}
+                    {/* <i class="fa-regular fa-cart"></i> */}
+                    <span>
+                      <span>Add to Cart</span>
+                      <i className="fa-solid fa-cart-shopping text-red-600 text-xl ml-1"></i>
+                    </span>
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>

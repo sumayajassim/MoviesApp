@@ -8,8 +8,6 @@ export default async function movie(req: NextApiRequest, res: NextApiResponse) {
   // req.headers["authorization"] ? console.log(true) : console.log(false)
 
   const movieID: any = req.query;
-  console.log({ movieID });
-  console.log(movieID.id * 1);
 
   let movie: any = await getMovie(movieID.id);
 

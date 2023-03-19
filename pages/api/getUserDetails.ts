@@ -13,7 +13,7 @@ export default async function getUserDetails(
   if (token) {
     let userDetails: any = jwtDecode(token as string);
     const id = userDetails.user.id;
-    console.log({ userDetails });
+    // console.log({ userDetails });
 
     const user = await prisma.user.findUniqueOrThrow({
       where: {

@@ -11,7 +11,6 @@ export default async function moviePage(
   const pageNumber = req.query.page || 1;
   const searchText = req.query.search;
   const genreId = req.query.genre || null;
-  console.log("pageNumber", pageNumber);
   try {
     if (!searchText) {
       const { data } = await axios.get(
@@ -25,7 +24,6 @@ export default async function moviePage(
       res.json(data);
     }
   } catch (err) {
-    console.log(err);
     res.send(err);
   }
 }
