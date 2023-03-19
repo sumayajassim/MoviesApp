@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import Spinner from "./spinner";
 
 function Wishlist() {
   const router = useRouter();
@@ -16,6 +17,24 @@ function Wishlist() {
         headers: { Authorization: localStorage.getItem("token") },
       }),
   });
+
+  const { mutate: handleAddToCartClick, isLoading: handleAddToCartLoading } =
+    useMutation({
+      mutationFn: (movieID: any) =>
+        axios.post(
+          "/api/cart/add",
+          { moviesIDs: [movieID.toString()] },
+          { headers: { Authorization: localStorage.getItem("token") } }
+        ),
+      onSuccess: () => {
+        queryClient.invalidateQueries(["userDetails"]);
+        toast.success("Movie Added successfully to your cart");
+      },
+      onError: (err) => {
+        console.log(err);
+        toast.error(`${err?.response?.data?.message}`);
+      },
+    });
 
   const { mutate: removeHandler, isLoading: removeHandlerLoading } =
     useMutation({
@@ -63,7 +82,14 @@ function Wishlist() {
             removeHandler(movie.id);
           }}
         ></i>
-        <i className="fa-solid fa-cart-plus cursor-pointer"></i>
+        <i
+          className="fa-solid fa-cart-plus cursor-pointer"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleAddToCartClick(movie.id);
+          }}
+        ></i>
       </div>
     </li>
   ));
@@ -79,10 +105,7 @@ function Wishlist() {
         )
       ) : (
         <div className="flex items-center justify-center min-w-110 p-5">
-          <div
-            className="w-12 h-12 rounded-full animate-spin
-                    border border-solid border-red-700 border-t-transparent shadow-md"
-          ></div>
+          <Spinner />
         </div>
       )}
     </div>

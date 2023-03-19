@@ -30,7 +30,7 @@ function HomePage() {
             </h1>
             <div className="flex flex-row overflow-x-scroll space-x-3 pl-5 pb-5 pt-5 ">
               {category.movies?.map((movie) => (
-                <MovieComponent movie={movie} />
+                <MovieComponent movie={movie} page="home"/>
               ))}
             </div>
           </div>

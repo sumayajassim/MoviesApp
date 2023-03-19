@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import Movie from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -7,10 +7,9 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 
 function MovieComponent(props) {
-  const { movie } = props;
+  const { movie, page } = props;
   const router = useRouter();
-  const { data, setData } = useContext(Context);
-
+  const [like, setLike] = useState(movie?.inWishlist);
   const queryClient = useQueryClient();
 
   // console.log("token", localStorage.getItem("token"));
@@ -24,12 +23,33 @@ function MovieComponent(props) {
         ),
       onSuccess: (res) => {
         toast.success(res.data.message);
+        setLike((like) => !like);
       },
       onError: (err) => {
         console.log(err);
         toast.error(`${err?.response?.data?.message}`, {
           toastId: 1,
         });
+      },
+    });
+
+  const { mutate: removeHandler, isLoading: removeHandlerLoading } =
+    useMutation({
+      mutationFn: (movieID: any) =>
+        axios.post(
+          "/api/wishlist/remove",
+          { moviesIDs: [movieID.toString()] },
+          { headers: { Authorization: localStorage.getItem("token") } }
+        ),
+      onSuccess: (res, movieID) => {
+        // queryClient.invalidateQueries(["movie"]);
+        setLike((like) => !like);
+        // if (page === "home") {
+        //   queryClient.invalidateQueries(["userDetails"]);
+        // } else {
+        //   queryClient.invalidateQueries(["userDetails"]);
+        // }
+        toast.success("Movie removed successfully from your wishlist!!");
       },
     });
 
@@ -80,30 +100,45 @@ function MovieComponent(props) {
           {movie.vote_average}
         </span>
       </div>
-      <div className="absolute bottom-0 bg-red w-60 h-10 rounded-br-md rounded-bl-md p-4 flex justify-between">
-        {/* <span className="text-red-700"></span> */}
-        {/* <span>{movie.vote_average}</span> */}
-        <button
-          className=""
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            handleLikeClick(movie.id);
-          }}
-        >
-          <i className="fa-regular fa-heart"></i>
-        </button>
-        <button
-          className=""
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            handleAddToCartClick(movie.id);
-          }}
-        >
-          <i className="fa-solid fa-cart-plus"></i>
-        </button>
-      </div>
+      {!movie.isPurchased && (
+        <div className="absolute bottom-0 bg-red w-60 h-10 rounded-br-md rounded-bl-md p-4 flex justify-between">
+          {/* <span className="text-red-700"></span> */}
+          {/* <span>{movie.vote_average}</span> */}
+          {like ? (
+            <button
+              className=""
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                removeHandler(movie.id);
+              }}
+            >
+              <i className="fa-solid fa-heart text-red-500"></i>
+            </button>
+          ) : (
+            <button
+              className=""
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleLikeClick(movie.id);
+              }}
+            >
+              <i className="fa-regular fa-heart"></i>
+            </button>
+          )}
+          <button
+            className=""
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleAddToCartClick(movie.id);
+            }}
+          >
+            <i className="fa-solid fa-cart-plus"></i>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

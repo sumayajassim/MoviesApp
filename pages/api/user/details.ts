@@ -28,7 +28,7 @@ const BADGES = {
     id: 4,
     name: "/Yuda",
     url: "/badges/ramen.png",
-  }
+  },
 };
 
 export default async function details2(
@@ -48,20 +48,19 @@ export default async function details2(
     },
   });
 
-  const userWishlistLength = user.wishlist?.moviesIDs.length || []
-  const userCartLength = user.cart?.moviesIDs.length || []
-  
-  let wishlistLength = user.wishlist?.moviesIDs.length || []
-  let purchasedMovies = []
-  let userWishlistMovieDetails =  [] 
-  let userCartMoviesDetails = []
-  let badges:any = []
+  const userWishlistLength = user.wishlist?.moviesIDs.length || [];
+  const userCartLength = user.cart?.moviesIDs.length || [];
 
+  let wishlistLength = user.wishlist?.moviesIDs.length || [];
+  let purchasedMovies = [];
+  let userWishlistMovieDetails = [];
+  let userCartMoviesDetails = [];
+  let badges: any = [];
 
-  if(user.purchases.length > 0){
-    purchasedMovies = user.purchases.map((movie: any) => movie.moviesIDs).flatMap((x:any) => x)
-
-    
+  if (user.purchases.length > 0) {
+    purchasedMovies = user.purchases
+      .map((movie: any) => movie.moviesIDs)
+      .flatMap((x: any) => x);
 
     const { moviesIDs } = await prisma.purchases.findUniqueOrThrow({
       where: {
@@ -73,74 +72,69 @@ export default async function details2(
       purchasedMovies.map(async (movieID: string) => await getMovie(movieID))
     );
 
-    purchasedMovies =  userPurchasedMoviesDetails
-
+    purchasedMovies = userPurchasedMoviesDetails;
   }
 
   // console.log(purchasedMovies)
 
-  if(wishlistLength > 0){
- const userWishlist = await prisma.wishlist.findUniqueOrThrow({
-    where: {
-      userID: userDetails.user.id,
-    },
-  });
+  if (wishlistLength > 0) {
+    const userWishlist = await prisma.wishlist.findUniqueOrThrow({
+      where: {
+        userID: userDetails.user.id,
+      },
+    });
 
-  userWishlistMovieDetails = await Promise.all(
-    userWishlist.moviesIDs.map(
-      async (movieID: string) => await getMovie(movieID)
-    )
-  );
-  console.log(userWishlistMovieDetails)
-
+    userWishlistMovieDetails = await Promise.all(
+      userWishlist.moviesIDs.map(
+        async (movieID: string) => await getMovie(movieID)
+      )
+    );
+    console.log(userWishlistMovieDetails);
   }
 
-  console.log(userWishlistMovieDetails)
+  console.log(userWishlistMovieDetails);
 
-  if(userCartLength > 0){
+  if (userCartLength > 0) {
     const userCartMovies = await prisma.cart.findUniqueOrThrow({
-    where: {
-      userID: userDetails.user.id,
-    },
-  });
+      where: {
+        userID: userDetails.user.id,
+      },
+    });
 
-  userCartMoviesDetails = await Promise.all(
-    userCartMovies.moviesIDs.map(
-      async (movieID: string) => await getMovie(movieID)
-    )
-  );
+    userCartMoviesDetails = await Promise.all(
+      userCartMovies.moviesIDs.map(
+        async (movieID: string) => await getMovie(movieID)
+      )
+    );
   }
 
-  
- let userPurchasesLength =  purchasedMovies.length || 0
+  let userPurchasesLength = purchasedMovies.length || 0;
 
+  if (userPurchasesLength >= 0) {
+    badges = [BADGES.obama.url];
+  }
 
- if(userPurchasesLength >= 0){
-  badges = [BADGES.obama.url]
- }
+  if (userPurchasesLength >= 1) {
+    badges = [BADGES.putin.url];
+  }
 
- if(userPurchasesLength >= 1){
-  badges = [BADGES.obama.url,BADGES.putin.url]
- }
- 
- if(userPurchasesLength >= 2){
-  badges = [BADGES.obama.url,BADGES.putin.url,BADGES.ramen.url]
- }
+  if (userPurchasesLength >= 2) {
+    badges = [BADGES.ramen.url];
+  }
 
- if(userPurchasesLength >= 5){
-  badges = [BADGES.obama.url,BADGES.putin.url,BADGES.ramen.url,BADGES.phoenix.url]
- }
+  if (userPurchasesLength >= 5) {
+    badges = [BADGES.phoenix.url];
+  }
 
- if(userPurchasesLength >= 10){
-  badges = [BADGES.obama.url,BADGES.putin.url,BADGES.ramen.url,BADGES.phoenix.url,BADGES.yuda.url]
- }
-
+  if (userPurchasesLength >= 10) {
+    badges = [BADGES.yuda.url];
+  }
 
   const userr = {
     userName: userDetails.user.firstName + " " + userDetails.user.firstName,
     email: userDetails.user.emailAddress,
     balance: userDetails.user.balance,
-    badges
+    badges,
   };
 
   res.json({
@@ -149,8 +143,4 @@ export default async function details2(
     cart: userCartMoviesDetails,
     purchases: purchasedMovies,
   });
-
-
-
 }
-

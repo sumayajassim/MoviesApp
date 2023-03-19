@@ -42,9 +42,9 @@ export default async function addToCart(
     );
 
     if (purchased.includes(movies[0])) {
-      res.status(401).json({ message: "Movie Is Already Purchased" });
+      res.status(401).json({ message: "Movie is already purchased" });
     } else if (userMoviesInCart.includes(movies[0])) {
-      res.status(401).json({ message: "Movie Is Already In Cart" });
+      res.status(401).json({ message: "Movie is already in cart" });
     } else if (
       !purchased.includes(movies[0]) &&
       !userMoviesInCart.includes(movies[0])
@@ -60,13 +60,11 @@ export default async function addToCart(
         },
       });
 
-      res.json({ message: "Movie Added To Cart", updateCart });
+      res.json({ message: "Movie added to cart successfully", updateCart });
     }
   } else {
-    res
-      .status(401)
-      .json({
-        message: "UnAuthorized - sign in if you have an account or sign up",
-      });
+    res.status(401).json({
+      message: "UnAuthorized - sign in if you have an account or sign up",
+    });
   }
 }

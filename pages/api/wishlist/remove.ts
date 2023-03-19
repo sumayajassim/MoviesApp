@@ -21,10 +21,10 @@ export default async function removeFromWishlist(
 
     const moviesInWishlist = wishlist.moviesIDs;
 
-    console.log(movies);
+    // console.log(movies);
 
     const finalArray = moviesInWishlist.filter((x: any) => !movies.includes(x));
-    console.log(finalArray);
+    // console.log(finalArray);
 
     const removeWishList = await prisma.wishlist.update({
       where: {

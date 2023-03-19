@@ -28,7 +28,7 @@ export default async function landingpage(
       },
     });
 
-    let userPurchases = userData.purchases
+    const userPurchases = userData.purchases
       .map(({ moviesIDs }) => moviesIDs)
       .flat();
 

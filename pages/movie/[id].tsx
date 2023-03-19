@@ -8,6 +8,8 @@ import { Movie } from "@/types";
 import { parseISO, format } from "date-fns";
 import addToWishList from "../api/wishlist/add";
 import dayjs from "dayjs";
+import Spinner from "@/components/spinner";
+// import Spinner from "../../components/Spinner";
 
 function Movie({}) {
   const router = useRouter();
@@ -15,7 +17,7 @@ function Movie({}) {
   const { id } = router.query;
   console.log({ id });
 
-  const { data: movie } = useQuery<{ data?: Movie }>({
+  const { data: movie, isLoading: movieLoading } = useQuery<{ data?: Movie }>({
     queryKey: ["movie", id],
     queryFn: () =>
       axios.get(`/api/movie/${id}`, {
@@ -41,34 +43,27 @@ function Movie({}) {
     return num.toString().padStart(2);
   }
 
-  const {
-    data: handleAddToWishlist,
-    mutate: addToWishlist,
-    isLoading: handleAddWishlistLoading,
-  } = useMutation({
-    mutationFn: (movieID: any) =>
-      axios.post(
-        "/api/wishlist/add",
-        { moviesIDs: [movieID.toString()] },
-        { headers: { Authorization: localStorage.getItem("token") } }
-      ),
-    onSuccess: (res) => {
-      queryClient.invalidateQueries(["movie"]);
-      toast.success(res.data.message);
-    },
-    onError: (err) => {
-      console.log(err);
-      toast.error(`${err?.response?.data?.message}`, {
-        toastId: 1,
-      });
-    },
-  });
+  const { mutate: addToWishlist, isLoading: handleAddWishlistLoading } =
+    useMutation({
+      mutationFn: (movieID: any) =>
+        axios.post(
+          "/api/wishlist/add",
+          { moviesIDs: [movieID.toString()] },
+          { headers: { Authorization: localStorage.getItem("token") } }
+        ),
+      onSuccess: (res) => {
+        queryClient.invalidateQueries(["movie"]);
+        toast.success(res.data.message);
+      },
+      onError: (err) => {
+        console.log(err);
+        toast.error(`${err?.response?.data?.message}`, {
+          toastId: 1,
+        });
+      },
+    });
 
-  const {
-    data: HandelAddToCart,
-    mutate: addToCart,
-    isLoading: handleAddToCartLoading,
-  } = useMutation({
+  const { mutate: addToCart, isLoading: handleAddToCartLoading } = useMutation({
     mutationFn: (movieID: any) =>
       axios.post(
         "/api/cart/add",
@@ -127,85 +122,93 @@ function Movie({}) {
     
       `}</style>
       <div className="pt-12">
-        <div className="image-overlay w-full"></div>
-        <div className="w-200 h-[calc(100vh-48px)] card-overlay p-10 flex items-center">
-          <div className="rounded-lg w-fit flex  flex-col ">
-            <div className="text-3xl font-bold text-white flex justify-between">
-              <span className="">
-                {movie?.data?.title} ({toHoursAndMinutes(movie?.data.runtime)})
-              </span>
-              <div className="min-w-fit">
-                <i className="fa-solid fa-star text-yellow mx-2"></i>
-                {movie?.data.vote_average.toPrecision(2)}
-              </div>
-            </div>
-            <p className="text-white p-1">
-              {dayjs(movie?.data?.release_date).format("MMM DD, YYYY")} ●{" "}
-              <span className="ml-1">{genres}</span>
-            </p>
-            <p className="text-white py-4 font-semibold">
-              {movie?.data?.overview}
-            </p>
-            <div>
-              {movie?.data?.isPurchased ? (
-                <button className="btn rounded bg-[rgba(255,255,255,.5)]">
-                  <span>
-                    <span>Watch now</span>
-                    <i className="fa-solid fa-video text-red-700 text-xl ml-1"></i>
-
-                    {/* <i className="fa-solid fa-cart-shopping text-red-600 text-xl ml-1"></i> */}
+        {!movieLoading ? (
+          <div>
+            <div className="image-overlay w-full"></div>
+            <div className="w-200 h-[calc(100vh-48px)] card-overlay p-10 flex items-center">
+              <div className="rounded-lg w-fit flex  flex-col ">
+                <div className="text-3xl font-bold text-white flex justify-between">
+                  <span className="">
+                    {movie?.data?.title} (
+                    {toHoursAndMinutes(movie?.data.runtime)})
                   </span>
-                </button>
-              ) : (
-                <>
-                  {" "}
-                  <span className="text-4xl text-yellow float-right font-bold">
-                    ${movie?.data?.price}
-                  </span>
-                  {movie?.data.inWishlist ? (
-                    <button
-                      className="btn rounded  bg-[rgba(255,255,255,.5)]"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        removeFromWishlist(movie?.data?.id);
-                      }}
-                    >
+                  <div className="min-w-fit">
+                    <i className="fa-solid fa-star text-yellow mx-2"></i>
+                    {movie?.data.vote_average.toPrecision(2)}
+                  </div>
+                </div>
+                <p className="text-white p-1">
+                  {dayjs(movie?.data?.release_date).format("MMM DD, YYYY")} ●{" "}
+                  <span className="ml-1">{genres}</span>
+                </p>
+                <p className="text-white py-4 font-semibold">
+                  {movie?.data?.overview}
+                </p>
+                <div>
+                  {movie?.data?.isPurchased ? (
+                    <button className="btn rounded bg-[rgba(255,255,255,.5)]">
                       <span>
-                        <span>Remove from Wishlist</span>
-                        <i className="fa-solid fa-heart text-red-600 text-xl ml-1"></i>
+                        <span>Watch now</span>
+                        <i className="fa-solid fa-video text-red-700 text-xl ml-1"></i>
+                        {/* <i className="fa-solid fa-cart-shopping text-red-600 text-xl ml-1"></i> */}
                       </span>
                     </button>
                   ) : (
-                    <button
-                      className="btn rounded  bg-[rgba(255,255,255,.5)]"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        addToWishlist(movie?.data?.id);
-                      }}
-                    >
-                      <span>
-                        <span>Add to Wishlist</span>
-                        <i className="fa-regular fa-heart text-red-600 text-xl ml-1"></i>
+                    <>
+                      {" "}
+                      <span className="text-4xl text-yellow float-right font-bold">
+                        ${movie?.data?.price}
                       </span>
-                    </button>
+                      {movie?.data.inWishlist ? (
+                        <button
+                          className="btn rounded  bg-[rgba(255,255,255,.5)]"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            removeFromWishlist(movie?.data?.id);
+                          }}
+                        >
+                          <span>
+                            <span>Remove from Wishlist</span>
+                            <i className="fa-solid fa-heart text-red-600 text-xl ml-1"></i>
+                          </span>
+                        </button>
+                      ) : (
+                        <button
+                          className="btn rounded  bg-[rgba(255,255,255,.5)]"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            addToWishlist(movie?.data?.id);
+                          }}
+                        >
+                          <span>
+                            <span>Add to Wishlist</span>
+                            <i className="fa-regular fa-heart text-red-600 text-xl ml-1"></i>
+                          </span>
+                        </button>
+                      )}
+                      <button
+                        onClick={() => addToCart(movie?.data?.id)}
+                        // disabled={!!movie?.data.inCart}
+                        className="btn rounded bg-[rgba(255,255,255,.5)] ml-2"
+                      >
+                        {/* <i class="fa-regular fa-cart-shopping"></i> */}
+                        {/* <i class="fa-regular fa-cart"></i> */}
+                        <span>
+                          <span>Add to Cart</span>
+                          <i className="fa-solid fa-cart-shopping text-red-600 text-xl ml-1"></i>
+                        </span>
+                      </button>
+                    </>
                   )}
-                  <button
-                    onClick={() => addToCart(movie?.data?.id)}
-                    // disabled={!!movie?.data.inCart}
-                    className="btn rounded bg-[rgba(255,255,255,.5)] ml-2"
-                  >
-                    {/* <i class="fa-regular fa-cart-shopping"></i> */}
-                    {/* <i class="fa-regular fa-cart"></i> */}
-                    <span>
-                      <span>Add to Cart</span>
-                      <i className="fa-solid fa-cart-shopping text-red-600 text-xl ml-1"></i>
-                    </span>
-                  </button>
-                </>
-              )}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="w-full h-[calc(100vh-45px)]">
+            <Spinner />
+          </div>
+        )}
       </div>
     </div>
   );
