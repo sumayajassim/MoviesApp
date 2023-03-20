@@ -172,7 +172,7 @@ export default async function details2(
   }
 
   const userr = {
-    userName: userDetails.user.firstName + " " + userDetails.user.firstName,
+    userName: userDetails.user.firstName + " " + userDetails.user.lastName,
     email: userDetails.user.emailAddress,
     balance: user.balance,
     badges,

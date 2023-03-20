@@ -98,43 +98,48 @@ function MovieComponent(props) {
         </span>
       </div>
       {!movie.isPurchased && (
-        <div className="absolute bottom-0 bg-red w-60 h-10 rounded-br-md rounded-bl-md p-4 flex justify-between">
-          {/* <span className="text-red-700"></span> */}
-          {/* <span>{movie.vote_average}</span> */}
-          {like ? (
+        <>
+          <div className="absolute bottom-1 left-4 text-xl font-bold text-[#C21807]">
+            ${movie.price || 5}
+          </div>
+          <div className="absolute bottom-2 bg-red w-60 h-10 rounded-br-md rounded-bl-md p-4 flex justify-end space-x-3">
+            {/* <span className="text-red-700"></span> */}
+            {/* <span>{movie.vote_average}</span> */}
+            {like ? (
+              <button
+                className=""
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  removeHandler(movie.id);
+                }}
+              >
+                <i className="fa-solid fa-heart text-red-500 text-lg "></i>
+              </button>
+            ) : (
+              <button
+                className=""
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleLikeClick(movie.id);
+                }}
+              >
+                <i className="fa-regular fa-heart text-red-500 text-lg"></i>
+              </button>
+            )}
             <button
               className=""
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                removeHandler(movie.id);
+                handleAddToCartClick(movie.id);
               }}
             >
-              <i className="fa-solid fa-heart text-red-500"></i>
+              <i className="fa-solid fa-cart-plus text-lg "></i>
             </button>
-          ) : (
-            <button
-              className=""
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleLikeClick(movie.id);
-              }}
-            >
-              <i className="fa-regular fa-heart"></i>
-            </button>
-          )}
-          <button
-            className=""
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleAddToCartClick(movie.id);
-            }}
-          >
-            <i className="fa-solid fa-cart-plus"></i>
-          </button>
-        </div>
+          </div>
+        </>
       )}
     </div>
   );
