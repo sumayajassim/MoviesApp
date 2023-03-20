@@ -16,12 +16,13 @@ export default async function addtest(
 
   const userDetails: any = jwtDecode(req.headers["authorization"] as string);
 
-  const { purchases, balance } = await prisma.user.findUniqueOrThrow({
+  const { purchases, balance, wishlist } = await prisma.user.findUniqueOrThrow({
     where: {
       id: userDetails.user.id,
     },
     include: {
       purchases: true,
+      wishlist: true,
     },
   });
 
@@ -34,6 +35,7 @@ export default async function addtest(
   });
 
   const cartMovies = cart.moviesIDs;
+  const wishlistMovies = wishlist?.moviesIDs;
 
   const trendingMovies = await axios.get(
     "https://api.themoviedb.org/3/discover/movie?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1"
@@ -59,13 +61,13 @@ export default async function addtest(
     (id: any) => id.id
   );
 
-  // cartMovies.map((id: any) => {
-  //   trendingMoviesArray.includes(id * 1) ||
-  //   upcomingMoviesArray.includes(id * 1) ||
-  //   topRatedMoviesArray.includes(id * 1)
-  //     ? (cartPrice = cartPrice + 10)
-  //     : (cartPrice = cartPrice + 5);
-  // });
+  cartMovies.map((id: any) => {
+    trendingMoviesArray.includes(id * 1) ||
+    upcomingMoviesArray.includes(id * 1) ||
+    topRatedMoviesArray.includes(id * 1)
+      ? (cartPrice = cartPrice + 10)
+      : (cartPrice = cartPrice + 5);
+  });
 
   let discount = 0;
 
@@ -77,24 +79,23 @@ export default async function addtest(
     });
 
     if (discountCode) {
-      discount = (discountCode.amount / 100) * req.body.cartPrice;
-      console.log("discount", discount);
+      discount = (discountCode.amount / 100) * cartPrice;
     } else {
       discount = 0;
     }
   }
 
   if (req.body.confirm == false) {
-    !discount
-      ? res.status(401).json({ message: "Invalid coupon" })
-      : res.json({
-          total: Math.floor(req.body.cartPrice - discount),
-        });
+    res.json({
+      message: `Your Total Will Be ${Math.floor(
+        cartPrice - discount
+      )} and your balance is ${balance}`,
+    });
   } else if (req.body.confirm == true) {
     const makePurchase = await prisma.purchases.create({
       data: {
         moviesIDs: cartMovies,
-        amount: Math.floor(req.body.cartPrice - discount),
+        amount: Math.floor(cartPrice - discount),
         user: {
           connect: {
             id: userDetails.user.id,
@@ -117,13 +118,26 @@ export default async function addtest(
         id: userDetails.user.id,
       },
       data: {
-        balance: balance - Math.floor(req.body.cartPrice - discount),
+        balance: balance - Math.floor(cartPrice - discount),
+      },
+    });
+
+    const updatedWishlist = cartMovies?.filter(
+      (x: any) => !wishlistMovies?.includes(x)
+    );
+
+    await prisma.wishlist.update({
+      where: {
+        userID: userDetails.user.id,
+      },
+      data: {
+        moviesIDs: updatedWishlist,
       },
     });
 
     res.json({
       balance: balance,
-      total: balance - Math.floor(req.body.cartPrice - discount),
+      total: balance - Math.floor(cartPrice - discount),
       makePurchase,
       removeFromCart,
     });

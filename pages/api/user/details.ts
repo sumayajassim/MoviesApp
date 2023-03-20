@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../../lib/prisma";
 import jwtDecode from "jwt-decode";
 import getMovie from "@/components/helpers/getmovie";
+import axios from "axios";
 
 const BADGES = {
   obama: {
@@ -54,7 +55,7 @@ export default async function details2(
   let wishlistLength = user.wishlist?.moviesIDs.length || [];
   let purchasedMovies = [];
   let userWishlistMovieDetails = [];
-  let userCartMoviesDetails = [];
+  let userCartMoviesDetails: any[] = [];
   let badges: any = [];
 
   if (user.purchases.length > 0) {
@@ -92,8 +93,6 @@ export default async function details2(
     console.log(userWishlistMovieDetails);
   }
 
-  console.log(userWishlistMovieDetails);
-
   if (userCartLength > 0) {
     const userCartMovies = await prisma.cart.findUniqueOrThrow({
       where: {
@@ -107,6 +106,46 @@ export default async function details2(
       )
     );
   }
+
+  const trendingMovies = await axios.get(
+    "https://api.themoviedb.org/3/discover/movie?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1"
+  );
+
+  const trendingMoviesArray = trendingMovies.data.results.map(
+    (id: any) => id.id
+  );
+
+  const upcomingMovies = await axios.get(
+    `https://api.themoviedb.org/3/movie/upcoming?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&page=1`
+  );
+
+  const upcomingMoviesArray = trendingMovies.data.results.map(
+    (id: any) => id.id
+  );
+
+  const topRatedMovies = await axios.get(
+    `https://api.themoviedb.org/3/movie/top_rated?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&page=1`
+  );
+
+  const topRatedMoviesArray = trendingMovies.data.results.map(
+    (id: any) => id.id
+  );
+
+  const cartMovies = user?.cart?.moviesIDs;
+
+  console.log(
+    trendingMoviesArray.includes(315162) ||
+      upcomingMoviesArray.includes(315162) ||
+      topRatedMoviesArray.includes(315162)
+  );
+
+  cartMovies?.map((movie: any, index: any) => {
+    trendingMoviesArray.includes(movie * 1) ||
+    upcomingMoviesArray.includes(movie * 1) ||
+    topRatedMoviesArray.includes(movie * 1)
+      ? (userCartMoviesDetails[index].price = 10)
+      : (userCartMoviesDetails[index].price = 5);
+  });
 
   let userPurchasesLength = purchasedMovies.length || 0;
 
