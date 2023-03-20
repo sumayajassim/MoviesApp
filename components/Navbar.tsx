@@ -16,8 +16,7 @@ function Navbar() {
   const { ref, isComponentVisible, setIsComponentVisible } =
     useComponentVisible(false);
   const [showModal, setShowModal] = useState(false);
-  const { isLoggedIn, logout } = useAuth();
-
+  const { isLoggedIn, logout, token } = useAuth();
   const clickHandler = (e: any) => {
     if (e.target.id === "signin") {
       setStatus((status) => true);
@@ -30,8 +29,9 @@ function Navbar() {
     queryKey: ["userDetails"],
     queryFn: () =>
       axios.get("/api/user/details", {
-        headers: { Authorization: localStorage.getItem("token") },
+        headers: { Authorization: token },
       }),
+    enabled: !!token,
   });
 
   return (

@@ -5,11 +5,12 @@ import axios from "axios";
 import Context from "@/context/context";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
-
+import { useAuth } from "@/context/auth";
 function MovieComponent(props) {
   const { movie, page } = props;
   const router = useRouter();
   const [like, setLike] = useState(movie?.inWishlist);
+  const { token } = useAuth();
   const queryClient = useQueryClient();
 
   // console.log("token", localStorage.getItem("token"));
@@ -19,7 +20,7 @@ function MovieComponent(props) {
         axios.post(
           "/api/wishlist/add",
           { moviesIDs: [movieID.toString()] },
-          { headers: { Authorization: localStorage.getItem("token") } }
+          { headers: { Authorization: token } }
         ),
       onSuccess: (res) => {
         toast.success(res.data.message);
@@ -39,7 +40,7 @@ function MovieComponent(props) {
         axios.post(
           "/api/wishlist/remove",
           { moviesIDs: [movieID.toString()] },
-          { headers: { Authorization: localStorage.getItem("token") } }
+          { headers: { Authorization: token } }
         ),
       onSuccess: (res, movieID) => {
         setLike((like) => !like);
@@ -49,19 +50,21 @@ function MovieComponent(props) {
 
   const { mutate: handleAddToCartClick, isLoading: handleAddToCartLoading } =
     useMutation({
-      mutationFn: (movieID: any) =>
-        axios.post(
-          "/api/cart/add",
-          { moviesIDs: [movieID.toString()] },
-          { headers: { Authorization: localStorage.getItem("token") } }
-        ),
-      onSuccess: (res) => {
-        queryClient.invalidateQueries(["cartDetails"]);
-        toast.success(`${res?.data?.message}`);
+      mutationFn: (movieID: any) => {
+        return axios
+          .post(
+            "/api/cart/add",
+            { moviesIDs: [movieID.toString()] },
+            { headers: { Authorization: token } }
+          )
+          .then((response) => toast.success(`${response?.data?.message}`));
       },
       onError: (err) => {
         console.log(err);
         toast.error(`${err?.response?.data?.message}`);
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries(["cartDetails"]);
       },
     });
 

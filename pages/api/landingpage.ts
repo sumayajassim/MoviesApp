@@ -44,7 +44,6 @@ export default async function landingpage(
         } else {
           movie["inCart"] = false;
         }
-
         if (userPurchases?.includes(movie.id.toString())) {
           movie["isPurchased"] = true;
         } else {

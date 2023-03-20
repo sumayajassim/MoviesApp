@@ -7,53 +7,94 @@ import { useRouter } from "next/router";
 import { useAuth } from "@/context/auth";
 
 export default function Modal(props) {
-  const { data, setData } = useContext(AppContext);
   const router = useRouter();
-  console.log("cart data", data.cart);
   const [discount, setDiscount] = useState(false);
   const [coupon, setCoupon] = useState("");
-
+  const { token } = useAuth();
   const queryClient = useQueryClient();
+  function getSum(total, num) {
+    return total + num.price;
+  }
+
   const { data: userDetails, isLoading: userDetailsLoading } = useQuery(
     ["cartDetails"],
     () =>
       axios.get("/api/user/details", {
-        headers: { Authorization: localStorage.getItem("token") },
-      })
+        headers: { Authorization: token },
+      }),
+    { enabled: !!token }
   );
+
+  const totalPrice = userDetails?.data.cart.reduce(getSum, 0);
+  let finalPrice = totalPrice;
+
   const { mutate: handelRemoveFromCart, isLoading: removeHandlerLoading } =
     useMutation({
-      mutationFn: (movieID: any) =>
-        axios.post(
-          "/api/cart/remove",
-          { moviesIDs: [movieID.toString()] },
-          { headers: { Authorization: localStorage.getItem("token") } }
-        ),
+      mutationFn: (movieID: any) => {
+        return axios
+          .post(
+            "/api/cart/remove",
+            { moviesIDs: [movieID.toString()] },
+            { headers: { Authorization: token } }
+          )
+          .then((response) => console.log(response));
+      },
+      onError: (err) => {
+        toast.error(err.data.message);
+      },
       onSuccess: (res) => {
-        queryClient.invalidateQueries(["cartDetails"]);
+        queryClient.invalidateQueries({ queryKey: ["cartDetails"] });
         toast.success(res.data.message);
       },
     });
-  const { mutate: handelCheckout, isLoading: checkoutHandlerLoading } =
-    useMutation({
-      mutationFn: (confirm: boolean) =>
-        axios.post(
-          "/api/purchase/add",
-          { confirm, cartPrice: totalPrice },
-          { headers: { Authorization: token } }
-        ),
-      onSuccess: (res, movieID) => {
-        queryClient.invalidateQueries(["userDetails"]);
-        toast.success("Successfully purchased!");
-      },
-    });
-  const totalPrice = userDetails?.data.cart.length * 5;
+  const {
+    data: checkout,
+    mutate: handelCheckout,
+    isLoading: checkoutHandlerLoading,
+  } = useMutation({
+    mutationFn: (confirm: boolean) =>
+      axios.post(
+        "/api/purchase/add",
+        { confirm, cartPrice: finalPrice },
+        { headers: { Authorization: token } }
+      ),
+    onError: (err) => toast.error(`${err?.data.message}`),
+    onSuccess: (res, movieID) => {
+      queryClient.invalidateQueries(["cartDetails"]);
+      toast.success(res.data.message);
+    },
+  });
+
+  const {
+    data: discountData,
+    mutate: handleDiscount,
+    isLoading: handleDiscountLoading,
+  } = useMutation({
+    mutationFn: (confirm: boolean) =>
+      axios.post(
+        "/api/purchase/add",
+        { confirm, cartPrice: totalPrice, code: coupon },
+        { headers: { Authorization: token } }
+      ),
+    onError: (err) => toast.error(`${err?.data.message}`),
+    onSuccess: (res, movieID) => {
+      console.log({ coupon });
+      if (coupon) {
+        setDiscount((discount) => !discount);
+        finalPrice = res.data.total;
+      }
+      queryClient.invalidateQueries(["userDetails"]);
+      toast.success(res.data.message);
+    },
+  });
+
   const cartItems = userDetails?.data.cart?.map((item) => (
     <li
       key={item.id}
       className="border-t-1 border-b-1 list-none py-4 px-8 flex items-center"
       onClick={() => {
         router.push(`/movie/${item.id}`);
+        props.setShowModal(false);
       }}
     >
       <img
@@ -79,7 +120,7 @@ export default function Modal(props) {
         </div>
       </div>
       <span className="flex flex-col text-2xl font-bold grow items-end">
-        $5
+        ${item.price || 5}
         <i
           className="fa-solid fa-trash text-red-500 text-xl pl-0"
           onClick={(e) => {
@@ -110,7 +151,7 @@ export default function Modal(props) {
                     onClick={() => props.setShowModal(false)}
                   >
                     <span className="text-black">
-                      <i class="fa-sharp fa-solid fa-xmark"></i>
+                      <i className="fa-sharp fa-solid fa-xmark"></i>
                     </span>
                   </button>
                 </div>
@@ -135,7 +176,7 @@ export default function Modal(props) {
                         className="bg-gray-200 appearance-none border-2 w-48 border-gray-200 rounded py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:border-none active:border-none focus:border-red-700 rounded-br-none rounded-tr-none"
                       />
                       <button
-                        onClick={() => handelCheckout(false)}
+                        onClick={() => handleDiscount(false)}
                         disabled={!coupon}
                         className="btn btn-red hover:shadow-lg disabled:bg-red-300 disabled:shadow-none active:bg-red-900 ease-linear transition-all duration-150 rounded-bl-none rounded-tl-none"
                       >
@@ -149,19 +190,22 @@ export default function Modal(props) {
                           <span className="float-right p-1 font-bold tracking-wide text-sm">
                             Cart total{" "}
                           </span>
-                          <span className="line-through">$150</span>
+                          <span className="line-through">${totalPrice}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="float-right p-1 font-bold tracking-wide text-sm">
                             Coupon Discount
                           </span>
-                          <span className="">- $10 (10%)</span>
+                          <span className="">
+                            ( -{discountData?.data.discountPercentage}%) - $
+                            {totalPrice - discountData?.data.total}
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="float-right p-1 font-bold tracking-wide text-sm">
                             Total amount{" "}
                           </span>
-                          <span className="">$140</span>
+                          <span className="">${discountData?.data.total}</span>
                         </div>
                       </div>
                     ) : (
@@ -182,6 +226,7 @@ export default function Modal(props) {
                         type="button"
                         onClick={() => {
                           handelCheckout(true);
+                          setDiscount(false);
                           props.setShowModal(false);
                         }}
                       >

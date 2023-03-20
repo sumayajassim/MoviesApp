@@ -1,20 +1,21 @@
 import React, { useContext } from "react";
-import Context from "@/context/context";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import Spinner from "./spinner";
+import { useAuth } from "@/context/auth";
 
 function Wishlist() {
   const router = useRouter();
-
+  const { token } = useAuth();
   const queryClient = useQueryClient();
+
   const { data: userDetails, isLoading: userDetailsLoading } = useQuery({
     queryKey: ["userDetails"],
     queryFn: () =>
       axios.get("/api/user/details", {
-        headers: { Authorization: localStorage.getItem("token") },
+        headers: { Authorization: token },
       }),
   });
 
@@ -24,11 +25,11 @@ function Wishlist() {
         axios.post(
           "/api/cart/add",
           { moviesIDs: [movieID.toString()] },
-          { headers: { Authorization: localStorage.getItem("token") } }
+          { headers: { Authorization: token } }
         ),
-      onSuccess: () => {
+      onSuccess: (res) => {
         queryClient.invalidateQueries(["userDetails"]);
-        toast.success("Movie Added successfully to your cart");
+        toast.success(res.data.message);
       },
       onError: (err) => {
         console.log(err);
@@ -42,7 +43,7 @@ function Wishlist() {
         axios.post(
           "/api/wishlist/remove",
           { moviesIDs: [movieID.toString()] },
-          { headers: { Authorization: localStorage.getItem("token") } }
+          { headers: { Authorization: token } }
         ),
       onSuccess: (res, movieID) => {
         queryClient.invalidateQueries(["userDetails"]);

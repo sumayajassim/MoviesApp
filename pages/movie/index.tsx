@@ -6,6 +6,7 @@ import MovieComponent from "@/components/MovieComponent";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import { useDebounce } from "use-debounce";
+import { useAuth } from "@/context/auth";
 
 function index(props: any) {
   const queryClient = useQueryClient();
@@ -13,7 +14,7 @@ function index(props: any) {
   const [search, setSearch] = useState("");
   const [genre, setGenre] = useState("");
   const [value] = useDebounce(search, 1000);
-
+  const { token } = useAuth();
   const {
     data,
     error,
@@ -24,14 +25,10 @@ function index(props: any) {
     status,
   } = useInfiniteQuery({
     queryKey: ["movies", search, genre],
-    queryFn: async ({
-      pageParam = 1,
-      genreId = genre,
-      searchText = search,
-    }) => {
+    queryFn: async ({ pageParam = 1, genreId = genre, searchText = value }) => {
       const res = await axios.get(
         `/api/movie/test?page=${pageParam}&search=${searchText}&genre=${genreId}`,
-        { headers: { Authorization: localStorage.getItem("token") } }
+        { headers: { Authorization: token } }
       );
       return res.data;
     },

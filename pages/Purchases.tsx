@@ -1,23 +1,27 @@
 import MovieComponent from "@/components/MovieComponent";
 import Spinner from "@/components/spinner";
+import { useAuth } from "@/context/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import React from "react";
 
 function Purchases() {
   const queryClient = useQueryClient();
+  const { token } = useAuth();
   const { data: previousPurchases, isLoading: userDetailsLoading } = useQuery({
     queryKey: ["previousPurchases"],
     queryFn: () =>
       axios.get("/api/user/details", {
-        headers: { Authorization: localStorage.getItem("token") },
+        headers: { Authorization: token },
       }),
+    enabled: !!token,
   });
+
   // const userDetail = queryClient.getQueryData('userDetails');
   return (
     <div className="p-12">
       <h1 className="text-2xl font-bold pl-10 pt-10">Previously purchased</h1>
-      {previousPurchases?.length > 0 ? (
+      {previousPurchases?.data.purchases.length > 0 ? (
         <div className="w-fit mx-auto my-auto flex flex-col p-10">
           {userDetailsLoading ? (
             <Spinner />

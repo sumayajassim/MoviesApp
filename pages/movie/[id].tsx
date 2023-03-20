@@ -5,29 +5,27 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { Movie } from "@/types";
-import { parseISO, format } from "date-fns";
-import addToWishList from "../api/wishlist/add";
 import dayjs from "dayjs";
 import Spinner from "@/components/spinner";
-// import Spinner from "../../components/Spinner";
+import { useAuth } from "@/context/auth";
 
 function Movie({}) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { id } = router.query;
-  console.log({ id });
+  const { token } = useAuth();
 
   const { data: movie, isLoading: movieLoading } = useQuery<{ data?: Movie }>({
     queryKey: ["movie", id],
     queryFn: () =>
       axios.get(`/api/movie/${id}`, {
-        headers: { Authorization: localStorage.getItem("token") },
+        headers: { Authorization: token },
       }),
     enabled: !!id,
   });
 
   const genres = movie?.data.genres.map((genre, index) => (
-    <span className="font-semibold">
+    <span className="font-semibold" key={genre.id}>
       {genre.name} {index !== movie?.data.genres.length - 1 ? ", " : ""}{" "}
     </span>
   ));
@@ -49,7 +47,7 @@ function Movie({}) {
         axios.post(
           "/api/wishlist/add",
           { moviesIDs: [movieID.toString()] },
-          { headers: { Authorization: localStorage.getItem("token") } }
+          { headers: { Authorization: token } }
         ),
       onSuccess: (res) => {
         queryClient.invalidateQueries(["movie"]);
@@ -65,15 +63,16 @@ function Movie({}) {
     });
 
   const { mutate: addToCart, isLoading: handleAddToCartLoading } = useMutation({
-    mutationFn: (movieID: any) =>
-      axios.post(
+    mutationFn: (movieID: any) => {
+      return axios.post(
         "/api/cart/add",
         { moviesIDs: [movieID.toString()] },
-        { headers: { Authorization: localStorage.getItem("token") } }
-      ),
+        { headers: { Authorization: token } }
+      );
+    },
     onSuccess: (res) => {
       queryClient.invalidateQueries(["cartDetails"]);
-      queryClient.invalidateQueries(["movie"]);
+      // queryClient.invalidateQueries(["movie"]);
       toast.success(`${res?.data?.message}`);
     },
     onError: (err) => {
@@ -88,7 +87,7 @@ function Movie({}) {
         axios.post(
           "/api/wishlist/remove",
           { moviesIDs: [movieID.toString()] },
-          { headers: { Authorization: localStorage.getItem("token") } }
+          { headers: { Authorization: token } }
         ),
       onSuccess: (res, movieID) => {
         queryClient.invalidateQueries(["movie"]);
