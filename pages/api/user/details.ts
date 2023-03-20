@@ -76,7 +76,7 @@ export default async function details2(
     purchasedMovies = userPurchasedMoviesDetails;
   }
 
-  // console.log(purchasedMovies)
+  console.log("oijhg");
 
   if (wishlistLength > 0) {
     const userWishlist = await prisma.wishlist.findUniqueOrThrow({
@@ -133,12 +133,6 @@ export default async function details2(
 
   const cartMovies = user?.cart?.moviesIDs;
 
-  console.log(
-    trendingMoviesArray.includes(315162) ||
-      upcomingMoviesArray.includes(315162) ||
-      topRatedMoviesArray.includes(315162)
-  );
-
   cartMovies?.map((movie: any, index: any) => {
     trendingMoviesArray.includes(movie * 1) ||
     upcomingMoviesArray.includes(movie * 1) ||
@@ -154,25 +148,36 @@ export default async function details2(
   }
 
   if (userPurchasesLength >= 1) {
-    badges = [BADGES.putin.url];
+    badges = [BADGES.obama.url, BADGES.putin.url];
   }
 
   if (userPurchasesLength >= 2) {
-    badges = [BADGES.ramen.url];
+    badges = [BADGES.obama.url, BADGES.putin.url, BADGES.ramen.url];
   }
 
   if (userPurchasesLength >= 5) {
-    badges = [BADGES.phoenix.url];
+    badges = [
+      BADGES.obama.url,
+      BADGES.putin.url,
+      BADGES.ramen.url,
+      BADGES.phoenix.url,
+    ];
   }
 
   if (userPurchasesLength >= 10) {
-    badges = [BADGES.yuda.url];
+    badges = [
+      BADGES.obama.url,
+      BADGES.putin.url,
+      BADGES.ramen.url,
+      BADGES.phoenix.url,
+      BADGES.yuda.url,
+    ];
   }
 
   const userr = {
     userName: userDetails.user.firstName + " " + userDetails.user.firstName,
     email: userDetails.user.emailAddress,
-    balance: userDetails.user.balance,
+    balance: user.balance,
     badges,
   };
 

@@ -32,7 +32,7 @@ export default async function landingpage(
       .map(({ moviesIDs }) => moviesIDs)
       .flat();
 
-    const checkUserActivities = (array) => {
+    const checkUserActivities = (array: any[]) => {
       array.map((movie) => {
         if (userData?.wishlist?.moviesIDs.includes(movie.id.toString())) {
           movie["inWishlist"] = true;
