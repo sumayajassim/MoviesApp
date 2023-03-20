@@ -70,26 +70,31 @@ export default async function addtest(
   });
 
   let discount = 0;
+  const codeSent = req.body.code || null;
+
+  const discountCodes = await prisma.discount.findMany();
+
+  const allCodes = discountCodes.map((x: any) => x.code);
 
   if (req.body.code) {
-    const discountCode = await prisma.discount.findFirstOrThrow({
-      where: {
-        code: req.body.code,
-      },
-    });
+    if (allCodes.includes(req.body.code)) {
+      const discountCode = await prisma.discount.findFirstOrThrow({
+        where: {
+          code: codeSent,
+        },
+      });
 
-    if (discountCode) {
       discount = (discountCode.amount / 100) * cartPrice;
     } else {
+      res.json({ message: "Invalid Discount Code" });
       discount = 0;
     }
   }
 
   if (req.body.confirm == false) {
     res.json({
-      message: `Your Total Will Be ${Math.floor(
-        cartPrice - discount
-      )} and your balance is ${balance}`,
+      total: Math.floor(cartPrice - discount),
+      balance: balance,
     });
   } else if (req.body.confirm == true) {
     const makePurchase = await prisma.purchases.create({
