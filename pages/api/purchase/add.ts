@@ -76,6 +76,8 @@ export default async function addtest(
 
   const allCodes = discountCodes.map((x: any) => x.code);
 
+  let percentage = 0;
+
   if (req.body.code) {
     if (allCodes.includes(req.body.code)) {
       const discountCode = await prisma.discount.findFirstOrThrow({
@@ -84,6 +86,7 @@ export default async function addtest(
         },
       });
 
+      percentage = discountCode.amount;
       discount = (discountCode.amount / 100) * cartPrice;
     } else {
       res.json({ message: "Invalid Discount Code" });
@@ -95,6 +98,7 @@ export default async function addtest(
     res.json({
       total: Math.floor(cartPrice - discount),
       balance: balance,
+      discountPercentage: percentage,
     });
   } else if (req.body.confirm == true) {
     const makePurchase = await prisma.purchases.create({
@@ -143,6 +147,7 @@ export default async function addtest(
     res.json({
       balance: balance,
       total: balance - Math.floor(cartPrice - discount),
+      discountPercentage: percentage,
       makePurchase,
       removeFromCart,
     });
