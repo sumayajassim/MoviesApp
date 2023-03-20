@@ -163,7 +163,7 @@ export default async function addtest(
         wishlist: wishlist,
       });
     } else {
-      res.json("Your out of Balance");
+      res.json({ message: "Your out of Balance" });
     }
   }
 }
