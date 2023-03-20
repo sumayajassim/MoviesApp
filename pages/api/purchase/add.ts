@@ -77,6 +77,15 @@ export default async function addtest(
   const allCodes = discountCodes.map((x: any) => x.code);
 
   let percentage = 0;
+  let purchasedMovies: string | any[] = [];
+
+  if (purchases.length > 0) {
+    purchasedMovies = purchases
+      .map((movie: any) => movie.moviesIDs)
+      .flatMap((x: any) => x);
+  }
+
+  console.log(purchasedMovies);
 
   if (req.body.code) {
     if (allCodes.includes(req.body.code)) {
@@ -131,9 +140,15 @@ export default async function addtest(
       },
     });
 
-    const updatedWishlist = cartMovies?.filter(
-      (x: any) => !wishlistMovies?.includes(x)
+    const updatedWishlist = wishlistMovies?.filter(
+      (x: any) => !purchasedMovies?.includes(x)
     );
+
+    res.json({
+      cart: cartMovies,
+      wishlist: wishlistMovies,
+      updatedWishlist: updatedWishlist,
+    });
 
     await prisma.wishlist.update({
       where: {
