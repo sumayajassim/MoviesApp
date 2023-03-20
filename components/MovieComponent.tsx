@@ -42,13 +42,7 @@ function MovieComponent(props) {
           { headers: { Authorization: localStorage.getItem("token") } }
         ),
       onSuccess: (res, movieID) => {
-        // queryClient.invalidateQueries(["movie"]);
         setLike((like) => !like);
-        // if (page === "home") {
-        //   queryClient.invalidateQueries(["userDetails"]);
-        // } else {
-        //   queryClient.invalidateQueries(["userDetails"]);
-        // }
         toast.success("Movie removed successfully from your wishlist!!");
       },
     });
@@ -61,9 +55,9 @@ function MovieComponent(props) {
           { moviesIDs: [movieID.toString()] },
           { headers: { Authorization: localStorage.getItem("token") } }
         ),
-      onSuccess: () => {
-        queryClient.invalidateQueries(["userDetails"]);
-        toast.success("Movie Added successfully to your cart");
+      onSuccess: (res) => {
+        queryClient.invalidateQueries(["cartDetails"]);
+        toast.success(`${res?.data?.message}`);
       },
       onError: (err) => {
         console.log(err);

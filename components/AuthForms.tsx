@@ -2,10 +2,9 @@ import React, { useState, useEffect, useContext } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
-import Context from "@/context/context";
-
 import axios from "axios";
 import { useAuth } from "@/context/auth";
+
 function AuthForms(props: { status: Boolean }) {
   const router = useRouter();
   const { status } = props;
@@ -34,6 +33,7 @@ function AuthForms(props: { status: Boolean }) {
     onSuccess: (res) => {
       if (!res.data.token) return;
       login(res.data.token);
+      router.reload();
     },
     onError: (err) => {
       console.log(err);

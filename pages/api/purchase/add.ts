@@ -4,8 +4,10 @@ import jwtDecode from "jwt-decode";
 import getMovie from "@/components/helpers/getmovie";
 import axios from "axios";
 
-export default async function addtest(req: NextApiRequest , res: NextApiResponse){
-
+export default async function addtest(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   const API_KEY = process.env.API_KEY;
 
   if (!req.headers["authorization"]) {
@@ -23,15 +25,15 @@ export default async function addtest(req: NextApiRequest , res: NextApiResponse
     },
   });
 
-  let cartPrice = 0
+  let cartPrice = 0;
 
   const cart = await prisma.cart.findUniqueOrThrow({
-    where:{
-        userID: userDetails.user.id
-    }
-  })
+    where: {
+      userID: userDetails.user.id,
+    },
+  });
 
-  const cartMovies = cart.moviesIDs
+  const cartMovies = cart.moviesIDs;
 
   const trendingMovies = await axios.get(
     "https://api.themoviedb.org/3/discover/movie?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1"
@@ -57,80 +59,73 @@ export default async function addtest(req: NextApiRequest , res: NextApiResponse
     (id: any) => id.id
   );
 
+  // cartMovies.map((id: any) => {
+  //   trendingMoviesArray.includes(id * 1) ||
+  //   upcomingMoviesArray.includes(id * 1) ||
+  //   topRatedMoviesArray.includes(id * 1)
+  //     ? (cartPrice = cartPrice + 10)
+  //     : (cartPrice = cartPrice + 5);
+  // });
 
-  cartMovies.map((id: any) => {
-    trendingMoviesArray.includes(id * 1) ||
-    upcomingMoviesArray.includes(id * 1) ||
-    topRatedMoviesArray.includes(id * 1)
-      ? (cartPrice = cartPrice + 10)
-      : (cartPrice = cartPrice + 5);
-  });
+  let discount = 0;
 
-  let discount = 0
-
-  if(req.body.code){
+  if (req.body.code) {
     const discountCode = await prisma.discount.findFirstOrThrow({
-        where:{
-            code: req.body.code
-        }
-    })
+      where: {
+        code: req.body.code,
+      },
+    });
 
-    if(discountCode){
-        discount = (discountCode.amount / 100) * cartPrice
+    if (discountCode) {
+      discount = (discountCode.amount / 100) * req.body.cartPrice;
+      console.log("discount", discount);
+    } else {
+      discount = 0;
     }
-    else{
-      discount = 0
-    }
-
   }
 
-
- if(req.body.confirm == false){
-    res.json({
-        message: `Your Total Will Be ${
-          Math.floor(cartPrice - discount)
-        } and your balance is ${balance}`,
-      });
- }
-
- else if(req.body.confirm == true){
+  if (req.body.confirm == false) {
+    !discount
+      ? res.status(401).json({ message: "Invalid coupon" })
+      : res.json({
+          total: Math.floor(req.body.cartPrice - discount),
+        });
+  } else if (req.body.confirm == true) {
     const makePurchase = await prisma.purchases.create({
-    data:{
+      data: {
         moviesIDs: cartMovies,
-        amount: Math.floor(cartPrice - discount),
-        user:{
-            connect:{
-                id: userDetails.user.id
-            }
-        }
-    }
-  })
+        amount: Math.floor(req.body.cartPrice - discount),
+        user: {
+          connect: {
+            id: userDetails.user.id,
+          },
+        },
+      },
+    });
 
-  const removeFromCart = await prisma.cart.update({
-    where:{
-        userID: userDetails.user.id
-    },
-    data:{
-        moviesIDs : []
-    }
-  }) 
+    const removeFromCart = await prisma.cart.update({
+      where: {
+        userID: userDetails.user.id,
+      },
+      data: {
+        moviesIDs: [],
+      },
+    });
 
- await prisma.user.update({
-  where:{
-    id : userDetails.user.id
-  },
-  data:{
-    balance : balance - Math.floor(cartPrice - discount)
+    await prisma.user.update({
+      where: {
+        id: userDetails.user.id,
+      },
+      data: {
+        balance: balance - Math.floor(req.body.cartPrice - discount),
+      },
+    });
+
+    res.json({
+      balance: balance,
+      total: balance - Math.floor(req.body.cartPrice - discount),
+      makePurchase,
+      removeFromCart,
+    });
   }
- })
-  
-  res.json({
-    balance: balance,
-    total : balance - Math.floor(cartPrice - discount),
-    makePurchase,
-    removeFromCart
-  });
-
- }
-
 }

@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
+import { useAuth } from "@/context/auth";
 
 export default function Modal(props) {
   const { data, setData } = useContext(AppContext);
@@ -13,13 +14,13 @@ export default function Modal(props) {
   const [coupon, setCoupon] = useState("");
 
   const queryClient = useQueryClient();
-  const { data: userDetails, isLoading: userDetailsLoading } = useQuery({
-    queryKey: ["userDetails"],
-    queryFn: () =>
+  const { data: userDetails, isLoading: userDetailsLoading } = useQuery(
+    ["cartDetails"],
+    () =>
       axios.get("/api/user/details", {
         headers: { Authorization: localStorage.getItem("token") },
-      }),
-  });
+      })
+  );
   const { mutate: handelRemoveFromCart, isLoading: removeHandlerLoading } =
     useMutation({
       mutationFn: (movieID: any) =>
@@ -28,9 +29,9 @@ export default function Modal(props) {
           { moviesIDs: [movieID.toString()] },
           { headers: { Authorization: localStorage.getItem("token") } }
         ),
-      onSuccess: (res, movieID) => {
-        queryClient.invalidateQueries(["userDetails"]);
-        toast.success("Movie removed successfully from your cart!");
+      onSuccess: (res) => {
+        queryClient.invalidateQueries(["cartDetails"]);
+        toast.success(res.data.message);
       },
     });
   const { mutate: handelCheckout, isLoading: checkoutHandlerLoading } =
@@ -38,16 +39,18 @@ export default function Modal(props) {
       mutationFn: (confirm: boolean) =>
         axios.post(
           "/api/purchase/add",
-          { confirm },
-          { headers: { Authorization: localStorage.getItem("token") } }
+          { confirm, cartPrice: totalPrice },
+          { headers: { Authorization: token } }
         ),
       onSuccess: (res, movieID) => {
         queryClient.invalidateQueries(["userDetails"]);
+        toast.success("Successfully purchased!");
       },
     });
-
+  const totalPrice = userDetails?.data.cart.length * 5;
   const cartItems = userDetails?.data.cart?.map((item) => (
     <li
+      key={item.id}
       className="border-t-1 border-b-1 list-none py-4 px-8 flex items-center"
       onClick={() => {
         router.push(`/movie/${item.id}`);
@@ -76,10 +79,14 @@ export default function Modal(props) {
         </div>
       </div>
       <span className="flex flex-col text-2xl font-bold grow items-end">
-        $10
+        $5
         <i
           className="fa-solid fa-trash text-red-500 text-xl pl-0"
-          onClick={() => handelRemoveFromCart(item.id)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handelRemoveFromCart(item.id);
+          }}
         ></i>
       </span>
     </li>
@@ -159,7 +166,7 @@ export default function Modal(props) {
                       </div>
                     ) : (
                       <span className="float-right p-2 font-bold tracking-wide text-md">
-                        Cart total : <span className="">$150</span>
+                        Cart total : <span className="">${totalPrice}</span>
                       </span>
                     )}
                     <div className="flex flex-row">
@@ -180,7 +187,6 @@ export default function Modal(props) {
                       >
                         Checkout
                       </button>
-                      s
                     </div>
                   </div>
                 )}

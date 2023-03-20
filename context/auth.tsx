@@ -1,10 +1,15 @@
+import router from "next/router";
 import { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext({} as AuthContextType);
 
-export const useAuth = () => useContext(AuthContext) 
+export const useAuth = () => useContext(AuthContext);
 
-export default function AuthProvider({ children }: { children: React.ReactNode }) {
+export default function AuthProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [token, setToken] = useState("");
 
   useEffect(() => {
@@ -23,6 +28,8 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   const logout = () => {
     localStorage.clear();
     setToken("");
+    router.push("/");
+    router.reload();
   };
 
   const isLoggedIn = !!token;

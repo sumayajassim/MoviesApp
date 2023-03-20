@@ -45,9 +45,9 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
     );
 
     movieIdsArray.map((movie: string, index: any) => {
-      trendingMoviesArray.includes(movie) ||
-      topRatedMoviesArray.includes(movie) ||
-      UpcomingMoviesArray.includes(movie)
+      trendingMoviesArray.includes(movie.toString()) ||
+      topRatedMoviesArray.includes(movie.toString()) ||
+      UpcomingMoviesArray.includes(movie.toString())
         ? (data.results[index].price = 10)
         : (data.results[index].price = 5);
     });
@@ -92,9 +92,9 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
   );
 
   movieIdsArray.map((movie: string, index: any) => {
-    trendingMoviesArray.includes(movie) ||
-    topRatedMoviesArray.includes(movie) ||
-    UpcomingMoviesArray.includes(movie)
+    trendingMoviesArray.includes(movie.toString()) ||
+    topRatedMoviesArray.includes(movie.toString()) ||
+    UpcomingMoviesArray.includes(movie.toString())
       ? (data.results[index].price = 10)
       : (data.results[index].price = 5);
   });
@@ -126,19 +126,19 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
   const userWishlist = wishlist.moviesIDs;
 
   movieIdsArray.map((movie: any, index: number) => {
-    purchasedMovies.includes(movie)
+    purchasedMovies.includes(movie.toString())
       ? (data.results[index].isPurchased = true)
       : (data.results[index].isPurchased = false);
   });
 
   movieIdsArray.map((movie: any, index: number) => {
-    userCart.includes(movie)
+    userCart.includes(movie.toString())
       ? (data.results[index].inCart = true)
       : (data.results[index].inCart = false);
   });
 
   movieIdsArray.map((movie: any, index: number) => {
-    userWishlist.includes(movie)
+    userWishlist.includes(movie.toString())
       ? (data.results[index].inWishlist = true)
       : (data.results[index].inWishlist = false);
   });

@@ -53,6 +53,7 @@ function Movie({}) {
         ),
       onSuccess: (res) => {
         queryClient.invalidateQueries(["movie"]);
+        queryClient.invalidateQueries(["userDetails"]);
         toast.success(res.data.message);
       },
       onError: (err) => {
@@ -70,9 +71,10 @@ function Movie({}) {
         { moviesIDs: [movieID.toString()] },
         { headers: { Authorization: localStorage.getItem("token") } }
       ),
-    onSuccess: () => {
-      queryClient.invalidateQueries(["userDetails"]);
-      toast.success("Movie Added successfully to your cart");
+    onSuccess: (res) => {
+      queryClient.invalidateQueries(["cartDetails"]);
+      queryClient.invalidateQueries(["movie"]);
+      toast.success(`${res?.data?.message}`);
     },
     onError: (err) => {
       console.log(err);
