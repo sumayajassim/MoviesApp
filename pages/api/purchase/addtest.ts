@@ -110,56 +110,60 @@ export default async function addtest(
       discountPercentage: percentage,
     });
   } else if (req.body.confirm == true) {
-    const makePurchase = await prisma.purchases.create({
-      data: {
-        moviesIDs: cartMovies,
-        amount: Math.floor(cartPrice - discount),
-        user: {
-          connect: {
-            id: userDetails.user.id,
+    if (balance >= Math.floor(cartPrice - discount)) {
+      const makePurchase = await prisma.purchases.create({
+        data: {
+          moviesIDs: cartMovies,
+          amount: Math.floor(cartPrice - discount),
+          user: {
+            connect: {
+              id: userDetails.user.id,
+            },
           },
         },
-      },
-    });
+      });
 
-    const removeFromCart = await prisma.cart.update({
-      where: {
-        userID: userDetails.user.id,
-      },
-      data: {
-        moviesIDs: [],
-      },
-    });
+      const removeFromCart = await prisma.cart.update({
+        where: {
+          userID: userDetails.user.id,
+        },
+        data: {
+          moviesIDs: [],
+        },
+      });
 
-    await prisma.user.update({
-      where: {
-        id: userDetails.user.id,
-      },
-      data: {
-        balance: balance - Math.floor(cartPrice - discount),
-      },
-    });
+      await prisma.user.update({
+        where: {
+          id: userDetails.user.id,
+        },
+        data: {
+          balance: balance - Math.floor(cartPrice - discount),
+        },
+      });
 
-    const updatedWishlist = wishlistMovies?.filter(
-      (x: any) => !purchasedMovies?.includes(x)
-    );
+      const updatedWishlist = wishlistMovies?.filter(
+        (x: any) => !purchasedMovies?.includes(x)
+      );
 
-    await prisma.wishlist.update({
-      where: {
-        userID: userDetails.user.id,
-      },
-      data: {
-        moviesIDs: updatedWishlist,
-      },
-    });
+      await prisma.wishlist.update({
+        where: {
+          userID: userDetails.user.id,
+        },
+        data: {
+          moviesIDs: updatedWishlist,
+        },
+      });
 
-    res.json({
-      balance: balance,
-      total: balance - Math.floor(cartPrice - discount),
-      discountPercentage: percentage,
-      makePurchase,
-      removeFromCart,
-      wishlist: wishlist,
-    });
+      res.json({
+        balance: balance,
+        total: balance - Math.floor(cartPrice - discount),
+        discountPercentage: percentage,
+        makePurchase,
+        removeFromCart,
+        wishlist: wishlist,
+      });
+    } else {
+      res.json("Your out of Balance");
+    }
   }
 }

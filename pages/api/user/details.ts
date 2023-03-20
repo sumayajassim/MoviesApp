@@ -76,8 +76,6 @@ export default async function details2(
     purchasedMovies = userPurchasedMoviesDetails;
   }
 
-  console.log("oijhg");
-
   if (wishlistLength > 0) {
     const userWishlist = await prisma.wishlist.findUniqueOrThrow({
       where: {
@@ -90,7 +88,6 @@ export default async function details2(
         async (movieID: string) => await getMovie(movieID)
       )
     );
-    console.log(userWishlistMovieDetails);
   }
 
   if (userCartLength > 0) {
