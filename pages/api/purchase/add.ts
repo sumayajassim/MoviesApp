@@ -89,7 +89,7 @@ export default async function addtest(
       percentage = discountCode.amount;
       discount = (discountCode.amount / 100) * cartPrice;
     } else {
-      res.json({ message: "Invalid Discount Code" });
+      res.status(401).json({ message: "Invalid Discount Code" });
       discount = 0;
     }
   }
