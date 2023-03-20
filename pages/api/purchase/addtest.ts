@@ -144,12 +144,6 @@ export default async function addtest(
       (x: any) => !purchasedMovies?.includes(x)
     );
 
-    res.json({
-      cart: cartMovies,
-      wishlist: wishlistMovies,
-      updatedWishlist: updatedWishlist,
-    });
-
     await prisma.wishlist.update({
       where: {
         userID: userDetails.user.id,
@@ -165,6 +159,7 @@ export default async function addtest(
       discountPercentage: percentage,
       makePurchase,
       removeFromCart,
+      wishlist: wishlist,
     });
   }
 }
