@@ -1,3 +1,6 @@
+// //// this should not be in the components folder.
+// //// use camelCase for file names
+
 import axios from "axios";
 const API_KEY = process.env.API_KEY;
 

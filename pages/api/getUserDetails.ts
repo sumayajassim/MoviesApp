@@ -4,6 +4,7 @@ import axios, { AxiosResponse } from "axios";
 import jwtDecode from "jwt-decode";
 import getMovie from "@/components/helpers/getmovie";
 
+// //// very messy code. This should be cleaned up. Remove the comments that are not needed.
 export default async function getUserDetails(
   req: NextApiRequest,
   res: NextApiResponse

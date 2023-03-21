@@ -34,6 +34,7 @@ export default async function badges(
   if (token) {
     let userDetails: any = jwtDecode(token as string);
 
+    // //// Is it only one purchase per user?
     const userPurchases = await prisma.purchases.findUniqueOrThrow({
       where: {
         userID: userDetails.user.id,

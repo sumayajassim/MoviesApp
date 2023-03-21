@@ -8,6 +8,7 @@ export default async function addtest(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  // //// defined but never used
   const API_KEY = process.env.API_KEY;
 
   if (!req.headers["authorization"]) {
@@ -98,11 +99,13 @@ export default async function addtest(
       percentage = discountCode.amount;
       discount = (discountCode.amount / 100) * cartPrice;
     } else {
+      // //// error returns should be as high as possible to reduce the amount of code that runs (especially database queries)
       res.status(401).json({ message: "Invalid Discount Code" });
       discount = 0;
     }
   }
 
+  // //// confirm?
   if (req.body.confirm == false) {
     res.json({
       total: Math.floor(cartPrice - discount),

@@ -7,6 +7,7 @@ export default async function moviePage(req: NextApiRequest , res: NextApiRespon
  if(pageNumber && pageNumber > 0){
         res.json(await fetchData(pageNumber))
     }
+  // //// else?
     
 }
 

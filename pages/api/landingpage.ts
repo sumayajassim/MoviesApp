@@ -17,6 +17,7 @@ export default async function landingpage(
   const nowPlaying_ = await nowPlaying();
   const topRated_ = await topRated();
 
+  // //// should be typed
   function mappingTheData(array) {
     return array.map((movie: any) => ({
       ...movie,
@@ -25,6 +26,7 @@ export default async function landingpage(
     }));
   }
 
+  // //// API key should be stored in an environment variable
   async function trendingMovies() {
     const { data } = await axios.get(
       "https://api.themoviedb.org/3/discover/movie?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1"
@@ -94,6 +96,7 @@ export default async function landingpage(
     checkUserActivities(nowPlaying_);
   }
 
+  // //// you can use randomUUID() from crypto instead of Math.random()
   res.json([
     {
       id: Math.floor(Math.random() * 10),

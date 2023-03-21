@@ -12,6 +12,7 @@ export default async function addToBalance(
     return res.json("UnAuthorized");
   }
 
+  // //// this is the first time i see this helper function used, it should be used in all the other endpoints
   const { id } = await authUser(token);
 
   await prisma.user.update({

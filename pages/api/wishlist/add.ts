@@ -7,6 +7,7 @@ async function addToWishList(req: NextApiRequest, res: NextApiResponse) {
   const token: any = req.headers["authorization"];
   const API_KEY = process.env.API_KEY;
 
+  // //// you can use a guard clause to reduce nesting.
   if (token) {
     let userDetails: any = jwtDecode(token as string);
 
@@ -22,6 +23,8 @@ async function addToWishList(req: NextApiRequest, res: NextApiResponse) {
         })),
       },
     });
+
+    // //// you could return an error here if purchased is not empty.
 
     const purchasedMovies = purchased.flatMap(({ moviesIDs }) => moviesIDs);
 
@@ -40,7 +43,8 @@ async function addToWishList(req: NextApiRequest, res: NextApiResponse) {
     });
 
     const moviesInWishList = wishlist.moviesIDs;
-
+  
+    // //// there's a much better way to do this.
     if (moviesInWishList.includes(req.body.moviesIDs[0])) {
       res.status(409).json({ message: "Movie Is ALready In the Wishlist" });
     } else if (moviesInCart.includes(req.body.moviesIDs[0])) {
@@ -59,6 +63,7 @@ async function addToWishList(req: NextApiRequest, res: NextApiResponse) {
           !moviesInWishList.includes(x)
       );
 
+      // //// this is not needed.
       const canBeAddedtoWishlist = finalArray;
 
       const update = await prisma.wishlist.update({
@@ -77,6 +82,7 @@ async function addToWishList(req: NextApiRequest, res: NextApiResponse) {
         `https://api.themoviedb.org/3/movie/${req.body.moviesIDs[0]}?api_key=${API_KEY}`
       );
 
+      // //// should return movie instead of data.
       res.json({ message: "Movie Added To Wishlist", data });
     }
   } else {

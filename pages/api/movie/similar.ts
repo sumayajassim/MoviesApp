@@ -23,6 +23,7 @@ export default async function getSimilarMovie(req: NextApiRequest , res: NextApi
 
    if(purchasedMovies.length > 0)
    {
+    // //// you are using a map in place of a forEach. You should use a forEach here.
     data.results.map((x:any , index: any) => {
         purchasedMovies.includes(x) ? data.results[index].isPurchased = true : data.results[index].isPurchased = false
     })
@@ -38,6 +39,7 @@ export default async function getSimilarMovie(req: NextApiRequest , res: NextApi
    console.log(cartMovies)
 
    if(cartMovies.length > 0){
+    // //// you are using a map in place of a forEach. You should use a forEach here.
     data.results.map((x:any , index:any) => {
         cartMovies.includes(x) ? data.results[index].inCart = true  : data.results[index].inCart = false
     })
@@ -52,6 +54,7 @@ export default async function getSimilarMovie(req: NextApiRequest , res: NextApi
    const wishlistMovies = wishlist.moviesIDs
 
    if(wishlistMovies.length > 0){
+    // //// you are using a map in place of a forEach. You should use a forEach here.
     data.results.map((x:any , index:any) => {
         wishlistMovies.includes(x) ? data.results[index].inWishlist = true : data.results[index].inWishlist = false
     })

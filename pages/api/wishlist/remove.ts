@@ -23,6 +23,7 @@ export default async function removeFromWishlist(
 
     // console.log(movies);
 
+    // //// dont use x as a variable name. Use a name that describes what it is.
     const finalArray = moviesInWishlist.filter((x: any) => !movies.includes(x));
     // console.log(finalArray);
 

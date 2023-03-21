@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
+// //// couldn't we have gotten this from the API?
 const GENRES = [
   { id: 28, title: "Action" },
   { id: 12, title: "Adventure" },

@@ -9,6 +9,7 @@ export default function movieRate(req: NextApiRequest, res: NextApiResponse) {
       },
     })
     .then((data) => {
+      // //// there must be a better (more readable) way to calculate the average
       let totalRate = 0;
       let i = 0;
 
@@ -19,6 +20,7 @@ export default function movieRate(req: NextApiRequest, res: NextApiResponse) {
       res.json(totalRate / i);
     })
     .catch((err) => {
+      // //// you should return an error response here
       console.log(err);
     });
 }

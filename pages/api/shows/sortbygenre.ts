@@ -3,6 +3,7 @@ import axios from "axios";
 
 export default async function sortTvShowsByGenre(req: NextApiRequest , res: NextApiResponse){
 
+    // //// why let?
     let tvShowId = req.body.tvShow
 
     res.json(await fetchData(tvShowId))
