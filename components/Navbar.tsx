@@ -36,7 +36,7 @@ function Navbar() {
 
   return (
     <>
-      <div className="bg-white drop-shadow flex fixed z-50 place-items-center w-full px-8 text-red-700 h-12 flex-row">
+      <div className="bg-white drop-shadow flex fixed z-50 place-items-center w-full px-8 text-red-700 h-14 flex-row">
         <div
           className={` ${
             isLoggedIn ? "flex" : "hidden"
@@ -52,8 +52,16 @@ function Navbar() {
           </div>
           <div className="flex flex-row list-none justify-end">
             <li className="btn btn--link">
-              <button onClick={() => setShowModal(true)} type="button">
+              <button
+                onClick={() => setShowModal(true)}
+                type="button"
+                className="relative"
+              >
                 Cart
+                <i className="fa-solid fa-cart-shopping ml-1"></i>
+                <span className="absolute rounded-full bg-white w-5 h-5 border bottom-3 right-[-12px] text-[12px]">
+                  {userDetails?.data.cart.length}
+                </span>
               </button>
             </li>
             <li className="btn btn--link ">
@@ -66,7 +74,8 @@ function Navbar() {
                 }}
                 type="button"
               >
-                <i className="fa-solid fa-heart"></i>
+                <span>Wishlist</span>
+                <i className="fa-solid fa-heart ml-1"></i>
               </button>
               <div ref={ref}>{isComponentVisible && <Wishlist />}</div>
             </li>

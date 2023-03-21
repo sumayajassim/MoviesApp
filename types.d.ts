@@ -36,3 +36,16 @@ export interface User {
     email:    string;
     balance:  number;
 }
+
+export interface Genre {
+    id:    number;
+    title: string;
+}
+
+interface MutationErrorResponse{
+    response: any;
+    data: {
+        message : string
+    }
+        
+}
