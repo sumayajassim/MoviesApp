@@ -36,7 +36,15 @@ export default async function details2(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const userDetails: any = jwtDecode(req.headers["authorization"] as string);
+  const token: any = req.headers["authorization"];
+
+  if (!req.headers["authorization"]) {
+    res
+      .status(401)
+      .send("UnAuthorized - Sign in If You Have An Account Or Sign Up");
+  }
+
+  let userDetails: any = jwtDecode(token as string);
 
   const user = await prisma.user.findUniqueOrThrow({
     where: {
@@ -63,7 +71,7 @@ export default async function details2(
       .map((movie: any) => movie.moviesIDs)
       .flatMap((movies: any) => movies);
 
-    const { moviesIDs } = await prisma.purchases.findUniqueOrThrow({
+    await prisma.purchases.findUniqueOrThrow({
       where: {
         userID: userDetails.user.id,
       },
@@ -116,7 +124,7 @@ export default async function details2(
     `https://api.themoviedb.org/3/movie/upcoming?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&page=1`
   );
 
-  const upcomingMoviesArray = trendingMovies.data.results.map(
+  const upcomingMoviesArray = upcomingMovies.data.results.map(
     (movie: any) => movie.id
   );
 
@@ -124,7 +132,7 @@ export default async function details2(
     `https://api.themoviedb.org/3/movie/top_rated?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&page=1`
   );
 
-  const topRatedMoviesArray = trendingMovies.data.results.map(
+  const topRatedMoviesArray = topRatedMovies.data.results.map(
     (movie: any) => movie.id
   );
 
@@ -168,7 +176,7 @@ export default async function details2(
   };
 
   res.json({
-    userr,
+    user: userr,
     wishlist: userWishlistMovieDetails,
     cart: userCartMoviesDetails,
     purchases: purchasedMovies,
