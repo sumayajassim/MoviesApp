@@ -42,7 +42,7 @@ export default async function addtest(
   );
 
   const trendingMoviesArray = trendingMovies.data.results.map(
-    (id: any) => id.id
+    (movie: any) => movie.id
   );
 
   const upcomingMovies = await axios.get(
@@ -50,7 +50,7 @@ export default async function addtest(
   );
 
   const upcomingMoviesArray = trendingMovies.data.results.map(
-    (id: any) => id.id
+    (movie: any) => movie.id
   );
 
   const topRatedMovies = await axios.get(
@@ -58,7 +58,7 @@ export default async function addtest(
   );
 
   const topRatedMoviesArray = trendingMovies.data.results.map(
-    (id: any) => id.id
+    (movie: any) => movie.id
   );
 
   cartMovies.map((id: any) => {
@@ -82,7 +82,7 @@ export default async function addtest(
   if (purchases.length > 0) {
     purchasedMovies = purchases
       .map((movie: any) => movie.moviesIDs)
-      .flatMap((x: any) => x);
+      .flatMap((movies: any) => movies);
   }
 
   console.log(purchasedMovies);
@@ -167,3 +167,5 @@ export default async function addtest(
     }
   }
 }
+
+// x to movie

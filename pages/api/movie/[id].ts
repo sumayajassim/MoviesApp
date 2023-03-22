@@ -77,9 +77,9 @@ export default async function movie(req: NextApiRequest, res: NextApiResponse) {
     );
 
     if (
-      trendingMoviesArray.includes(movieID.id * 1) ||
-      upcomingMoviesArray.includes(movieID.id * 1) ||
-      topRatedMoviesArray.includes(movieID.id * 1)
+      trendingMoviesArray.includes(+movieID.id) ||
+      upcomingMoviesArray.includes(+movieID.id) ||
+      topRatedMoviesArray.includes(+movieID.id)
     ) {
       price = 10;
     }
@@ -87,3 +87,5 @@ export default async function movie(req: NextApiRequest, res: NextApiResponse) {
     res.json(movie);
   }
 }
+
+// change x to movie in filter / if not token not req.headers / .includes + not * 1 / let is purchased = purchases.length > 0 / movie object directly in json / env varialble in the api

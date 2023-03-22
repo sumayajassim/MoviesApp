@@ -8,31 +8,34 @@ export default async function removeFromeCart(
 ) {
   const token: any = req.headers["authorization"];
 
-  if (token) {
-    let userDetails: any = jwtDecode(token as string);
-
-    const {moviesIDs} = await prisma.cart.findUniqueOrThrow({
-      where:{
-        userID: userDetails.user.id
-      }
-    })
-
-    res.json(moviesIDs)
-
-    const updatedArray = moviesIDs.filter((x:any) => !req.body.moviesIDs.includes(x))
-
-    await prisma.cart.update({
-      where:{
-        userID: userDetails.user.id
-      },
-      data:{
-        moviesIDs : updatedArray
-      }
-    })
-
-    res.json("Movie Removed")
-
-    
+  if (!token) {
+    res.status(401).send("UnAuthorized");
   }
-      
+
+  const userDetails: any = jwtDecode(token as string);
+
+  const { moviesIDs } = await prisma.cart.findUniqueOrThrow({
+    where: {
+      userID: userDetails.user.id,
+    },
+  });
+
+  res.json(moviesIDs);
+
+  const updatedArray = moviesIDs.filter(
+    (movie: any) => !req.body.moviesIDs.includes(movie)
+  );
+
+  await prisma.cart.update({
+    where: {
+      userID: userDetails.user.id,
+    },
+    data: {
+      moviesIDs: updatedArray,
+    },
+  });
+
+  res.json("Movie Removed");
 }
+
+//change x to movie in filter / if no token loop / if no token

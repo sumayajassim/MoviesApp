@@ -14,8 +14,6 @@ export default async function addToCart(
 
     const movies: string[] = req.body.moviesIDs || [];
 
-    // const movie = 'fdfd'
-
     const purchased = (
       await prisma.purchases.findMany({
         where: {
@@ -33,14 +31,16 @@ export default async function addToCart(
       },
     });
 
+    //not used variable / no array in req.body
     let userMoviesInCart = alreadyInCart.moviesIDs;
     const isInCart = alreadyInCart.moviesIDs.includes(movies[0]);
     const isPurchased = purchased.includes(movies[0]);
 
     let finalArray = movies.filter(
-      (x) => !purchased.includes(x) && !userMoviesInCart.includes(x)
+      (movie) => !purchased.includes(movie) && !userMoviesInCart.includes(movie)
     );
 
+    // req .body should not be an array error code?
     if (purchased.includes(movies[0])) {
       res.status(401).json({ message: "Movie is already purchased" });
     } else if (userMoviesInCart.includes(movies[0])) {
@@ -68,3 +68,5 @@ export default async function addToCart(
     });
   }
 }
+
+// if not token

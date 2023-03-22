@@ -37,3 +37,5 @@ export default async function removeFromWishlist(
     res.json(removeWishList);
   }
 }
+
+// if not authorized loop

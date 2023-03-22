@@ -61,7 +61,7 @@ export default async function details2(
   if (user.purchases.length > 0) {
     purchasedMovies = user.purchases
       .map((movie: any) => movie.moviesIDs)
-      .flatMap((x: any) => x);
+      .flatMap((movies: any) => movies);
 
     const { moviesIDs } = await prisma.purchases.findUniqueOrThrow({
       where: {
@@ -109,7 +109,7 @@ export default async function details2(
   );
 
   const trendingMoviesArray = trendingMovies.data.results.map(
-    (id: any) => id.id
+    (movie: any) => movie.id
   );
 
   const upcomingMovies = await axios.get(
@@ -117,7 +117,7 @@ export default async function details2(
   );
 
   const upcomingMoviesArray = trendingMovies.data.results.map(
-    (id: any) => id.id
+    (movie: any) => movie.id
   );
 
   const topRatedMovies = await axios.get(
@@ -125,15 +125,15 @@ export default async function details2(
   );
 
   const topRatedMoviesArray = trendingMovies.data.results.map(
-    (id: any) => id.id
+    (movie: any) => movie.id
   );
 
   const cartMovies = user?.cart?.moviesIDs;
 
   cartMovies?.map((movie: any, index: any) => {
-    trendingMoviesArray.includes(movie * 1) ||
-    upcomingMoviesArray.includes(movie * 1) ||
-    topRatedMoviesArray.includes(movie * 1)
+    trendingMoviesArray.includes(+movie) ||
+    upcomingMoviesArray.includes(+movie) ||
+    topRatedMoviesArray.includes(+movie)
       ? (userCartMoviesDetails[index].price = 10)
       : (userCartMoviesDetails[index].price = 5);
   });
@@ -145,30 +145,19 @@ export default async function details2(
   }
 
   if (userPurchasesLength >= 1) {
-    badges = [BADGES.obama.url, BADGES.putin.url];
+    badges = [BADGES.putin.url];
   }
 
   if (userPurchasesLength >= 2) {
-    badges = [BADGES.obama.url, BADGES.putin.url, BADGES.ramen.url];
+    badges = [BADGES.ramen.url];
   }
 
   if (userPurchasesLength >= 5) {
-    badges = [
-      BADGES.obama.url,
-      BADGES.putin.url,
-      BADGES.ramen.url,
-      BADGES.phoenix.url,
-    ];
+    badges = [BADGES.phoenix.url];
   }
 
   if (userPurchasesLength >= 10) {
-    badges = [
-      BADGES.obama.url,
-      BADGES.putin.url,
-      BADGES.ramen.url,
-      BADGES.phoenix.url,
-      BADGES.yuda.url,
-    ];
+    badges = [BADGES.yuda.url];
   }
 
   const userr = {
@@ -185,3 +174,5 @@ export default async function details2(
     purchases: purchasedMovies,
   });
 }
+
+// change all x to movie / user validation? / ?

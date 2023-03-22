@@ -9,11 +9,10 @@ export default async function addDiscount(
   const token = req.headers["authorization"];
 
   if (!token) {
-    // else
-    return;
+    res.status(401).send("UnAuthorized");
   }
 
-  const { id, isAdmin } = await authUser(token);
+  const { id, isAdmin } = await authUser(token as string);
 
   if (!isAdmin) {
     res.status(401).json({ message: "Not an admin" });
@@ -22,7 +21,7 @@ export default async function addDiscount(
   try {
     const data = await prisma.discount.create({
       data: {
-        userID: { connect: id },
+        userID: id,
         amount: req.body.amount,
         code: req.body.code,
       },
@@ -33,3 +32,5 @@ export default async function addDiscount(
     res.status(500).json(e);
   }
 }
+
+// userID to id / not authorized

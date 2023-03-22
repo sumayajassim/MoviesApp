@@ -42,7 +42,9 @@ export default async function reAdd(req: NextApiRequest, res: NextApiResponse) {
         },
       });
 
-      res.json({message: "Added To Wishlist"});
+      res.json({ message: "Added To Wishlist" });
     }
   }
 }
+
+// if not authorized loop / no need for variable for db queries
