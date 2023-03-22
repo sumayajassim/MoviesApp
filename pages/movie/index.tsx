@@ -1,50 +1,42 @@
-import React, { useState, useEffect, useContext } from "react";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
+import React, { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import Context from "@/context/context";
 import MovieComponent from "@/components/MovieComponent";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import { useDebounce } from "use-debounce";
 import { useAuth } from "@/context/auth";
+import Spinner from "@/components/spinner";
+import { Genre, Movie } from "@/types";
 
-function index(props: any) {
-  const queryClient = useQueryClient();
+function index() {
   const { ref, inView } = useInView();
   const [search, setSearch] = useState("");
   const [genre, setGenre] = useState("");
   const [value] = useDebounce(search, 1000);
   const { token } = useAuth();
-  const {
-    data,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
-    status,
-  } = useInfiniteQuery({
-    queryKey: ["movies", search, genre],
-    queryFn: async ({ pageParam = 1, genreId = genre, searchText = value }) => {
-      const res = await axios.get(
-        `/api/movie/test?page=${pageParam}&search=${searchText}&genre=${genreId}`,
-        { headers: { Authorization: token } }
-      );
-      return res.data;
-    },
-    getNextPageParam: (lastPage, pages) => {
-      if (lastPage.total_pages === pages.length) return;
-      else return pages.length + 1;
-    },
-    refetchOnWindowFocus: false,
-  });
+
+  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ["movies", value, genre],
+      queryFn: async ({ pageParam = 1 }) => {
+        const res = await axios.get(
+          `/api/movie/test?page=${pageParam}&search=${value}&genre=${genre}`,
+          { headers: { Authorization: token } }
+        );
+        return res.data;
+      },
+      getNextPageParam: (lastPage, pages) => {
+        if (lastPage.total_pages === pages.length) return;
+        else return pages.length + 1;
+      },
+      refetchOnWindowFocus: false,
+    });
 
   const { data: genres } = useQuery({
     queryKey: ["genres"],
     queryFn: () => axios.get("/api/movie/genres"),
   });
-
-  console.log("genres", genres);
 
   useEffect(() => {
     if (inView) {
@@ -52,17 +44,13 @@ function index(props: any) {
     }
   }, [inView]);
 
-  console.log("pages", data);
-
-  const changeHandler = (e: any) => {
-    setSearch((search) => e.target.value);
+  const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
   };
 
-  const handleGenre = (e) => {
+  const handleGenre = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setGenre(e.target.value);
   };
-
-  console.log("selected genre", genre);
 
   return (
     <div className="pt-12">
@@ -83,7 +71,7 @@ function index(props: any) {
               onChange={handleGenre}
             >
               <option selected>Choose a genre</option>
-              {genres?.data?.map((genre) => (
+              {genres?.data?.map((genre: Genre) => (
                 <option value={genre.id}>{genre.title}</option>
               ))}
             </select>
@@ -92,29 +80,28 @@ function index(props: any) {
         <div className="grid grid-cols-4 gap-4 max-w-fit">
           {data?.pages?.map((page) => (
             <React.Fragment key={page.page}>
-              {page?.results?.map((movie) => (
+              {page?.results?.map((movie: Movie) => (
                 <MovieComponent movie={movie} />
               ))}
             </React.Fragment>
           ))}
-          <div>
+          <div className="">
             <button
+              className="justify-center self-center"
               ref={ref}
               onClick={() => fetchNextPage()}
               disabled={!hasNextPage || isFetchingNextPage}
             >
-              {isFetchingNextPage
-                ? "Loading more..."
-                : hasNextPage
-                ? "Load Newer"
-                : "Nothing more to load"}
+              {isFetchingNextPage ? (
+                <Spinner />
+              ) : hasNextPage ? (
+                <Spinner />
+              ) : (
+                "Nothing more to load"
+              )}
             </button>
           </div>
-          <div>
-            {isFetching && !isFetchingNextPage
-              ? "Background Updating..."
-              : null}
-          </div>
+          <div>{isFetching && !isFetchingNextPage ? <Spinner /> : null}</div>
         </div>
       </div>
     </div>

@@ -1,22 +1,22 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useAuth } from "@/context/auth";
+import { MutationErrorResponse } from "@/types";
 
 function AuthForms(props: { status: Boolean }) {
-  const router = useRouter();
   const { status } = props;
   const [emailAddress, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const { login } = useAuth();
+  const queryClient = useQueryClient();
   let formData = {};
   let endPoint = "";
 
-  // console.log('context', context)
   const handleClick = () => {
     if (status) {
       formData = { emailAddress, password };
@@ -33,9 +33,9 @@ function AuthForms(props: { status: Boolean }) {
     onSuccess: (res) => {
       if (!res.data.token) return;
       login(res.data.token);
-      router.reload();
+      queryClient.invalidateQueries(["userDetails"]);
     },
-    onError: (err) => {
+    onError: (err: MutationErrorResponse) => {
       console.log(err);
       toast.error(`${err?.response?.data?.message}`);
     },

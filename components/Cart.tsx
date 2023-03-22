@@ -190,13 +190,15 @@ export default function Modal(props) {
                           <span className="float-right p-1 font-bold tracking-wide text-sm">
                             Cart total{" "}
                           </span>
-                          <span className="line-through">${totalPrice}</span>
+                          <span className="line-through font-bold tracking-wide text-md">
+                            ${totalPrice}
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="float-right p-1 font-bold tracking-wide text-sm">
                             Coupon Discount
                           </span>
-                          <span className="">
+                          <span className="font-bold tracking-wide text-md">
                             ( -{discountData?.data.discountPercentage}%) - $
                             {totalPrice - discountData?.data.total}
                           </span>
@@ -205,12 +207,17 @@ export default function Modal(props) {
                           <span className="float-right p-1 font-bold tracking-wide text-sm">
                             Total amount{" "}
                           </span>
-                          <span className="">${discountData?.data.total}</span>
+                          <span className="font-bold tracking-wide text-md">
+                            ${discountData?.data.total}
+                          </span>
                         </div>
                       </div>
                     ) : (
                       <span className="float-right p-2 font-bold tracking-wide text-md">
-                        Cart total : <span className="">${totalPrice}</span>
+                        Cart total :{" "}
+                        <span className="font-bold tracking-wide text-md">
+                          ${totalPrice}
+                        </span>
                       </span>
                     )}
                     <div className="flex flex-row">

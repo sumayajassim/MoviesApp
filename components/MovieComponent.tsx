@@ -94,7 +94,7 @@ function MovieComponent(props) {
         </span>
         <span>
           <i className="fa-solid fa-star text-yellow mr-1"></i>
-          {movie.vote_average}
+          {movie.vote_average.toPrecision(2)}
         </span>
       </div>
       {!movie.isPurchased && (
