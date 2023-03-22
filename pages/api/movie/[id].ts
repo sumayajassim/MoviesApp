@@ -5,7 +5,8 @@ import getMovie from "@/components/helpers/getmovie";
 import jwtDecode from "jwt-decode";
 
 export default async function movie(req: NextApiRequest, res: NextApiResponse) {
-  // req.headers["authorization"] ? console.log(true) : console.log(false)
+  const API_KEY = process.env.API_KEY;
+  if (!API_KEY) throw Error("API key is not provided");
 
   const movieID: any = req.query;
 
@@ -53,7 +54,7 @@ export default async function movie(req: NextApiRequest, res: NextApiResponse) {
     }
 
     const trendingMovies = await axios.get(
-      "https://api.themoviedb.org/3/discover/movie?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1"
+      `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1`
     );
 
     const trendingMoviesArray = trendingMovies.data.results.map(
@@ -61,18 +62,18 @@ export default async function movie(req: NextApiRequest, res: NextApiResponse) {
     );
 
     const upcomingMovies = await axios.get(
-      `https://api.themoviedb.org/3/movie/upcoming?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&page=1`
+      `https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}&language=en-US&page=1`
     );
 
-    const upcomingMoviesArray = trendingMovies.data.results.map(
+    const upcomingMoviesArray = upcomingMovies.data.results.map(
       (id: any) => id.id
     );
 
     const topRatedMovies = await axios.get(
-      `https://api.themoviedb.org/3/movie/top_rated?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&page=1`
+      `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&language=en-US&page=1`
     );
 
-    const topRatedMoviesArray = trendingMovies.data.results.map(
+    const topRatedMoviesArray = topRatedMovies.data.results.map(
       (id: any) => id.id
     );
 
@@ -87,5 +88,3 @@ export default async function movie(req: NextApiRequest, res: NextApiResponse) {
     res.json(movie);
   }
 }
-
-// change x to movie in filter / if not token not req.headers / .includes + not * 1 / let is purchased = purchases.length > 0 / movie object directly in json / env varialble in the api

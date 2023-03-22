@@ -7,10 +7,11 @@ export default async function getSimilarMovie(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const API_KEY = process.env.API_KEY;
   const userDetails: any = jwtDecode(req.headers["authorization"] as string);
 
   const { data } = await axios.get(
-    `https://api.themoviedb.org/3/movie/${req.query.movieID}/similar?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&page=1`
+    `https://api.themoviedb.org/3/movie/${req.query.movieID}/similar?api_key=${API_KEY}&language=en-US&page=1`
   );
 
   if (!userDetails) {
@@ -23,11 +24,11 @@ export default async function getSimilarMovie(
     },
   });
 
-  const purchasedMovies = purchases.moviesIDs.map((x: any) => x);
+  const purchasedMovies = purchases.moviesIDs.map((movies: any) => movies);
 
   if (purchasedMovies.length > 0) {
-    data.results.map((x: any, index: any) => {
-      purchasedMovies.includes(x)
+    data.results.forEach((movie: any, index: any) => {
+      purchasedMovies.includes(movie)
         ? (data.results[index].isPurchased = true)
         : (data.results[index].isPurchased = false);
     });
@@ -43,8 +44,8 @@ export default async function getSimilarMovie(
   console.log(cartMovies);
 
   if (cartMovies.length > 0) {
-    data.results.map((x: any, index: any) => {
-      cartMovies.includes(x)
+    data.results.forEach((movie: any, index: number) => {
+      cartMovies.includes(movie)
         ? (data.results[index].inCart = true)
         : (data.results[index].inCart = false);
     });
@@ -59,8 +60,8 @@ export default async function getSimilarMovie(
   const wishlistMovies = wishlist.moviesIDs;
 
   if (wishlistMovies.length > 0) {
-    data.results.map((x: any, index: any) => {
-      wishlistMovies.includes(x)
+    data.results.foreach((movie: any, index: number) => {
+      wishlistMovies.includes(movie)
         ? (data.results[index].inWishlist = true)
         : (data.results[index].inWishlist = false);
     });
@@ -68,5 +69,3 @@ export default async function getSimilarMovie(
 
   res.json(data);
 }
-
-// x to movie
