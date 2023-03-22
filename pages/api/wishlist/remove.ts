@@ -8,34 +8,31 @@ export default async function removeFromWishlist(
 ) {
   const token: any = req.headers["authorization"];
 
-  if (token) {
-    let userDetails: any = jwtDecode(token as string);
-    // res.json(userDetails.user.wishlist.moviesIDs);
-    const movies = req.body.moviesIDs;
-
-    const wishlist = await prisma.wishlist.findUniqueOrThrow({
-      where: {
-        userID: userDetails.user.id,
-      },
-    });
-
-    const moviesInWishlist = wishlist.moviesIDs;
-
-    // console.log(movies);
-
-    const finalArray = moviesInWishlist.filter((x: any) => !movies.includes(x));
-    // console.log(finalArray);
-
-    const removeWishList = await prisma.wishlist.update({
-      where: {
-        userID: userDetails.user.id,
-      },
-      data: {
-        moviesIDs: finalArray,
-      },
-    });
-    res.json(removeWishList);
+  if (!token) {
+    res.status(401).send("UnAuthorized - Sign in /Sign Up First");
   }
-}
 
-// if not authorized loop
+  let userDetails: any = jwtDecode(token as string);
+
+  const movies = req.body.moviesIDs;
+
+  const wishlist = await prisma.wishlist.findUniqueOrThrow({
+    where: {
+      userID: userDetails.user.id,
+    },
+  });
+
+  const moviesInWishlist = wishlist.moviesIDs;
+
+  const finalArray = moviesInWishlist.filter((x: any) => !movies.includes(x));
+
+  const removeWishList = await prisma.wishlist.update({
+    where: {
+      userID: userDetails.user.id,
+    },
+    data: {
+      moviesIDs: finalArray,
+    },
+  });
+  res.json(removeWishList);
+}
