@@ -131,8 +131,8 @@ function MovieComponent(props) {
             <button
               className=""
               onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
+                // e.preventDefault();
+                // e.stopPropagation();
                 handleAddToCartClick(movie.id);
               }}
             >

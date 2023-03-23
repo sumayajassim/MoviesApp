@@ -56,7 +56,7 @@ export default async function landingpage(
     const userDetails: any = jwtDecode(token as string);
 
     const userData = await prisma.user.findUniqueOrThrow({
-      where: { id: userDetails.user.id },
+      where: { id: userDetails.id },
       include: {
         wishlist: true,
         cart: true,

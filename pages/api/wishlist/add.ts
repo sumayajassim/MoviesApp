@@ -24,7 +24,7 @@ export default async function addToWishList(
 
   const purchased = await prisma.purchases.findMany({
     where: {
-      userID: userDetails.user.id,
+      userID: userDetails.id,
       OR: movies.map((movieId: string) => ({
         moviesIDs: { has: movieId },
       })),
@@ -37,7 +37,7 @@ export default async function addToWishList(
 
   const cart = await prisma.cart.findUniqueOrThrow({
     where: {
-      userID: userDetails.user.id,
+      userID: userDetails.id,
     },
   });
 
@@ -45,7 +45,7 @@ export default async function addToWishList(
 
   const wishlist = await prisma.wishlist.findUniqueOrThrow({
     where: {
-      userID: userDetails.user.id,
+      userID: userDetails.id,
     },
   });
 
@@ -72,7 +72,7 @@ export default async function addToWishList(
 
     await prisma.wishlist.update({
       where: {
-        userID: userDetails.user.id,
+        userID: userDetails.id,
       },
       data: {
         moviesIDs: {

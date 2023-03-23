@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { GetStaticProps, GetStaticPaths } from "next";
 import { useRouter } from "next/router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
@@ -9,13 +8,13 @@ import dayjs from "dayjs";
 import Spinner from "@/components/spinner";
 import { useAuth } from "@/context/auth";
 
-function Movie({}) {
+function GetMovie() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { id } = router.query;
   const { token } = useAuth();
 
-  const { data: movie, isLoading: movieLoading } = useQuery<{ data?: Movie }>({
+  const { data: movie, isLoading: movieLoading } = useQuery<{ data: Movie }>({
     queryKey: ["movie", id],
     queryFn: () =>
       axios.get(`/api/movie/${id}`, {
@@ -30,16 +29,14 @@ function Movie({}) {
     </span>
   ));
 
-  function toHoursAndMinutes(totalMinutes: number) {
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-
-    return `${padToTwoDigits(hours)}h ${padToTwoDigits(minutes)}m`;
-  }
-
-  function padToTwoDigits(num) {
-    return num.toString().padStart(2);
-  }
+  const convertMinutesToHours = (duration: number) => {
+    const hours = Math.floor(duration / 60) + dayjs().hour();
+    const formattedDuration = dayjs()
+      .hour(hours)
+      .minute(duration % 60)
+      .format("h:mm");
+    return formattedDuration;
+  };
 
   const { mutate: addToWishlist, isLoading: handleAddWishlistLoading } =
     useMutation({
@@ -77,7 +74,7 @@ function Movie({}) {
     },
     onError: (err) => {
       console.log(err);
-      toast.error(`${err?.response?.data?.message}`);
+      toast.error(err?.response?.data?.message);
     },
   });
 
@@ -96,123 +93,98 @@ function Movie({}) {
     });
 
   if (!id) return "NOT FOUND - NO ID";
+  if (movieLoading)
+    return (
+      <div className="w-full h-[calc(100vh-45px)] p-14 flex justify-center items-center">
+        <Spinner />
+      </div>
+    );
 
   return (
     <div>
-      <style>{`
-      .image-overlay{
-        position: relative;
-      }
-      .image-overlay{
-         display: block;
-         content: '';
-         position: absolute;
-         width: 100%;
-         height: calc(100vh - 48px);
-         background: linear-gradient(0deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),url("https://image.tmdb.org/t/p/original${movie?.data?.backdrop_path}");
-         background-repeat: no-repeat;
-         background-size: cover;
-         background-position: center;
-      }
-      .card-overlay{
-        background: rgba(255, 255, 255, 0.31);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        backdrop-filter: blur(0px);
-        -webkit-backdrop-filter: blur(0px);
-      }
-    
-      `}</style>
-      <div className="pt-12">
-        {!movieLoading ? (
-          <div>
-            <div className="image-overlay w-full"></div>
-            <div className="w-200 h-[calc(100vh-48px)] card-overlay p-10 flex items-center">
-              <div className="rounded-lg w-fit flex  flex-col ">
-                <div className="text-3xl font-bold text-white flex justify-between">
-                  <span className="">
-                    {movie?.data?.title} (
-                    {toHoursAndMinutes(movie?.data.runtime)})
-                  </span>
-                  <div className="min-w-fit">
-                    <i className="fa-solid fa-star text-yellow mx-2"></i>
-                    {movie?.data.vote_average.toPrecision(2)}
-                  </div>
+      <div className="pt-14">
+        <div>
+          <div
+            className="relative w-full h-[calc(100vh-56px)]  content-[''] block bg-no-repeat bg-center bg-cover "
+            style={{
+              backgroundImage: `linear-gradient(0deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),url(https://image.tmdb.org/t/p/original${movie?.data?.backdrop_path})`,
+            }}
+          ></div>
+
+          <div className="w-200 h-[calc(100vh-48px)] absolute top-12 bg-[rgba(255,255,255,0.31)] shadow-[0_4px_30px_rgba(0,0,0,0.1)] p-10 flex items-center">
+            <div className="rounded-lg w-fit flex  flex-col ">
+              <div className="text-3xl font-bold text-white flex justify-between">
+                <span className="">
+                  {movie?.data?.title} (
+                  {convertMinutesToHours(movie?.data.runtime | 0)})
+                </span>
+                <div className="min-w-fit">
+                  <i className="fa-solid fa-star text-yellow mx-2"></i>
+                  {movie?.data.vote_average.toPrecision(2)}
                 </div>
-                <p className="text-white p-1">
-                  {dayjs(movie?.data?.release_date).format("MMM DD, YYYY")} ●{" "}
-                  <span className="ml-1">{genres}</span>
-                </p>
-                <p className="text-white py-4 font-semibold">
-                  {movie?.data?.overview}
-                </p>
-                <div>
-                  {movie?.data?.isPurchased ? (
-                    <button className="btn rounded bg-[rgba(255,255,255,.5)]">
+              </div>
+              <p className="text-white p-1">
+                {dayjs(movie?.data?.release_date).format("MMM DD, YYYY")} ●
+                <span className="ml-1">{genres}</span>
+              </p>
+              <p className="text-white py-4 font-semibold">
+                {movie?.data?.overview}
+              </p>
+              <div>
+                {movie?.data?.isPurchased ? (
+                  <button className="btn rounded bg-[rgba(255,255,255,.5)]">
+                    <span>
+                      <span>Watch now</span>
+                      <i className="fa-solid fa-video text-red-700 text-xl ml-1"></i>
+                      {/* <i className="fa-solid fa-cart-shopping text-red-600 text-xl ml-1"></i> */}
+                    </span>
+                  </button>
+                ) : (
+                  <>
+                    <span className="text-4xl text-yellow float-right font-bold">
+                      ${movie?.data?.price}
+                    </span>
+                    <button
+                      className="btn rounded  bg-[rgba(255,255,255,.5)]"
+                      onClick={(e) => {
+                        movie?.data.inWishlist
+                          ? removeFromWishlist(movie?.data?.id)
+                          : addToWishlist(movie?.data?.id);
+                      }}
+                    >
                       <span>
-                        <span>Watch now</span>
-                        <i className="fa-solid fa-video text-red-700 text-xl ml-1"></i>
-                        {/* <i className="fa-solid fa-cart-shopping text-red-600 text-xl ml-1"></i> */}
+                        <span>
+                          {movie?.data.inWishlist
+                            ? "Remove from Wishlist"
+                            : "Add to Wishlist"}
+                        </span>
+                        {movie?.data.inWishlist ? (
+                          <i className="fa-solid fa-heart text-red-600 text-xl ml-1"></i>
+                        ) : (
+                          <i className="fa-regular fa-heart text-red-600 text-xl ml-1"></i>
+                        )}
                       </span>
                     </button>
-                  ) : (
-                    <>
-                      {" "}
-                      <span className="text-4xl text-yellow float-right font-bold">
-                        ${movie?.data?.price}
+
+                    <button
+                      onClick={() => addToCart(movie?.data?.id)}
+                      // disabled={!!movie?.data.inCart}
+                      className="btn rounded bg-[rgba(255,255,255,.5)] ml-2"
+                    >
+                      <span>
+                        <span>Add to Cart</span>
+                        <i className="fa-solid fa-cart-shopping text-red-600 text-xl ml-1"></i>
                       </span>
-                      {movie?.data.inWishlist ? (
-                        <button
-                          className="btn rounded  bg-[rgba(255,255,255,.5)]"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            removeFromWishlist(movie?.data?.id);
-                          }}
-                        >
-                          <span>
-                            <span>Remove from Wishlist</span>
-                            <i className="fa-solid fa-heart text-red-600 text-xl ml-1"></i>
-                          </span>
-                        </button>
-                      ) : (
-                        <button
-                          className="btn rounded  bg-[rgba(255,255,255,.5)]"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            addToWishlist(movie?.data?.id);
-                          }}
-                        >
-                          <span>
-                            <span>Add to Wishlist</span>
-                            <i className="fa-regular fa-heart text-red-600 text-xl ml-1"></i>
-                          </span>
-                        </button>
-                      )}
-                      <button
-                        onClick={() => addToCart(movie?.data?.id)}
-                        // disabled={!!movie?.data.inCart}
-                        className="btn rounded bg-[rgba(255,255,255,.5)] ml-2"
-                      >
-                        {/* <i class="fa-regular fa-cart-shopping"></i> */}
-                        {/* <i class="fa-regular fa-cart"></i> */}
-                        <span>
-                          <span>Add to Cart</span>
-                          <i className="fa-solid fa-cart-shopping text-red-600 text-xl ml-1"></i>
-                        </span>
-                      </button>
-                    </>
-                  )}
-                </div>
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>
-        ) : (
-          <div className="w-full h-[calc(100vh-45px)]">
-            <Spinner />
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
 }
 
-export default Movie;
+export default GetMovie;
