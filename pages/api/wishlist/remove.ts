@@ -12,7 +12,7 @@ export default async function removeFromWishlist(
     res.status(401).send("UnAuthorized - Sign in /Sign Up First");
   }
 
-  let userDetails: any = jwtDecode(token as string);
+  const userDetails: any = jwtDecode(token as string);
 
   const movies = req.body.moviesIDs;
 
