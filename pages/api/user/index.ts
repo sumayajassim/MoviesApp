@@ -32,7 +32,7 @@ const BADGES = {
   },
 };
 
-export default async function details2(
+export default async function details(
   req: NextApiRequest,
   res: NextApiResponse
 ) {

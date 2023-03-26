@@ -6,66 +6,62 @@ export default async function addToCart(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const token: any = req.headers["authorization"];
+  const token: string = req.headers["authorization"] as string;
 
-  if (token) {
-    let userDetails: any = jwtDecode(token as string);
-    const id = userDetails.user.id;
+  if (!token) {
+    res.status(401).send("UnAuthorized - Sign In / Sign Up");
+  }
+  // any should be changed
+  let userDetails: any = jwtDecode(token);
 
-    const movies: string[] = req.body.moviesIDs || [];
+  const id = userDetails?.user.id;
 
-    const purchased = (
-      await prisma.purchases.findMany({
-        where: {
-          OR: movies.map((movieId) => ({
-            moviesIDs: { has: movieId },
-          })),
-          userID: userDetails.user.id,
-        },
-      })
-    ).flatMap(({ moviesIDs }) => moviesIDs);
+  const movies: string[] = req.body.moviesIDs || [];
 
-    const alreadyInCart = await prisma.cart.findUniqueOrThrow({
+  const purchased = (
+    await prisma.purchases.findMany({
       where: {
-        userID: userDetails.user.id,
+        OR: movies.map((movieId) => ({
+          moviesIDs: { has: movieId },
+        })),
+        userID: userDetails?.user?.id,
+      },
+    })
+  ).flatMap(({ moviesIDs }) => moviesIDs);
+
+  const alreadyInCart = await prisma.cart.findUniqueOrThrow({
+    where: {
+      userID: userDetails.user.id,
+    },
+  });
+
+  const userMoviesInCart = alreadyInCart.moviesIDs;
+
+  const finalArray = movies.filter(
+    (movie) => !purchased.includes(movie) && !userMoviesInCart.includes(movie)
+  );
+
+  // req .body should not be an array error code?
+  if (purchased.includes(movies[0])) {
+    res.status(401).json({ message: "Movie is already purchased" });
+  } else if (userMoviesInCart.includes(movies[0])) {
+    res.status(401).json({ message: "Movie is already in cart" });
+  } else if (
+    !purchased.includes(movies[0]) &&
+    !userMoviesInCart.includes(movies[0])
+  ) {
+    const updateCart = await prisma.cart.update({
+      where: {
+        userID: id,
+      },
+      data: {
+        moviesIDs: {
+          push: finalArray,
+        },
       },
     });
 
-    //not used variable / no array in req.body
-    let userMoviesInCart = alreadyInCart.moviesIDs;
-    const isInCart = alreadyInCart.moviesIDs.includes(movies[0]);
-    const isPurchased = purchased.includes(movies[0]);
-
-    let finalArray = movies.filter(
-      (movie) => !purchased.includes(movie) && !userMoviesInCart.includes(movie)
-    );
-
-    // req .body should not be an array error code?
-    if (purchased.includes(movies[0])) {
-      res.status(401).json({ message: "Movie is already purchased" });
-    } else if (userMoviesInCart.includes(movies[0])) {
-      res.status(401).json({ message: "Movie is already in cart" });
-    } else if (
-      !purchased.includes(movies[0]) &&
-      !userMoviesInCart.includes(movies[0])
-    ) {
-      const updateCart = await prisma.cart.update({
-        where: {
-          userID: id,
-        },
-        data: {
-          moviesIDs: {
-            push: finalArray,
-          },
-        },
-      });
-
-      res.json({ message: "Movie added to cart successfully", updateCart });
-    }
-  } else {
-    res.status(401).json({
-      message: "UnAuthorized - sign in if you have an account or sign up",
-    });
+    res.json({ message: "Movie added to cart successfully", updateCart });
   }
 }
 

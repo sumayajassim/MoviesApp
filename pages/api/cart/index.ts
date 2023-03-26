@@ -10,21 +10,21 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   }
 
   let userDetails: any = jwtDecode(token as string);
-  const userCart = await prisma.cart.findUniqueOrThrow({
+  const cart = await prisma.cart.findUniqueOrThrow({
     where: {
       userID: userDetails.user.id,
     },
   });
 
-  const userBalance = await prisma.user.findUniqueOrThrow({
+  const balance = await prisma.user.findUniqueOrThrow({
     where: {
       id: userDetails.user.id,
     },
   });
 
   res.json({
-    userCart: userCart.moviesIDs,
-    userBalance: userBalance.balance,
+    userCart: cart.moviesIDs,
+    userBalance: balance.balance,
   });
 }
 

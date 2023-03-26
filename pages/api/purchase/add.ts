@@ -7,6 +7,8 @@ export default async function addtest(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const { code, confirm } = req.body;
+
   const API_KEY = process.env.API_KEY;
   let discount = 0;
   const discountCodes = await prisma.discount.findMany();
@@ -68,7 +70,7 @@ export default async function addtest(
     `https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}&language=en-US&page=1`
   );
 
-  const upcomingMoviesArray = trendingMovies.data.results.map(
+  const upcomingMoviesArray = upcomingMovies.data.results.map(
     (movie: any) => movie.id
   );
 
@@ -76,7 +78,7 @@ export default async function addtest(
     `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&language=en-US&page=1`
   );
 
-  const topRatedMoviesArray = trendingMovies.data.results.map(
+  const topRatedMoviesArray = topRatedMovies.data.results.map(
     (movie: any) => movie.id
   );
 
@@ -137,7 +139,7 @@ export default async function addtest(
       });
 
       const updatedWishlist = wishlistMovies?.filter(
-        (x: any) => !purchasedMovies?.includes(x)
+        (movie: any) => !purchasedMovies?.includes(movie)
       );
 
       await prisma.wishlist.update({

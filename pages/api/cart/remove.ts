@@ -6,7 +6,7 @@ export default async function removeFromeCart(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const token: any = req.headers["authorization"];
+  const token: string = req.headers["authorization"] as string;
 
   if (!token) {
     res.status(401).send("UnAuthorized");
@@ -22,7 +22,7 @@ export default async function removeFromeCart(
 
   res.json(moviesIDs);
 
-  const updatedArray = moviesIDs.filter(
+  const cartAfterRemovingMovie = moviesIDs.filter(
     (movie: any) => !req.body.moviesIDs.includes(movie)
   );
 
@@ -31,11 +31,11 @@ export default async function removeFromeCart(
       userID: userDetails.user.id,
     },
     data: {
-      moviesIDs: updatedArray,
+      moviesIDs: cartAfterRemovingMovie,
     },
   });
 
-  res.json("Movie Removed");
+  res.send("Movie Removed");
 }
 
 //change x to movie in filter / if no token loop / if no token

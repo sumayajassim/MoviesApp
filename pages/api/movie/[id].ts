@@ -8,9 +8,9 @@ export default async function movie(req: NextApiRequest, res: NextApiResponse) {
   const API_KEY = process.env.API_KEY;
   if (!API_KEY) throw Error("API key is not provided");
 
-  const movieID: any = req.query;
+  const movieID = req.query.id as string;
 
-  let movie: any = await getMovie(movieID.id);
+  let movie: any = await getMovie(movieID);
 
   if (!req.headers["authorization"]) {
     res.json(movie);
@@ -40,17 +40,17 @@ export default async function movie(req: NextApiRequest, res: NextApiResponse) {
       let purchasedMOviesArray = purchases
         .map((movie: any) => movie.moviesIDs)
         .flatMap((x: any) => x);
-      purchasedMOviesArray.includes(movieID.id)
+      purchasedMOviesArray.includes(movieID)
         ? (isPurchased = true)
         : (isPurchased = false);
     }
     if (wishlistMoviesLength > 0) {
-      wishlist?.moviesIDs.includes(movieID.id)
+      wishlist?.moviesIDs.includes(movieID)
         ? (inWishlist = true)
         : (inWishlist = false);
     }
     if (cartMoviesLength > 0) {
-      cart?.moviesIDs.includes(movieID.id) ? (inCart = true) : (inCart = false);
+      cart?.moviesIDs.includes(movieID) ? (inCart = true) : (inCart = false);
     }
 
     const trendingMovies = await axios.get(
@@ -78,9 +78,9 @@ export default async function movie(req: NextApiRequest, res: NextApiResponse) {
     );
 
     if (
-      trendingMoviesArray.includes(+movieID.id) ||
-      upcomingMoviesArray.includes(+movieID.id) ||
-      topRatedMoviesArray.includes(+movieID.id)
+      trendingMoviesArray.includes(+movieID) ||
+      upcomingMoviesArray.includes(+movieID) ||
+      topRatedMoviesArray.includes(+movieID)
     ) {
       price = 10;
     }
