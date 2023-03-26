@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../../lib/prisma";
-import jwtDecode from "jwt-decode";
+import authUser from "@/components/helpers/auth";
 
 export default async function reAdd(req: NextApiRequest, res: NextApiResponse) {
   const token = req.headers["authorization"];
@@ -9,12 +9,17 @@ export default async function reAdd(req: NextApiRequest, res: NextApiResponse) {
     res.status(401).send("UnAuthorized - Sign in /Sign Up First");
   }
 
-  let userDetails: any = jwtDecode(token as string);
+  if (req.method !== "POST") {
+    res.status(401).send("Not A POST Request");
+  }
+
+  const { id } = await authUser(token as string);
+
   let movie = req.body.moviesIDs[0];
 
   const cart = await prisma.cart.findUniqueOrThrow({
     where: {
-      userID: userDetails.user.id,
+      userID: id,
     },
   });
 
@@ -27,7 +32,7 @@ export default async function reAdd(req: NextApiRequest, res: NextApiResponse) {
 
     await prisma.cart.update({
       where: {
-        userID: userDetails.user.id,
+        userID: id,
       },
       data: {
         moviesIDs: moviesToBeRemoved,
@@ -36,7 +41,7 @@ export default async function reAdd(req: NextApiRequest, res: NextApiResponse) {
 
     await prisma.wishlist.update({
       where: {
-        userID: userDetails.user.id,
+        userID: id,
       },
       data: {
         moviesIDs: {

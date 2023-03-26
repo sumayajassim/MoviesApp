@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../../lib/prisma";
 import jwtDecode from "jwt-decode";
+import authUser from "@/components/helpers/auth";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   const token: any = req.headers["authorization"];
@@ -9,16 +10,21 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     res.status(401).send("UnAuthorized");
   }
 
-  let userDetails: any = jwtDecode(token as string);
+  if (req.method !== "GET") {
+    res.status(401).send("Not A GET Request");
+  }
+
+  const { id } = await authUser(token);
+
   const cart = await prisma.cart.findUniqueOrThrow({
     where: {
-      userID: userDetails.user.id,
+      userID: id,
     },
   });
 
   const balance = await prisma.user.findUniqueOrThrow({
     where: {
-      id: userDetails.user.id,
+      id: id,
     },
   });
 

@@ -3,6 +3,7 @@ import { prisma } from "../../../lib/prisma";
 import jwtDecode from "jwt-decode";
 import getMovie from "@/components/helpers/getmovie";
 import axios from "axios";
+import authUser from "@/components/helpers/auth";
 
 const BADGES = {
   obama: {
@@ -38,17 +39,21 @@ export default async function details(
 ) {
   const token: any = req.headers["authorization"];
 
-  if (!req.headers["authorization"]) {
+  if (!token) {
     res
       .status(401)
       .send("UnAuthorized - Sign in If You Have An Account Or Sign Up");
   }
 
-  let userDetails: any = jwtDecode(token as string);
+  if (req.method !== "GET") {
+    res.status(401).send("Not A GET Request");
+  }
+
+  const { id } = await authUser(token);
 
   const user = await prisma.user.findUniqueOrThrow({
     where: {
-      id: userDetails.id,
+      id: id,
     },
     include: {
       wishlist: true,
@@ -73,7 +78,7 @@ export default async function details(
 
     await prisma.purchases.findUniqueOrThrow({
       where: {
-        userID: userDetails.id,
+        userID: id,
       },
     });
 
@@ -87,7 +92,7 @@ export default async function details(
   if (wishlistLength > 0) {
     const userWishlist = await prisma.wishlist.findUniqueOrThrow({
       where: {
-        userID: userDetails.id,
+        userID: id,
       },
     });
 
@@ -101,7 +106,7 @@ export default async function details(
   if (userCartLength > 0) {
     const userCartMovies = await prisma.cart.findUniqueOrThrow({
       where: {
-        userID: userDetails.id,
+        userID: id,
       },
     });
 

@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../../lib/prisma";
-import jwtDecode from "jwt-decode";
+import authUser from "@/components/helpers/auth";
 
 export default async function addToCart(
   req: NextApiRequest,
@@ -12,9 +12,12 @@ export default async function addToCart(
     res.status(401).send("UnAuthorized - Sign In / Sign Up");
   }
   // any should be changed
-  let userDetails: any = jwtDecode(token);
 
-  const id = userDetails?.user.id;
+  if (req.method !== "POST") {
+    res.status(401).send("Not A POST Request");
+  }
+
+  const { id } = await authUser(token as string);
 
   const movies: string[] = req.body.moviesIDs || [];
 
@@ -24,14 +27,14 @@ export default async function addToCart(
         OR: movies.map((movieId) => ({
           moviesIDs: { has: movieId },
         })),
-        userID: userDetails?.user?.id,
+        userID: id,
       },
     })
   ).flatMap(({ moviesIDs }) => moviesIDs);
 
   const alreadyInCart = await prisma.cart.findUniqueOrThrow({
     where: {
-      userID: userDetails.user.id,
+      userID: id,
     },
   });
 

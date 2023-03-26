@@ -2,25 +2,28 @@ import { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 import { prisma } from "../../../lib/prisma";
 import jwtDecode from "jwt-decode";
+import authUser from "@/components/helpers/auth";
 
 export default async function getSimilarMovie(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   const API_KEY = process.env.API_KEY;
-  const userDetails: any = jwtDecode(req.headers["authorization"] as string);
+  const token = req.headers["authorization"];
 
   const { data } = await axios.get(
     `https://api.themoviedb.org/3/movie/${req.query.movieID}/similar?api_key=${API_KEY}&language=en-US&page=1`
   );
 
-  if (!userDetails) {
+  if (!token) {
     res.json(data);
   }
 
+  const { id } = await authUser(token as string);
+
   const purchases = await prisma.purchases.findUniqueOrThrow({
     where: {
-      userID: userDetails.user.id,
+      userID: id,
     },
   });
 
@@ -36,7 +39,7 @@ export default async function getSimilarMovie(
 
   const cart = await prisma.cart.findUniqueOrThrow({
     where: {
-      userID: userDetails.user.id,
+      userID: id,
     },
   });
 
@@ -53,7 +56,7 @@ export default async function getSimilarMovie(
 
   const wishlist = await prisma.wishlist.findUniqueOrThrow({
     where: {
-      userID: userDetails.user.id,
+      userID: id,
     },
   });
 

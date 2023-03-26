@@ -2,12 +2,13 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/prisma";
 import jwtDecode from "jwt-decode";
 import axios from "axios";
+import authUser from "@/components/helpers/auth";
 
 export default async function addtest(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { code, confirm } = req.body;
+  const token = req.headers["authorization"];
 
   const API_KEY = process.env.API_KEY;
   let discount = 0;
@@ -17,8 +18,14 @@ export default async function addtest(
   let percentage = 0;
   let cartPrice = 0;
 
-  if (!req.headers["authorization"]) {
+  const { id } = await authUser(token as string);
+
+  if (!token) {
     res.status(401).send("UnAuthorized");
+  }
+
+  if (req.method !== "POST") {
+    res.status(401).send("Not A POST Request");
   }
 
   if (req.body.code) {
@@ -37,11 +44,9 @@ export default async function addtest(
     }
   }
 
-  const userDetails: any = jwtDecode(req.headers["authorization"] as string);
-
   const { purchases, balance, wishlist } = await prisma.user.findUniqueOrThrow({
     where: {
-      id: userDetails.user.id,
+      id: id,
     },
     include: {
       purchases: true,
@@ -51,7 +56,7 @@ export default async function addtest(
 
   const cart = await prisma.cart.findUniqueOrThrow({
     where: {
-      userID: userDetails.user.id,
+      userID: id,
     },
   });
 
@@ -114,7 +119,7 @@ export default async function addtest(
           amount: Math.floor(cartPrice - discount),
           user: {
             connect: {
-              id: userDetails.user.id,
+              id: id,
             },
           },
         },
@@ -122,7 +127,7 @@ export default async function addtest(
 
       const removeFromCart = await prisma.cart.update({
         where: {
-          userID: userDetails.user.id,
+          userID: id,
         },
         data: {
           moviesIDs: [],
@@ -131,7 +136,7 @@ export default async function addtest(
 
       await prisma.user.update({
         where: {
-          id: userDetails.user.id,
+          id: id,
         },
         data: {
           balance: balance - Math.floor(cartPrice - discount),
@@ -144,7 +149,7 @@ export default async function addtest(
 
       await prisma.wishlist.update({
         where: {
-          userID: userDetails.user.id,
+          userID: id,
         },
         data: {
           moviesIDs: updatedWishlist,

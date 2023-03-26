@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import jwtDecode from "jwt-decode";
 import { prisma } from "../../../lib/prisma";
+import authUser from "@/components/helpers/auth";
 
 export default async function removeFromWishlist(
   req: NextApiRequest,
@@ -12,13 +13,17 @@ export default async function removeFromWishlist(
     res.status(401).send("UnAuthorized - Sign in /Sign Up First");
   }
 
-  const userDetails: any = jwtDecode(token as string);
+  if (req.method !== "POST") {
+    res.status(401).send("Not A POST Request");
+  }
+
+  const { id } = await authUser(token);
 
   const movies = req.body.moviesIDs;
 
   const wishlist = await prisma.wishlist.findUniqueOrThrow({
     where: {
-      userID: userDetails.id,
+      userID: id,
     },
   });
 
@@ -26,13 +31,14 @@ export default async function removeFromWishlist(
 
   const finalArray = moviesInWishlist.filter((x: any) => !movies.includes(x));
 
-  const removeWishList = await prisma.wishlist.update({
+  await prisma.wishlist.update({
     where: {
-      userID: userDetails.id,
+      userID: id,
     },
     data: {
       moviesIDs: finalArray,
     },
   });
-  res.json(removeWishList);
+
+  res.json({ message: "Movie Is Removed" });
 }

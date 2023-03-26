@@ -16,7 +16,7 @@ export default async function landingpage(
   const nowPlaying_ = await nowPlaying();
   const topRated_ = await topRated();
 
-  function mappingTheData(array) {
+  function mappingTheData(array: any) {
     return array.map((movie: any) => ({
       ...movie,
       poster_path: "https://image.tmdb.org/t/p/original" + movie.poster_path,

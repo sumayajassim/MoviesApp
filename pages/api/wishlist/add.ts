@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../../lib/prisma";
 import jwtDecode from "jwt-decode";
 import axios from "axios";
+import authUser from "@/components/helpers/auth";
 
 export default async function addToWishList(
   req: NextApiRequest,
@@ -18,13 +19,17 @@ export default async function addToWishList(
       );
   }
 
-  let userDetails: any = jwtDecode(token as string);
+  if (req.method !== "POST") {
+    res.status(401).send("Not A POST Request");
+  }
+
+  const { id } = await authUser(token);
 
   const movies = req.body.moviesIDs;
 
   const purchased = await prisma.purchases.findMany({
     where: {
-      userID: userDetails.id,
+      userID: id,
       OR: movies.map((movieId: string) => ({
         moviesIDs: { has: movieId },
       })),
@@ -37,7 +42,7 @@ export default async function addToWishList(
 
   const cart = await prisma.cart.findUniqueOrThrow({
     where: {
-      userID: userDetails.id,
+      userID: id,
     },
   });
 
@@ -45,7 +50,7 @@ export default async function addToWishList(
 
   const wishlist = await prisma.wishlist.findUniqueOrThrow({
     where: {
-      userID: userDetails.id,
+      userID: id,
     },
   });
 
@@ -72,7 +77,7 @@ export default async function addToWishList(
 
     await prisma.wishlist.update({
       where: {
-        userID: userDetails.id,
+        userID: id,
       },
       data: {
         moviesIDs: {

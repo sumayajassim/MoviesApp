@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../../lib/prisma";
 import jwtDecode from "jwt-decode";
+import authUser from "@/components/helpers/auth";
 
 export default async function removeFromeCart(
   req: NextApiRequest,
@@ -12,11 +13,15 @@ export default async function removeFromeCart(
     res.status(401).send("UnAuthorized");
   }
 
-  const userDetails: any = jwtDecode(token as string);
+  if (req.method !== "POST") {
+    res.status(401).send("Not A POST Request");
+  }
+
+  const { id } = await authUser(token);
 
   const { moviesIDs } = await prisma.cart.findUniqueOrThrow({
     where: {
-      userID: userDetails.user.id,
+      userID: id,
     },
   });
 
@@ -28,7 +33,7 @@ export default async function removeFromeCart(
 
   await prisma.cart.update({
     where: {
-      userID: userDetails.user.id,
+      userID: id,
     },
     data: {
       moviesIDs: cartAfterRemovingMovie,

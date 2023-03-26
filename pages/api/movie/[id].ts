@@ -3,6 +3,7 @@ import axios from "axios";
 import { prisma } from "../../../lib/prisma";
 import getMovie from "@/components/helpers/getmovie";
 import jwtDecode from "jwt-decode";
+import authUser from "@/components/helpers/auth";
 
 export default async function movie(req: NextApiRequest, res: NextApiResponse) {
   const API_KEY = process.env.API_KEY;
@@ -12,14 +13,20 @@ export default async function movie(req: NextApiRequest, res: NextApiResponse) {
 
   let movie: any = await getMovie(movieID);
 
-  if (!req.headers["authorization"]) {
+  const token = req.headers["authorization"];
+
+  if (req.method !== "POST") {
+    res.status(401).send("Not A POST Request");
+  }
+
+  if (!token) {
     res.json(movie);
   } else {
-    const userDetails: any = jwtDecode(req?.headers["authorization"] as string);
+    const { id } = await authUser(token);
 
     const { purchases, wishlist, cart } = await prisma.user.findUniqueOrThrow({
       where: {
-        id: userDetails.id,
+        id: id,
       },
       include: {
         wishlist: true,

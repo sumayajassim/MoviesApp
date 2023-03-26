@@ -12,6 +12,10 @@ export default async function addToBalance(
     return res.json("UnAuthorized");
   }
 
+  if (req.method !== "POST") {
+    res.status(401).send("Not A POST Request");
+  }
+
   const { id } = await authUser(token);
 
   await prisma.user.update({
