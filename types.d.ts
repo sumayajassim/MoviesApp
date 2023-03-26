@@ -6,26 +6,38 @@ export interface LandingPage {
     movies: Movie[];
 }
 
-export interface Movie {
-    adult?:            boolean;
-    backdrop_path:     string;
-    genre_ids:         number[];
-    id:                number;
-    original_language: string;
-    original_title?:   string;
-    overview:          string;
-    popularity:        number;
-    poster_path:       string;
-    release_date?:     Date;
-    title?:            string;
-    video?:            boolean;
-    vote_average:      number;
-    vote_count:        number;
-    first_air_date?:   Date;
-    name?:             string;
-    origin_country?:   string[];
-    original_name?:    string;
+export type Movie = {
+    adult:                 boolean;
+    backdrop_path:         string;
+    belongs_to_collection: BelongsToCollection;
+    budget:                number;
+    genres:                Genre[];
+    homepage:              string;
+    id:                    number;
+    imdb_id:               string;
+    original_language:     string;
+    original_title:        string;
+    overview:              string;
+    popularity:            number;
+    poster_path:           string;
+    production_companies:  ProductionCompany[];
+    production_countries:  ProductionCountry[];
+    release_date:          Date;
+    revenue:               number;
+    runtime:               number;
+    spoken_languages:      SpokenLanguage[];
+    status:                string;
+    tagline:               string;
+    title:                 string;
+    video:                 boolean;
+    vote_average:          number;
+    vote_count:            number;
+    isPurchased:           boolean;
+    inCart:                boolean;
+    inWishlist:            boolean;
+    price:                 number;
 }
+
 
 export type AuthorizedUser {
     id: string
@@ -37,9 +49,9 @@ export interface User {
     balance:  number;
 }
 
-export interface Genre {
-    id:    number;
-    title: string;
+export type Genre = {
+    id:   number;
+    name: string;
 }
 
 interface MutationErrorResponse{

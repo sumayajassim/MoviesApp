@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { Prisma } from "@prisma/client";
 
-export default async function signin(
+export default async function signIn(
   req: NextApiRequest,
   res: NextApiResponse
 ) {

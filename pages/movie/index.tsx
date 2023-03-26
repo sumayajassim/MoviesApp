@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 import MovieComponent from "@/components/MovieComponent";
-import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import { useDebounce } from "use-debounce";
 import { useAuth } from "@/context/auth";
@@ -21,7 +20,7 @@ function index() {
       queryKey: ["movies", value, genre],
       queryFn: async ({ pageParam = 1 }) => {
         const res = await axios.get(
-          `/api/movie/test?page=${pageParam}&search=${value}&genre=${genre}`,
+          `/api/movie?page=${pageParam}&search=${value}&genre=${genre}`,
           { headers: { Authorization: token } }
         );
         return res.data;
@@ -44,14 +43,6 @@ function index() {
     }
   }, [inView]);
 
-  const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-  };
-
-  const handleGenre = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setGenre(e.target.value);
-  };
-
   return (
     <div className="pt-12">
       <div className="w-fit mx-auto my-auto flex flex-col p-10">
@@ -62,13 +53,13 @@ function index() {
             id="searchBar"
             placeholder="Search for a movie"
             className="w-3/4 bg-gray-100 border-2 border-gray-200 rounded  py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:border-red-700"
-            onChange={changeHandler}
+            onChange={(e) => setSearch(e.target.value)}
           />
           <div className="flex-1 ml-4">
             <select
               id="genre"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              onChange={handleGenre}
+              onChange={(e) => setGenre(e.target.value)}
             >
               <option selected>Choose a genre</option>
               {genres?.data?.map((genre: Genre) => (
@@ -78,13 +69,17 @@ function index() {
           </div>
         </div>
         <div className="grid grid-cols-4 gap-4 max-w-fit">
-          {data?.pages?.map((page) => (
-            <React.Fragment key={page.page}>
-              {page?.results?.map((movie: Movie) => (
-                <MovieComponent movie={movie} />
-              ))}
-            </React.Fragment>
-          ))}
+          {/* {data?.pages?.map((page) =>
+            page?.results?.map((movie: Movie) => (
+              <MovieComponent key={page.page + movie.id} movie={movie} />
+            ))
+          )} */}
+
+          {data?.pages
+            ?.flatMap(({ results }) => results)
+            .map((movie: Movie) => (
+              <MovieComponent key={movie.id} movie={movie} />
+            ))}
           <div className="">
             <button
               className="justify-center self-center"
@@ -92,16 +87,14 @@ function index() {
               onClick={() => fetchNextPage()}
               disabled={!hasNextPage || isFetchingNextPage}
             >
-              {isFetchingNextPage ? (
-                <Spinner />
-              ) : hasNextPage ? (
+              {isFetchingNextPage || hasNextPage ? (
                 <Spinner />
               ) : (
                 "Nothing more to load"
               )}
             </button>
           </div>
-          <div>{isFetching && !isFetchingNextPage ? <Spinner /> : null}</div>
+          <div>{isFetching && !isFetchingNextPage && <Spinner />}</div>
         </div>
       </div>
     </div>

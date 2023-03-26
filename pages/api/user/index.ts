@@ -48,7 +48,7 @@ export default async function details(
 
   const user = await prisma.user.findUniqueOrThrow({
     where: {
-      id: userDetails.user.id,
+      id: userDetails.id,
     },
     include: {
       wishlist: true,
@@ -73,7 +73,7 @@ export default async function details(
 
     await prisma.purchases.findUniqueOrThrow({
       where: {
-        userID: userDetails.user.id,
+        userID: userDetails.id,
       },
     });
 
@@ -87,7 +87,7 @@ export default async function details(
   if (wishlistLength > 0) {
     const userWishlist = await prisma.wishlist.findUniqueOrThrow({
       where: {
-        userID: userDetails.user.id,
+        userID: userDetails.id,
       },
     });
 
@@ -101,7 +101,7 @@ export default async function details(
   if (userCartLength > 0) {
     const userCartMovies = await prisma.cart.findUniqueOrThrow({
       where: {
-        userID: userDetails.user.id,
+        userID: userDetails.id,
       },
     });
 
@@ -169,8 +169,8 @@ export default async function details(
   }
 
   const userr = {
-    userName: userDetails.user.firstName + " " + userDetails.user.lastName,
-    email: userDetails.user.emailAddress,
+    userName: user.firstName + " " + user.lastName,
+    email: user.emailAddress,
     balance: user.balance,
     badges,
   };

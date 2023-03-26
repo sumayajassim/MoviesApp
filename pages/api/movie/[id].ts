@@ -19,7 +19,7 @@ export default async function movie(req: NextApiRequest, res: NextApiResponse) {
 
     const { purchases, wishlist, cart } = await prisma.user.findUniqueOrThrow({
       where: {
-        id: userDetails.user.id,
+        id: userDetails.id,
       },
       include: {
         wishlist: true,
