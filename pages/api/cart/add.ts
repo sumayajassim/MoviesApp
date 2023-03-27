@@ -11,7 +11,6 @@ export default async function addToCart(
   if (!token) {
     res.status(401).send("UnAuthorized - Sign In / Sign Up");
   }
-  // any should be changed
 
   if (req.method !== "POST") {
     res.status(401).send("Not A POST Request");
@@ -19,53 +18,43 @@ export default async function addToCart(
 
   const { id } = await authUser(token as string);
 
-  const movies: string[] = req.body.moviesIDs || [];
+  const { movie } = req.body;
 
   const purchased = (
     await prisma.purchases.findMany({
       where: {
-        OR: movies.map((movieId) => ({
-          moviesIDs: { has: movieId },
-        })),
+        OR: {
+          moviesIDs: { has: movie },
+        },
         userID: id,
       },
     })
   ).flatMap(({ moviesIDs }) => moviesIDs);
 
-  const alreadyInCart = await prisma.cart.findUniqueOrThrow({
+  const { moviesIDs } = await prisma.cart.findUniqueOrThrow({
     where: {
       userID: id,
     },
   });
 
-  const userMoviesInCart = alreadyInCart.moviesIDs;
+  if (purchased.length > 0) {
+    res.status(400).send("Movie Already Purchased");
+  }
 
-  const finalArray = movies.filter(
-    (movie) => !purchased.includes(movie) && !userMoviesInCart.includes(movie)
-  );
-
-  // req .body should not be an array error code?
-  if (purchased.includes(movies[0])) {
-    res.status(401).json({ message: "Movie is already purchased" });
-  } else if (userMoviesInCart.includes(movies[0])) {
-    res.status(401).json({ message: "Movie is already in cart" });
-  } else if (
-    !purchased.includes(movies[0]) &&
-    !userMoviesInCart.includes(movies[0])
-  ) {
-    const updateCart = await prisma.cart.update({
+  if (moviesIDs.includes(movie)) {
+    res.status(400).send("Movie Already In Cart");
+  } else if (purchased.length <= 0 && !moviesIDs.includes(movie)) {
+    await prisma.cart.update({
       where: {
         userID: id,
       },
       data: {
         moviesIDs: {
-          push: finalArray,
+          push: movie,
         },
       },
     });
 
-    res.json({ message: "Movie added to cart successfully", updateCart });
+    res.json({ message: "Added to Cart" });
   }
 }
-
-// if not token
