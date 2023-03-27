@@ -27,7 +27,16 @@ export default async function removeFromWishlist(
     },
   });
 
+  if(!moviesIDs.includes(movie)){
+    res.status(400).send("Movie Is Already Not In The Wishlist")
+  }
+
   const wishlistMoviesAfter = moviesIDs.filter((wishlistMovie: any) => wishlistMovie !== movie);
+
+  res.json({
+    wishlist : moviesIDs,
+    after: wishlistMoviesAfter
+  })
 
   await prisma.wishlist.update({
     where: {
@@ -38,5 +47,5 @@ export default async function removeFromWishlist(
     },
   });
 
-  res.json({ message: "Movie Is Removed" });
+  res.json({ message: "Movie Is Removed From Wishlist" });
 }
