@@ -18,7 +18,7 @@ export default async function removeFromeCart(
 
   const { id } = await authUser(token);
 
-  const { movie } = req.body;
+  const { movieId } = req.body;
 
   const { moviesIDs } = await prisma.cart.findUniqueOrThrow({
     where: {
@@ -27,13 +27,8 @@ export default async function removeFromeCart(
   });
 
   const cartAfterRemovingMovie = moviesIDs.filter(
-    (cartMovie: any) => cartMovie !== movie
+    (cartMovie: any) => cartMovie !== movieId
   );
-
-  res.json({
-    cart: moviesIDs,
-    after: cartAfterRemovingMovie,
-  });
 
   await prisma.cart.update({
     where: {
@@ -44,7 +39,5 @@ export default async function removeFromeCart(
     },
   });
 
-  res.send("Movie Removed");
+  res.json({ message: "Movie Removed" });
 }
-
-

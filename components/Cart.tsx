@@ -35,7 +35,7 @@ export default function Modal(props: {
     mutationFn: (movieID: number) => {
       return axios.post(
         "/api/cart/remove",
-        { moviesIDs: [movieID.toString()] },
+        { movieId: movieID.toString() },
         { headers: { Authorization: token } }
       );
     },

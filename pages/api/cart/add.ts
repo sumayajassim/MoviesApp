@@ -18,13 +18,13 @@ export default async function addToCart(
 
   const { id } = await authUser(token as string);
 
-  const { movie } = req.body;
+  const { movieId } = req.body;
 
   const purchased = (
     await prisma.purchases.findMany({
       where: {
         OR: {
-          moviesIDs: { has: movie },
+          moviesIDs: { has: movieId },
         },
         userID: id,
       },
@@ -41,16 +41,16 @@ export default async function addToCart(
     res.status(400).send("Movie Already Purchased");
   }
 
-  if (moviesIDs.includes(movie)) {
+  if (moviesIDs.includes(movieId)) {
     res.status(400).send("Movie Already In Cart");
-  } else if (purchased.length <= 0 && !moviesIDs.includes(movie)) {
+  } else if (purchased.length <= 0 && !moviesIDs.includes(movieId)) {
     await prisma.cart.update({
       where: {
         userID: id,
       },
       data: {
         moviesIDs: {
-          push: movie,
+          push: movieId,
         },
       },
     });
