@@ -15,8 +15,8 @@ export default async function movie(req: NextApiRequest, res: NextApiResponse) {
 
   const token = req.headers["authorization"];
 
-  if (req.method !== "POST") {
-    res.status(401).send("Not A POST Request");
+  if (req.method !== "GET") {
+    res.status(401).send("Not A GET Request");
   }
 
   if (!token) {

@@ -9,7 +9,7 @@ export default async function addToBalance(
   const token = req.headers["authorization"];
 
   if (!token) {
-    return res.json("UnAuthorized");
+    return res.status(401).json("UnAuthorized");
   }
 
   if (req.method !== "POST") {
@@ -27,7 +27,7 @@ export default async function addToBalance(
     },
   });
 
-  res.json("Balance Added");
+  res.json({ message: "Balance Added" });
 }
 
 // if not authorized

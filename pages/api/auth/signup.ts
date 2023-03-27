@@ -61,48 +61,12 @@ export default async function signup(
     res.status(400).send("Invalid Email Address");
   }
 
-<<<<<<< Updated upstream
   if (!validPassword) {
     res
       .status(400)
       .send(
         "Password Must Conatin 8 To 22 Characters With At Least One Special Character : @,#,$,%,&,* ... etc"
       );
-=======
-  if (valid()) {
-    bcrypt.hash(req.body.password, 10, function (err, hash) {
-      prisma.user
-        .create({
-          data: {
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            emailAddress: req.body.emailAddress,
-            password: hash,
-            wishlist: { create: {} },
-            cart: { create: {} },
-          },
-        })
-        .then((user: any) => {
-          const userPass = user.password;
-          const verifired = bcrypt.compare(req.body.password, userPass);
-
-          verifired.then((istrue) => {
-            if (istrue && SECRET_KEY) {
-              const token = jwt.sign({ id: user.id }, SECRET_KEY, {
-                expiresIn: 604800,
-              });
-              //  getUserDetails(data);
-              res.json({ token });
-            } else {
-              res.status(400).json({ message: "Wrong Password" });
-            }
-          });
-        })
-        .catch((err: any) => {
-          res.status(400).json({ message: "Email is already registered " });
-        });
-    });
->>>>>>> Stashed changes
   }
 
   const hashPass = bcrypt.hashSync(password, salt);
