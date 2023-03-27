@@ -3,11 +3,11 @@ import { useRouter } from "next/router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { Movie } from "@/types";
+import { MovieType } from "@/types";
 import dayjs from "dayjs";
-import Spinner from "@/components/spinner";
+import Spinner from "@/components/Spinner";
 import { useAuth } from "@/context/auth";
-import { MutationErrorResponse } from "@/types";
+import { MutationResponse } from "@/types";
 
 function GetMovie() {
   const router = useRouter();
@@ -15,7 +15,9 @@ function GetMovie() {
   const { id } = router.query;
   const { token } = useAuth();
 
-  const { data: movie, isLoading: movieLoading } = useQuery<{ data: Movie }>({
+  const { data: movie, isLoading: movieLoading } = useQuery<{
+    data: MovieType;
+  }>({
     queryKey: ["movie", id],
     queryFn: () =>
       axios.get(`/api/movie/${id}`, {
@@ -52,7 +54,7 @@ function GetMovie() {
         queryClient.invalidateQueries(["userDetails"]);
         toast.success(res.data.message);
       },
-      onError: (err: MutationErrorResponse) => {
+      onError: (err: MutationResponse) => {
         console.log(err);
         toast.error(`${err?.response?.data?.message}`, {
           toastId: 1,
@@ -73,7 +75,7 @@ function GetMovie() {
       // queryClient.invalidateQueries(["movie"]);
       toast.success(`${res?.data?.message}`);
     },
-    onError: (err: MutationErrorResponse) => {
+    onError: (err: MutationResponse) => {
       console.log(err);
       toast.error(err?.response?.data?.message);
     },

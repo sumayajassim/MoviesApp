@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../../lib/prisma";
-import authUser from "@/components/helpers/auth";
+import authUser from "@/helpers/auth";
 
 export default async function reAdd(req: NextApiRequest, res: NextApiResponse) {
   const token = req.headers["authorization"];
