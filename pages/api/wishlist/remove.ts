@@ -19,7 +19,7 @@ export default async function removeFromWishlist(
 
   const { id } = await authUser(token);
 
-  const { movie } = req.body
+  const { movieId } = req.body;
 
   const { moviesIDs } = await prisma.wishlist.findUniqueOrThrow({
     where: {
@@ -27,16 +27,13 @@ export default async function removeFromWishlist(
     },
   });
 
-  if(!moviesIDs.includes(movie)){
-    res.status(400).send("Movie Is Already Not In The Wishlist")
+  if (!moviesIDs.includes(movieId)) {
+    res.status(400).json({ message: "Movie Is Already Not In The Wishlist" });
   }
 
-  const wishlistMoviesAfter = moviesIDs.filter((wishlistMovie: any) => wishlistMovie !== movie);
-
-  res.json({
-    wishlist : moviesIDs,
-    after: wishlistMoviesAfter
-  })
+  const wishlistMoviesAfter = moviesIDs.filter(
+    (wishlistMovie: any) => wishlistMovie !== movieId
+  );
 
   await prisma.wishlist.update({
     where: {

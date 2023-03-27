@@ -12,31 +12,30 @@ function Movie(props: { movie: MovieType }) {
   const { token } = useAuth();
   const queryClient = useQueryClient();
 
-  const { mutate: handleLikeClick, isLoading: handleAddWishlistLoading } =
-    useMutation({
-      mutationFn: (movieID: any) =>
-        axios.post(
-          "/api/wishlist/add",
-          { moviesIDs: [movieID.toString()] },
-          { headers: { Authorization: token } }
-        ),
-      onSuccess: (res) => {
-        toast.success(res.data.message);
-        queryClient.invalidateQueries(["userDetails"]);
-        setLike((isLiked) => !isLiked);
-      },
-      onError: (err: MutationResponse) => {
-        toast.error(err?.response?.data?.message, {
-          toastId: 1,
-        });
-      },
-    });
+  const { mutate: handleLikeClick } = useMutation({
+    mutationFn: (movieID: any) =>
+      axios.post(
+        "/api/wishlist/add",
+        { movieId: movieID.toString() },
+        { headers: { Authorization: token } }
+      ),
+    onSuccess: (res) => {
+      toast.success(res.data.message);
+      queryClient.invalidateQueries(["userDetails"]);
+      setLike((isLiked) => !isLiked);
+    },
+    onError: (err: MutationResponse) => {
+      toast.error(err?.response?.data?.message, {
+        toastId: 1,
+      });
+    },
+  });
 
   const { mutate: removeHandler } = useMutation({
     mutationFn: (movieID: any) =>
       axios.post(
         "/api/wishlist/remove",
-        { moviesIDs: [movieID.toString()] },
+        { movieId: movieID.toString() },
         { headers: { Authorization: token } }
       ),
     onSuccess: (res) => {
@@ -45,24 +44,23 @@ function Movie(props: { movie: MovieType }) {
     },
   });
 
-  const { mutate: handleAddToCartClick, isLoading: handleAddToCartLoading } =
-    useMutation({
-      mutationFn: (movieID: any) => {
-        return axios
-          .post(
-            "/api/cart/add",
-            { moviesIDs: [movieID.toString()] },
-            { headers: { Authorization: token } }
-          )
-          .then((response) => toast.success(`${response?.data?.message}`));
-      },
-      onError: (err: MutationResponse) => {
-        toast.error(`${err?.response?.data?.message}`);
-      },
-      onSuccess: () => {
-        queryClient.invalidateQueries(["cartDetails"]);
-      },
-    });
+  const { mutate: handleAddToCartClick } = useMutation({
+    mutationFn: (movieID: any) => {
+      return axios
+        .post(
+          "/api/cart/add",
+          { movieId: movieID.toString() },
+          { headers: { Authorization: token } }
+        )
+        .then((response) => toast.success(response?.data?.message));
+    },
+    onError: (err: MutationResponse) => {
+      toast.error(err?.response?.data?.message);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["cartDetails"]);
+    },
+  });
 
   const handleMovieClick = (id: number) => {
     router.push(`movie/${id}`);

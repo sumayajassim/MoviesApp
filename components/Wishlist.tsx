@@ -24,7 +24,7 @@ function Wishlist() {
       mutationFn: (movieID: Number) =>
         axios.post(
           "/api/cart/add",
-          { moviesIDs: [movieID.toString()] },
+          { movieId: movieID.toString() },
           { headers: { Authorization: token } }
         ),
       onSuccess: (res) => {
@@ -41,7 +41,7 @@ function Wishlist() {
       mutationFn: (movieID: Number) =>
         axios.post(
           "/api/wishlist/remove",
-          { moviesIDs: [movieID.toString()] },
+          { movieId: movieID.toString() },
           { headers: { Authorization: token } }
         ),
       onSuccess: (res) => {
