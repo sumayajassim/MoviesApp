@@ -15,19 +15,20 @@ export default async function reAdd(req: NextApiRequest, res: NextApiResponse) {
 
   const { id } = await authUser(token as string);
 
-  let movie = req.body.moviesIDs[0];
+  let {movie} = req.body
 
-  const cart = await prisma.cart.findUniqueOrThrow({
+  const {moviesIDs} = await prisma.cart.findUniqueOrThrow({
     where: {
       userID: id,
     },
   });
 
-  let moviesInCart = cart.moviesIDs;
+  if(!moviesIDs.includes(movie)){
+    res.status(400).send("Movie Is Not In Wishlist")
+  }
 
-  if (req.body.moviesIDs) {
-    let moviesToBeRemoved = moviesInCart.filter(
-      (x, index) => moviesInCart[index] != movie
+    let moviesToBeRemoved = moviesIDs.filter(
+      (cartMovie) => cartMovie !== movie
     );
 
     await prisma.cart.update({
@@ -50,6 +51,6 @@ export default async function reAdd(req: NextApiRequest, res: NextApiResponse) {
       },
     });
 
-    res.json({ message: "Added To Wishlist" });
-  }
+    res.json({ message: "Removed And Added To Wishlist" });
+  
 }
