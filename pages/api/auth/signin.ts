@@ -11,6 +11,10 @@ export default async function signIn(
   const SECRET_KEY = process.env.SECRET_KEY;
   if (!SECRET_KEY) throw Error("Secret key is not provided!");
 
+  if (req.method !== "POST") {
+    res.status(401).send("Not A POST Request");
+  }
+
   try {
     const user = await prisma.user.findUniqueOrThrow({
       where: {

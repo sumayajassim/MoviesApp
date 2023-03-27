@@ -41,8 +41,6 @@ export default async function signup(
     },
   });
 
-  console.log(emailAddress);
-
   if (emailExist) {
     res.status(500).send("Email Is Already Registred");
   }
@@ -79,6 +77,8 @@ export default async function signup(
       lastName,
       emailAddress,
       password: hashPass,
+      wishlist: { create: {} },
+      cart: { create: {} },
     },
   });
 

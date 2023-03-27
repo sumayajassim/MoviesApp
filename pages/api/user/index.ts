@@ -51,6 +51,8 @@ export default async function details(
 
   const { id } = await authUser(token);
 
+  console.log(id);
+
   const user = await prisma.user.findUniqueOrThrow({
     where: {
       id: id,
@@ -187,5 +189,3 @@ export default async function details(
     purchases: purchasedMovies,
   });
 }
-
-// change all x to movie / user validation? / ?
