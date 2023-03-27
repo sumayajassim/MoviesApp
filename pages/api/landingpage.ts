@@ -3,6 +3,7 @@ import axios from "axios";
 import { prisma } from "../../lib/prisma";
 import jwtDecode from "jwt-decode";
 import _ from "lodash";
+import authUser from "@/helpers/auth";
 const API_KEY = process.env.API_KEY;
 if (!API_KEY) throw Error("API key is not provided");
 
@@ -53,10 +54,10 @@ export default async function landingpage(
   }
 
   if (token) {
-    const userDetails: any = jwtDecode(token as string);
+    const { id } = await authUser(token);
 
     const userData = await prisma.user.findUniqueOrThrow({
-      where: { id: userDetails.id },
+      where: { id },
       include: {
         wishlist: true,
         cart: true,
