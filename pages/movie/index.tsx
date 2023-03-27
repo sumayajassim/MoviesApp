@@ -63,7 +63,7 @@ function index() {
             >
               <option selected>Choose a genre</option>
               {genres?.data?.map((genre: Genre) => (
-                <option value={genre.id}>{genre.title}</option>
+                <option value={genre.id}>{genre.name}</option>
               ))}
             </select>
           </div>

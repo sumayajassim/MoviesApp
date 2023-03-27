@@ -28,7 +28,7 @@ function GetMovie() {
 
   const genres = movie?.data.genres.map((genre, index) => (
     <span className="font-semibold" key={genre.id}>
-      {genre.title} {index !== movie?.data.genres.length - 1 ? ", " : ""}{" "}
+      {genre.name} {index !== movie?.data.genres.length - 1 ? ", " : ""}{" "}
     </span>
   ));
 
@@ -42,7 +42,7 @@ function GetMovie() {
   };
 
   const { mutate: addToWishlist } = useMutation({
-    mutationFn: (movieID: any) =>
+    mutationFn: (movieID: number) =>
       axios.post(
         "/api/wishlist/add",
         { movieId: movieID.toString() },
@@ -61,8 +61,8 @@ function GetMovie() {
     },
   });
 
-  const { mutate: addToCart, isLoading: handleAddToCartLoading } = useMutation({
-    mutationFn: (movieID: any) => {
+  const { mutate: addToCart } = useMutation({
+    mutationFn: (movieID: number) => {
       return axios.post(
         "/api/cart/add",
         { movieId: movieID.toString() },
@@ -72,7 +72,7 @@ function GetMovie() {
     onSuccess: (res) => {
       queryClient.invalidateQueries(["cartDetails"]);
       queryClient.invalidateQueries(["movie"]);
-      toast.success(`${res?.data?.message}`);
+      toast.success(res?.data?.message);
     },
     onError: (err: MutationResponse) => {
       console.log(err);
@@ -81,7 +81,7 @@ function GetMovie() {
   });
 
   const { mutate: removeFromWishlist } = useMutation({
-    mutationFn: (movieID: any) =>
+    mutationFn: (movieID: number) =>
       axios.post(
         "/api/wishlist/remove",
         { movieId: movieID.toString() },
@@ -150,7 +150,7 @@ function GetMovie() {
                       onClick={(e) => {
                         movie?.data.inWishlist
                           ? removeFromWishlist(movie?.data?.id)
-                          : addToWishlist(movie?.data?.id);
+                          : addToWishlist(movie?.data?.id || 0);
                       }}
                     >
                       <span>
@@ -168,7 +168,7 @@ function GetMovie() {
                     </button>
 
                     <button
-                      onClick={() => addToCart(movie?.data?.id)}
+                      onClick={() => addToCart(movie?.data?.id || 0)}
                       // disabled={!!movie?.data.inCart}
                       className="btn rounded bg-[rgba(255,255,255,.5)] ml-2"
                     >

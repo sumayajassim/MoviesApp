@@ -13,7 +13,7 @@ function Movie(props: { movie: MovieType }) {
   const queryClient = useQueryClient();
 
   const { mutate: handleLikeClick } = useMutation({
-    mutationFn: (movieID: any) =>
+    mutationFn: (movieID: number) =>
       axios.post(
         "/api/wishlist/add",
         { movieId: movieID.toString() },
@@ -32,7 +32,7 @@ function Movie(props: { movie: MovieType }) {
   });
 
   const { mutate: removeHandler } = useMutation({
-    mutationFn: (movieID: any) =>
+    mutationFn: (movieID: number) =>
       axios.post(
         "/api/wishlist/remove",
         { movieId: movieID.toString() },
@@ -45,7 +45,7 @@ function Movie(props: { movie: MovieType }) {
   });
 
   const { mutate: handleAddToCartClick } = useMutation({
-    mutationFn: (movieID: any) => {
+    mutationFn: (movieID: number) => {
       return axios
         .post(
           "/api/cart/add",

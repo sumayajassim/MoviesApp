@@ -198,7 +198,9 @@ export default function Modal(props: {
                         Total amount
                       </span>
                       <span className="font-bold tracking-wide text-md">
-                        ${totalPrice - (totalPrice * couponData?.amount) / 100}
+                        $
+                        {couponData &&
+                          totalPrice - (totalPrice * couponData?.amount) / 100}
                       </span>
                     </div>
                   </div>
