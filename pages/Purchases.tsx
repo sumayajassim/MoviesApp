@@ -1,5 +1,5 @@
 import Movie from "@/components/Movie";
-import Spinner from "@/components/Spinner";
+import LoadingSpinner from "@/components/Spinner";
 import { useAuth } from "@/context/auth";
 import { MovieType } from "@/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -25,7 +25,7 @@ function Purchases() {
       {previousPurchases?.data.purchases.length > 0 ? (
         <div className="w-fit mx-auto my-auto flex flex-col p-10">
           {userDetailsLoading ? (
-            <Spinner />
+            <LoadingSpinner />
           ) : (
             <div className="grid lg:grid-cols-4 gap-4  md:grid-cols-3  sm:grid-cols-1 max-w-fit">
               {previousPurchases?.data?.purchases.map((movie: MovieType) => (

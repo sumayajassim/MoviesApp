@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import Spinner from "./spinner";
+import LoadingSpinner from "@/components/Spinner";
 import { useAuth } from "@/context/auth";
 import { MovieType, MutationResponse } from "@/types";
 
@@ -88,7 +88,7 @@ function Wishlist() {
     return (
       <div className="z-50 w-110 absolute top-12 right-20 mt-1 font-normal bg-white divide-y divide-gray-100 rounded-lg shadow overflow-auto max-h-128">
         <div className="flex items-center justify-center min-w-110 p-5">
-          <Spinner />
+          <LoadingSpinner />
         </div>
       </div>
     );

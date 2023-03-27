@@ -1,6 +1,6 @@
 import React from "react";
 
-function Spinner() {
+function LoadingSpinner() {
   return (
     <div
       className="w-12 h-12 rounded-full animate-spin
@@ -9,4 +9,4 @@ function Spinner() {
   );
 }
 
-export default Spinner;
+export default LoadingSpinner;

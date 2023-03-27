@@ -5,7 +5,7 @@ import Movie from "@/components/Movie";
 import { useInView } from "react-intersection-observer";
 import { useDebounce } from "use-debounce";
 import { useAuth } from "@/context/auth";
-import Spinner from "@/components/Spinner";
+import LoadingSpinner from "@/components/Spinner";
 import { Genre, MovieType } from "@/types";
 
 function index() {
@@ -82,13 +82,13 @@ function index() {
               disabled={!hasNextPage || isFetchingNextPage}
             >
               {isFetchingNextPage || hasNextPage ? (
-                <Spinner />
+                <LoadingSpinner />
               ) : (
                 "Nothing more to load"
               )}
             </button>
           </div>
-          <div>{isFetching && !isFetchingNextPage && <Spinner />}</div>
+          <div>{isFetching && !isFetchingNextPage && <LoadingSpinner />}</div>
         </div>
       </div>
     </div>

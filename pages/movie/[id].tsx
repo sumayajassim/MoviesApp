@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { MovieType } from "@/types";
 import dayjs from "dayjs";
-import Spinner from "@/components/Spinner";
+import LoadingSpinner from "@/components/Spinner";
 import { useAuth } from "@/context/auth";
 import { MutationResponse } from "@/types";
 
@@ -99,7 +99,7 @@ function GetMovie() {
   if (movieLoading)
     return (
       <div className="w-full h-[calc(100vh-45px)] p-14 flex justify-center items-center">
-        <Spinner />
+        <LoadingSpinner />
       </div>
     );
 

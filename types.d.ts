@@ -48,7 +48,7 @@ export interface User {
 
 export type Genre = {
   id: number;
-  name: string;
+  title: string;
 };
 
 interface MutationResponse {

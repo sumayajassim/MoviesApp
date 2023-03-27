@@ -29,7 +29,6 @@ export default function Modal(props: {
     (total: number, item: MovieType) => total + item.price,
     0
   );
-  console.log({ totalPrice });
   let finalPrice = totalPrice;
 
   const { mutate: handelRemoveFromCart } = useMutation({

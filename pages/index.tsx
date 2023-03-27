@@ -2,7 +2,7 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { LandingPage, MovieType } from "@/types";
-import Spinner from "@/components/Spinner";
+import LoadingSpinner from "@/components/Spinner";
 import Movie from "@/components/Movie";
 import { useAuth } from "@/context/auth";
 
@@ -39,7 +39,7 @@ function App() {
     <div className="pt-12">
       {isLoading ? (
         <div className="flex w-full h-[calc(100vh-45px)] justify-center items-center">
-          <Spinner />
+          <LoadingSpinner />
         </div>
       ) : (
         HomePageContent
