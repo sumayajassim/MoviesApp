@@ -57,3 +57,10 @@ interface MutationResponse {
     message: string;
   };
 }
+
+export type Coupon = {
+  id: string;
+  userID: string;
+  amount: number;
+  code: string;
+};

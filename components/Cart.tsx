@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/auth";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { MovieType, MutationResponse } from "@/types";
+import { MovieType, MutationResponse, Coupon } from "@/types";
 
 export default function Modal(props: {
   showModal: boolean;
@@ -12,8 +12,9 @@ export default function Modal(props: {
 }) {
   const { showModal, setShowModal } = props;
   const router = useRouter();
-  const [discount, setDiscount] = useState(false);
+  const [discount, setDiscount] = useState(Number || 0);
   const [coupon, setCoupon] = useState("");
+  const [couponData, setCouponData] = useState<Coupon>();
   const { token } = useAuth();
   const queryClient = useQueryClient();
 
@@ -63,22 +64,24 @@ export default function Modal(props: {
 
   const { data: discountData, mutate: handleDiscount } = useMutation({
     mutationFn: (confirm: boolean) =>
-      axios.post(
-        "/api/purchase/add",
-        { confirm, cartPrice: totalPrice, code: coupon },
-        { headers: { Authorization: token } }
-      ),
-    onError: (err: MutationResponse) => toast.error(err?.data.message),
+      axios.post("/api/coupon", { code: coupon }),
+    onError: (err: MutationResponse) => toast.error(err?.response.data.message),
     onSuccess: (res) => {
-      console.log({ coupon });
+      setCouponData(res.data);
       if (coupon) {
-        setDiscount((discount) => !discount);
-        finalPrice = res.data.total;
+        setDiscount(totalPrice - (totalPrice * res.data.amount) / 100);
+        // finalPrice = res.data.total;
       }
       queryClient.invalidateQueries(["userDetails"]);
+      queryClient.invalidateQueries(["cartDetails"]);
       toast.success(res.data.message);
     },
   });
+
+  if (coupon) {
+    // setDiscount(totalPrice - (totalPrice * couponData?.amount) / 100);
+    // finalPrice = res.data.total;
+  }
 
   const cartItems = userDetails?.data.cart?.map((item: MovieType) => (
     <li
@@ -186,8 +189,8 @@ export default function Modal(props: {
                         Coupon Discount
                       </span>
                       <span className="font-bold tracking-wide text-md">
-                        ( -{discountData?.data.discountPercentage}%) - $
-                        {totalPrice - discountData?.data.total}
+                        ( -{discountData?.data.amount}%) - $
+                        {(totalPrice - discount).toPrecision(3)}
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -195,7 +198,7 @@ export default function Modal(props: {
                         Total amount
                       </span>
                       <span className="font-bold tracking-wide text-md">
-                        ${discountData?.data.total}
+                        ${totalPrice - (totalPrice * couponData?.amount) / 100}
                       </span>
                     </div>
                   </div>
@@ -220,7 +223,7 @@ export default function Modal(props: {
                     type="button"
                     onClick={() => {
                       handelCheckout(true);
-                      setDiscount(false);
+                      setDiscount(0);
                       setShowModal(false);
                     }}
                   >
