@@ -28,7 +28,7 @@ function GetMovie() {
 
   const genres = movie?.data.genres.map((genre, index) => (
     <span className="font-semibold" key={genre.id}>
-      {genre.name} {index !== movie?.data.genres.length - 1 ? ", " : ""}{" "}
+      {genre.title} {index !== movie?.data.genres.length - 1 ? ", " : ""}{" "}
     </span>
   ));
 
@@ -41,38 +41,37 @@ function GetMovie() {
     return formattedDuration;
   };
 
-  const { mutate: addToWishlist, isLoading: handleAddWishlistLoading } =
-    useMutation({
-      mutationFn: (movieID: any) =>
-        axios.post(
-          "/api/wishlist/add",
-          { moviesIDs: [movieID.toString()] },
-          { headers: { Authorization: token } }
-        ),
-      onSuccess: (res) => {
-        queryClient.invalidateQueries(["movie"]);
-        queryClient.invalidateQueries(["userDetails"]);
-        toast.success(res.data.message);
-      },
-      onError: (err: MutationResponse) => {
-        console.log(err);
-        toast.error(`${err?.response?.data?.message}`, {
-          toastId: 1,
-        });
-      },
-    });
+  const { mutate: addToWishlist } = useMutation({
+    mutationFn: (movieID: any) =>
+      axios.post(
+        "/api/wishlist/add",
+        { movieId: movieID.toString() },
+        { headers: { Authorization: token } }
+      ),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries(["movie"]);
+      queryClient.invalidateQueries(["userDetails"]);
+      toast.success(res.data.message);
+    },
+    onError: (err: MutationResponse) => {
+      console.log(err);
+      toast.error(err?.response?.data?.message, {
+        toastId: 1,
+      });
+    },
+  });
 
   const { mutate: addToCart, isLoading: handleAddToCartLoading } = useMutation({
     mutationFn: (movieID: any) => {
       return axios.post(
         "/api/cart/add",
-        { moviesIDs: [movieID.toString()] },
+        { movieId: movieID.toString() },
         { headers: { Authorization: token } }
       );
     },
     onSuccess: (res) => {
       queryClient.invalidateQueries(["cartDetails"]);
-      // queryClient.invalidateQueries(["movie"]);
+      queryClient.invalidateQueries(["movie"]);
       toast.success(`${res?.data?.message}`);
     },
     onError: (err: MutationResponse) => {
@@ -81,19 +80,18 @@ function GetMovie() {
     },
   });
 
-  const { mutate: removeFromWishlist, isLoading: removeHandlerLoading } =
-    useMutation({
-      mutationFn: (movieID: any) =>
-        axios.post(
-          "/api/wishlist/remove",
-          { moviesIDs: [movieID.toString()] },
-          { headers: { Authorization: token } }
-        ),
-      onSuccess: (res, movieID) => {
-        queryClient.invalidateQueries(["movie"]);
-        toast.success(res.data.message);
-      },
-    });
+  const { mutate: removeFromWishlist } = useMutation({
+    mutationFn: (movieID: any) =>
+      axios.post(
+        "/api/wishlist/remove",
+        { movieId: movieID.toString() },
+        { headers: { Authorization: token } }
+      ),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries(["movie"]);
+      toast.success(res.data.message);
+    },
+  });
 
   if (!id) return "NOT FOUND - NO ID";
   if (movieLoading)

@@ -4,7 +4,7 @@ import getMovie from "@/helpers/getmovie";
 import axios from "axios";
 import authUser from "../../../helpers/auth";
 
-const API_KEY = process.env.API_KEY
+const API_KEY = process.env.API_KEY;
 
 const BADGES = {
   obama: {
@@ -117,7 +117,7 @@ export default async function details(
   }
 
   const trendingMovies = await axios.get(
-`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1`
+    `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1`
   );
 
   const trendingMoviesArray = trendingMovies.data.results.map(
@@ -140,16 +140,15 @@ export default async function details(
     (movie: any) => movie.id
   );
 
-
   const cartMovies = user?.cart?.moviesIDs;
 
-  // cartMovies?.map((movie: any, index: any) => {
-  //   trendingMoviesArray.includes(+movie) ||
-  //   upcomingMoviesArray.includes(+movie) ||
-  //   topRatedMoviesArray.includes(+movie)
-  //     ? (userCartMoviesDetails[index].price = 10)
-  //     : (userCartMoviesDetails[index].price = 5);
-  // });
+  cartMovies?.map((movie: any, index: any) => {
+    trendingMoviesArray.includes(+movie) ||
+    upcomingMoviesArray.includes(+movie) ||
+    topRatedMoviesArray.includes(+movie)
+      ? (userCartMoviesDetails[index].price = 10)
+      : (userCartMoviesDetails[index].price = 5);
+  });
 
   let userPurchasesLength = purchasedMovies.length || 0;
 

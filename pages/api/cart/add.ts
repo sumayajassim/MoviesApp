@@ -1,22 +1,22 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { prisma } from "../../../lib/prisma";
-import authUser from "../../../helpers/auth";
+import { prisma } from "@/lib/prisma";
+import authUser from "@/helpers/auth";
 
 export default async function addToCart(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const token: string = req.headers["authorization"] as string;
+  const token = req.headers["authorization"] as string;
 
   if (!token) {
-    res.status(401).send("UnAuthorized - Sign In / Sign Up");
+    res.status(401).json({ message: "UnAuthorized - Sign In / Sign Up" });
   }
 
   if (req.method !== "POST") {
-    res.status(401).send("Not A POST Request");
+    res.status(401).json({ message: "Not A POST Request" });
   }
 
-  const { id } = await authUser(token as string);
+  const { id } = await authUser(token);
 
   const { movieId } = req.body;
 
@@ -38,11 +38,11 @@ export default async function addToCart(
   });
 
   if (purchased.length > 0) {
-    res.status(400).send("Movie Already Purchased");
+    res.status(400).json({ message: "Movie Already Purchased" });
   }
 
   if (moviesIDs.includes(movieId)) {
-    res.status(400).send("Movie Already In Cart");
+    res.status(400).json({ message: "Movie Already In Cart" });
   } else if (purchased.length <= 0 && !moviesIDs.includes(movieId)) {
     await prisma.cart.update({
       where: {
