@@ -143,13 +143,13 @@ export default async function details(
 
   const cartMovies = user?.cart?.moviesIDs;
 
-  cartMovies?.map((movie: any, index: any) => {
-    trendingMoviesArray.includes(+movie) ||
-    upcomingMoviesArray.includes(+movie) ||
-    topRatedMoviesArray.includes(+movie)
-      ? (userCartMoviesDetails[index].price = 10)
-      : (userCartMoviesDetails[index].price = 5);
-  });
+  // cartMovies?.map((movie: any, index: any) => {
+  //   trendingMoviesArray.includes(+movie) ||
+  //   upcomingMoviesArray.includes(+movie) ||
+  //   topRatedMoviesArray.includes(+movie)
+  //     ? (userCartMoviesDetails[index].price = 10)
+  //     : (userCartMoviesDetails[index].price = 5);
+  // });
 
   let userPurchasesLength = purchasedMovies.length || 0;
 
