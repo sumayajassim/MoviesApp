@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/prisma";
 import jwtDecode from "jwt-decode";
 import axios from "axios";
-import authUser from "@/components/helpers/auth";
+import authUser from "../../../helpers/auth";
 
 export default async function addtest(
   req: NextApiRequest,
