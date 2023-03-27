@@ -1,6 +1,7 @@
-import MovieComponent from "@/components/MovieComponent";
+import MovieComponent from "@/components/Movie";
 import Spinner from "@/components/spinner";
 import { useAuth } from "@/context/auth";
+import { MovieType } from "@/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import React from "react";
@@ -27,7 +28,7 @@ function Purchases() {
             <Spinner />
           ) : (
             <div className="grid grid-cols-4 gap-4 max-w-fit">
-              {previousPurchases?.data?.purchases.map((movie) => (
+              {previousPurchases?.data?.purchases.map((movie: MovieType) => (
                 <MovieComponent movie={movie} />
               ))}
             </div>

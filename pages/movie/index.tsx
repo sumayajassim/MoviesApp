@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
-import MovieComponent from "@/components/MovieComponent";
+import MovieComponent from "@/components/Movie";
 import { useInView } from "react-intersection-observer";
 import { useDebounce } from "use-debounce";
 import { useAuth } from "@/context/auth";
@@ -63,7 +63,7 @@ function index() {
             >
               <option selected>Choose a genre</option>
               {genres?.data?.map((genre: Genre) => (
-                <option value={genre.id}>{genre.title}</option>
+                <option value={genre.id}>{genre.name}</option>
               ))}
             </select>
           </div>

@@ -1,10 +1,10 @@
-import React, { useContext } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import Spinner from "./spinner";
 import { useAuth } from "@/context/auth";
+import { MovieType, MutationResponse } from "@/types";
 
 function Wishlist() {
   const router = useRouter();
@@ -21,7 +21,7 @@ function Wishlist() {
 
   const { mutate: handleAddToCartClick, isLoading: handleAddToCartLoading } =
     useMutation({
-      mutationFn: (movieID: any) =>
+      mutationFn: (movieID: Number) =>
         axios.post(
           "/api/cart/add",
           { moviesIDs: [movieID.toString()] },
@@ -31,7 +31,7 @@ function Wishlist() {
         queryClient.invalidateQueries(["userDetails"]);
         toast.success(res.data.message);
       },
-      onError: (err) => {
+      onError: (err: MutationResponse) => {
         console.log(err);
         toast.error(`${err?.response?.data?.message}`);
       },
@@ -39,28 +39,25 @@ function Wishlist() {
 
   const { mutate: removeHandler, isLoading: removeHandlerLoading } =
     useMutation({
-      mutationFn: (movieID: any) =>
+      mutationFn: (movieID: Number) =>
         axios.post(
           "/api/wishlist/remove",
           { moviesIDs: [movieID.toString()] },
           { headers: { Authorization: token } }
         ),
-      onSuccess: (res, movieID) => {
+      onSuccess: () => {
         queryClient.invalidateQueries(["userDetails"]);
         toast.success("Movie removed successfully from your wishlist!!");
       },
     });
 
-  // console.log("userDetails", userDetails);
-  const wishlistItems = userDetails?.data?.wishlist.map((movie) => (
+  const wishlistItems = userDetails?.data?.wishlist.map((movie: MovieType) => (
     <li
       key={movie.id}
       className="flex p-4 items-center justify-between"
       onClick={(e) => {
-        e.preventDefault();
         e.stopPropagation();
         router.push(`/movie/${movie.id}`);
-        // router.refresh();
       }}
     >
       <div className="flex items-center">
@@ -78,7 +75,6 @@ function Wishlist() {
         <i
           className="fa-solid fa-heart cursor-pointer hover:text-red-900"
           onClick={(e) => {
-            e.preventDefault();
             e.stopPropagation();
             removeHandler(movie.id);
           }}
@@ -86,7 +82,6 @@ function Wishlist() {
         <i
           className="fa-solid fa-cart-plus cursor-pointer"
           onClick={(e) => {
-            e.preventDefault();
             e.stopPropagation();
             handleAddToCartClick(movie.id);
           }}
@@ -94,20 +89,23 @@ function Wishlist() {
       </div>
     </li>
   ));
-  return (
-    <div className="z-50 w-110 absolute top-12 right-20 mt-1 font-normal bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600 overflow-auto max-h-128">
-      {!userDetailsLoading ? (
-        userDetails?.data?.wishlist.length > 0 ? (
-          wishlistItems
-        ) : (
-          <p className="min-w-110 p-5 text-dark-grey">
-            You have nothing in your wishlist!{" "}
-          </p>
-        )
-      ) : (
+  if (userDetailsLoading)
+    return (
+      <div className="z-50 w-110 absolute top-12 right-20 mt-1 font-normal bg-white divide-y divide-gray-100 rounded-lg shadow overflow-auto max-h-128">
         <div className="flex items-center justify-center min-w-110 p-5">
           <Spinner />
         </div>
+      </div>
+    );
+
+  return (
+    <div className="z-50 w-110 absolute top-12 right-20 mt-1 font-normal bg-white divide-y divide-gray-100 rounded-lg shadow overflow-auto max-h-128">
+      {userDetails?.data?.wishlist.length > 0 ? (
+        wishlistItems
+      ) : (
+        <p className="min-w-110 p-5 text-dark-grey">
+          You have nothing in your wishlist
+        </p>
       )}
     </div>
   );

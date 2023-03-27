@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../../lib/prisma";
 import jwtDecode from "jwt-decode";
-import getMovie from "@/components/helpers/getmovie";
+import getMovie from "@/helpers/getmovie";
 import axios from "axios";
 import authUser from "@/components/helpers/auth";
 

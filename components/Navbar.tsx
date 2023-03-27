@@ -1,29 +1,22 @@
 import React, { useContext, useState, useEffect, Fragment } from "react";
-import AuthForms from "./AuthForms";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import useComponentVisible from "./helpers/useComponentVisible";
 import Wishlist from "./Wishlist";
 import Cart from "./Cart";
 import { useAuth } from "@/context/auth";
 import { Menu, Transition } from "@headlessui/react";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
+import useComponentVisible from "@/helpers/useComponentVisible";
+import Signup from "./auth/signup";
+import SignIn from "./auth/signin";
 
 function Navbar() {
   const router = useRouter();
-  const [status, setStatus] = useState<Boolean>(false);
   const { ref, isComponentVisible, setIsComponentVisible } =
     useComponentVisible(false);
   const [showModal, setShowModal] = useState(false);
   const { isLoggedIn, logout, token } = useAuth();
-  const clickHandler = (e: any) => {
-    if (e.target.id === "signin") {
-      setStatus((status) => true);
-    } else {
-      setStatus((status) => false);
-    }
-  };
 
   const { data: userDetails, isLoading: userDetailsLoading } = useQuery({
     queryKey: ["userDetails"],
@@ -84,10 +77,10 @@ function Navbar() {
                 <Menu.Button>
                   <div className="flex ">
                     <img
-                      src={userDetails?.data?.userr.badges[0]}
+                      src={userDetails?.data?.user.badges[0]}
                       className="w-6 h-6 mr-1"
                     />{" "}
-                    {userDetails?.data?.userr.userName}
+                    {userDetails?.data?.user.userName}
                   </div>
                 </Menu.Button>
                 <Transition
@@ -149,33 +142,35 @@ function Navbar() {
             </Link>
           </div>
           <div className="flex flex-row space-x-4 list-none">
-            <button
-              type="button"
-              id="signin"
-              onClick={clickHandler}
-              data-drawer-target="drawer-right-example"
-              data-drawer-show="drawer-right-example"
-              data-drawer-placement="right"
-              aria-controls="drawer-right-example"
-            >
-              Signin
-            </button>
-            <button
-              type="button"
-              id="register"
-              onClick={clickHandler}
-              data-drawer-target="drawer-right-example"
-              data-drawer-show="drawer-right-example"
-              data-drawer-placement="right"
-              aria-controls="drawer-right-example"
-            >
-              Signup
-            </button>
+            <li className="btn btn--link">
+              <button
+                type="button"
+                id="signin"
+                data-drawer-target="sign-in-drawer"
+                data-drawer-show="sign-in-drawer"
+                data-drawer-placement="right"
+                aria-controls="sign-in-drawer"
+              >
+                Signin
+              </button>
+            </li>
+            <li className="btn btn--link">
+              <button
+                type="button"
+                id="register"
+                data-drawer-target="sign-up-drawer"
+                data-drawer-show="sign-up-drawer"
+                data-drawer-placement="right"
+                aria-controls="sign-up-drawer"
+              >
+                Signup
+              </button>
+            </li>
           </div>
         </div>
       </div>
-
-      <AuthForms status={status} />
+      <Signup />
+      <SignIn />
       <Cart showModal={showModal} setShowModal={setShowModal} />
     </>
   );

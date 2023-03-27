@@ -7,6 +7,7 @@ import { Movie } from "@/types";
 import dayjs from "dayjs";
 import Spinner from "@/components/spinner";
 import { useAuth } from "@/context/auth";
+import { MutationErrorResponse } from "@/types";
 
 function GetMovie() {
   const router = useRouter();
@@ -51,7 +52,7 @@ function GetMovie() {
         queryClient.invalidateQueries(["userDetails"]);
         toast.success(res.data.message);
       },
-      onError: (err) => {
+      onError: (err: MutationErrorResponse) => {
         console.log(err);
         toast.error(`${err?.response?.data?.message}`, {
           toastId: 1,
@@ -72,7 +73,7 @@ function GetMovie() {
       // queryClient.invalidateQueries(["movie"]);
       toast.success(`${res?.data?.message}`);
     },
-    onError: (err) => {
+    onError: (err: MutationErrorResponse) => {
       console.log(err);
       toast.error(err?.response?.data?.message);
     },
@@ -116,7 +117,7 @@ function GetMovie() {
               <div className="text-3xl font-bold text-white flex justify-between">
                 <span className="">
                   {movie?.data?.title} (
-                  {convertMinutesToHours(movie?.data.runtime | 0)})
+                  {convertMinutesToHours(movie?.data.runtime || 0)})
                 </span>
                 <div className="min-w-fit">
                   <i className="fa-solid fa-star text-yellow mx-2"></i>

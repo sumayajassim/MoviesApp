@@ -1,19 +1,17 @@
-import React, { useContext, useState } from "react";
-import Movie from "@/types";
+import React, { useState } from "react";
+import { MovieType, MutationResponse } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import Context from "@/context/context";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/auth";
-function MovieComponent(props) {
-  const { movie, page } = props;
+function Movie(props: { movie: MovieType }) {
+  const { movie } = props;
   const router = useRouter();
-  const [like, setLike] = useState(movie?.inWishlist);
+  const [isLiked, setLike] = useState<Boolean>(movie?.inWishlist || false);
   const { token } = useAuth();
   const queryClient = useQueryClient();
 
-  // console.log("token", localStorage.getItem("token"));
   const { mutate: handleLikeClick, isLoading: handleAddWishlistLoading } =
     useMutation({
       mutationFn: (movieID: any) =>
@@ -24,10 +22,9 @@ function MovieComponent(props) {
         ),
       onSuccess: (res) => {
         toast.success(res.data.message);
-        setLike((like) => !like);
+        setLike((isLiked) => !isLiked);
       },
-      onError: (err) => {
-        console.log(err);
+      onError: (err: MutationResponse) => {
         toast.error(`${err?.response?.data?.message}`, {
           toastId: 1,
         });
@@ -43,7 +40,7 @@ function MovieComponent(props) {
           { headers: { Authorization: token } }
         ),
       onSuccess: (res, movieID) => {
-        setLike((like) => !like);
+        setLike((isLiked) => !isLiked);
         toast.success("Movie removed successfully from your wishlist!!");
       },
     });
@@ -59,8 +56,7 @@ function MovieComponent(props) {
           )
           .then((response) => toast.success(`${response?.data?.message}`));
       },
-      onError: (err) => {
-        console.log(err);
+      onError: (err: MutationResponse) => {
         toast.error(`${err?.response?.data?.message}`);
       },
       onSuccess: () => {
@@ -68,7 +64,7 @@ function MovieComponent(props) {
       },
     });
 
-  const handleMovieClick = (id: string) => {
+  const handleMovieClick = (id: number) => {
     router.push(`movie/${id}`);
   };
   return (
@@ -86,12 +82,8 @@ function MovieComponent(props) {
         }
         alt=""
       />
-      {/* <Image width={300} height={400}
-     src={movie.poster_path ? movie.poster_path : 'https://www.altavod.com/assets/images/poster-placeholder.png'} alt=""/> */}
       <div className="absolute bottom-0 bg-white w-60 h-20 rounded-br-md rounded-bl-md p-4 flex justify-between">
-        <span className="text-red-700 truncate w-40">
-          {movie.title ? movie.title : movie.name}
-        </span>
+        <span className="text-red-700 truncate w-40">{movie.title}</span>
         <span>
           <i className="fa-solid fa-star text-yellow mr-1"></i>
           {movie.vote_average.toPrecision(2)}
@@ -103,13 +95,10 @@ function MovieComponent(props) {
             ${movie.price || 5}
           </div>
           <div className="absolute bottom-2 bg-red w-60 h-10 rounded-br-md rounded-bl-md p-4 flex justify-end space-x-3">
-            {/* <span className="text-red-700"></span> */}
-            {/* <span>{movie.vote_average}</span> */}
-            {like ? (
+            {isLiked ? (
               <button
                 className=""
                 onClick={(e) => {
-                  e.preventDefault();
                   e.stopPropagation();
                   removeHandler(movie.id);
                 }}
@@ -120,7 +109,6 @@ function MovieComponent(props) {
               <button
                 className=""
                 onClick={(e) => {
-                  e.preventDefault();
                   e.stopPropagation();
                   handleLikeClick(movie.id);
                 }}
@@ -131,8 +119,7 @@ function MovieComponent(props) {
             <button
               className=""
               onClick={(e) => {
-                // e.preventDefault();
-                // e.stopPropagation();
+                e.stopPropagation();
                 handleAddToCartClick(movie.id);
               }}
             >
@@ -145,4 +132,4 @@ function MovieComponent(props) {
   );
 }
 
-export default MovieComponent;
+export default Movie;
