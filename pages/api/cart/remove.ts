@@ -18,6 +18,8 @@ export default async function removeFromeCart(
 
   const { id } = await authUser(token);
 
+  const { movie } = req.body;
+
   const { moviesIDs } = await prisma.cart.findUniqueOrThrow({
     where: {
       userID: id,
@@ -25,19 +27,24 @@ export default async function removeFromeCart(
   });
 
   const cartAfterRemovingMovie = moviesIDs.filter(
-    (movie: any) => !req.body.moviesIDs.includes(movie)
+    (cartMovie: any) => cartMovie !== movie
   );
 
-  await prisma.cart.update({
-    where: {
-      userID: id,
-    },
-    data: {
-      moviesIDs: cartAfterRemovingMovie,
-    },
+  res.json({
+    cart: moviesIDs,
+    after: cartAfterRemovingMovie,
   });
 
-  res.send("Movie Removed");
+  // await prisma.cart.update({
+  //   where: {
+  //     userID: id,
+  //   },
+  //   data: {
+  //     moviesIDs: cartAfterRemovingMovie,
+  //   },
+  // });
+
+  // res.send("Movie Removed");
 }
 
 //change x to movie in filter / if no token loop / if no token
