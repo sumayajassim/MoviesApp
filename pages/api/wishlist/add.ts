@@ -1,98 +1,58 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../../lib/prisma";
-import axios from "axios";
 import authUser from "@/helpers/auth";
+import axios from "axios";
 
-export default async function addToWishList(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  const token: any = req.headers["authorization"];
-  const API_KEY = process.env.API_KEY;
+export default async function (req: NextApiRequest, res: NextApiResponse) {
+  const token = req.headers["authorization"];
 
   if (!token) {
-    res
-      .status(401)
-      .send(
-        "Unauthorized - Sign in if you have an account or sign up to add to the wishlist"
-      );
+    res.status(401).send("UnAuthorized");
   }
 
   if (req.method !== "POST") {
-    res.status(401).send("Not A POST Request");
+    res.status(400).send("Not A POST Request");
   }
 
-  const { id } = await authUser(token);
+  const { id } = await authUser(token as string);
 
-  const movies = req.body.moviesIDs;
+  const { movieId } = req.body;
 
   const purchased = await prisma.purchases.findMany({
     where: {
       userID: id,
-      OR: movies.map((movieId: string) => ({
-        moviesIDs: { has: movieId },
-      })),
+      moviesIDs : {has : movieId}
     },
   });
 
-  // you could return an error here if purchases is not empty
 
-  if (purchased.length > 0) {
-    res.status(400).send("Movie is purchased");
+  if(purchased.length > 0){
+    res.status(400).send("Movie Already Purchased")
   }
 
-  const purchasedMovies = purchased.flatMap(({ moviesIDs }) => moviesIDs);
 
-  const cart = await prisma.cart.findUniqueOrThrow({
-    where: {
-      userID: id,
+  const {moviesIDs} = await prisma.wishlist.findUniqueOrThrow({
+    where:{
+      userID : id
+    }
+  })
+
+  if(moviesIDs.includes(movieId)){
+    res.status(400).send("Movie Already In Wishlist")
+  }
+
+     await prisma.wishlist.update({
+    where:{
+      userID: id
     },
-  });
+    data:{
+      moviesIDs: {
+        push: movieId
+      }
+    }
+  })
 
-  const moviesInCart = cart.moviesIDs;
-
-  const wishlist = await prisma.wishlist.findUniqueOrThrow({
-    where: {
-      userID: id,
-    },
-  });
-
-  const moviesInWishList = wishlist.moviesIDs;
-
-  if (moviesInWishList.includes(req.body.moviesIDs[0])) {
-    res.status(400).json({ message: "Movie Is ALready In the Wishlist" });
-  } else if (moviesInCart.includes(req.body.moviesIDs[0])) {
-    res.status(400).json({ message: "Movie Is ALready In Cart" });
-  } else if (purchasedMovies.includes(req.body.moviesIDs[0])) {
-    res.status(400).json({ message: "Movie Is ALready Purchased" });
-  }
-  if (
-    !moviesInWishList.includes(req.body.moviesIDs[0]) &&
-    !moviesInCart.includes(req.body.moviesIDs[0]) &&
-    !purchasedMovies.includes(req.body.moviesIDs[0])
-  ) {
-    const finalArray = movies.filter(
-      (x: any) =>
-        !purchasedMovies.includes(x) &&
-        !moviesInCart.includes(x) &&
-        !moviesInWishList.includes(x)
-    );
-
-    await prisma.wishlist.update({
-      where: {
-        userID: id,
-      },
-      data: {
-        moviesIDs: {
-          push: finalArray,
-        },
-      },
-    });
-
-    const { data } = await axios.get(
-      `https://api.themoviedb.org/3/movie/${req.body.moviesIDs[0]}?api_key=${API_KEY}`
-    );
-
-    res.json({ message: "Movie Added To Wishlist", data });
-  }
+  res.json({message: "Added to Wishlist"})
+  
+ 
 }

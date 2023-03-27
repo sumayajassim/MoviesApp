@@ -19,24 +19,22 @@ export default async function removeFromWishlist(
 
   const { id } = await authUser(token);
 
-  const movies = req.body.moviesIDs;
+  const { movie } = req.body
 
-  const wishlist = await prisma.wishlist.findUniqueOrThrow({
+  const { moviesIDs } = await prisma.wishlist.findUniqueOrThrow({
     where: {
       userID: id,
     },
   });
 
-  const moviesInWishlist = wishlist.moviesIDs;
-
-  const finalArray = moviesInWishlist.filter((x: any) => !movies.includes(x));
+  const wishlistMoviesAfter = moviesIDs.filter((wishlistMovie: any) => wishlistMovie !== movie);
 
   await prisma.wishlist.update({
     where: {
       userID: id,
     },
     data: {
-      moviesIDs: finalArray,
+      moviesIDs: wishlistMoviesAfter,
     },
   });
 
