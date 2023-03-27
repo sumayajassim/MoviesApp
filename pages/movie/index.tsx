@@ -63,16 +63,16 @@ function index() {
             >
               <option selected>Choose a genre</option>
               {genres?.data?.map((genre: Genre) => (
-                <option value={genre.id}>{genre.name}</option>
+                <option value={genre.id}>{genre.title}</option>
               ))}
             </select>
           </div>
         </div>
-        <div className="grid grid-cols-4 gap-4 max-w-fit">
+        <div className="grid lg:grid-cols-4 gap-4  md:grid-cols-3  sm:grid-cols-1 max-w-fit">
           {data?.pages
             ?.flatMap(({ results }) => results)
             .map((movie: MovieType) => (
-              <Movie key={movie.id} movie={movie} />
+              <Movie key={movie?.id} movie={movie} />
             ))}
           <div className="">
             <button

@@ -6,7 +6,10 @@ import { useAuth } from "@/context/auth";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { MovieType, MutationResponse } from "@/types";
 
-export default function Modal(props) {
+export default function Modal(props: {
+  showModal: boolean;
+  setShowModal: any;
+}) {
   const { showModal, setShowModal } = props;
   const router = useRouter();
   const [discount, setDiscount] = useState(false);
@@ -22,11 +25,11 @@ export default function Modal(props) {
       }),
     { enabled: !!token }
   );
-
-  const totalPrice = userDetails?.data.cart.reduce(
-    (item: MovieType, total: number) => total + item.price,
+  const totalPrice: number = userDetails?.data.cart?.reduce(
+    (total: number, item: MovieType) => total + item.price,
     0
   );
+  console.log({ totalPrice });
   let finalPrice = totalPrice;
 
   const { mutate: handelRemoveFromCart } = useMutation({
@@ -82,37 +85,39 @@ export default function Modal(props) {
     <li
       key={item.id}
       className="border-t-1 border-b-1 list-none py-4 px-8 flex items-center"
-      onClick={() => {
-        router.push(`/movie/${item.id}`);
-        setShowModal(false);
-      }}
     >
-      <img
-        className="w-20 h-32 drop-shadow-lg rounded"
-        src={
-          item.poster_path
-            ? `https://image.tmdb.org/t/p/original/${item.poster_path}`
-            : "https://www.altavod.com/assets/images/poster-placeholder.png"
-        }
-        alt=""
-      />
-      <div className="flex flex-col ml-4 items">
-        <span className="text-black font-semibold">{item.title}</span>
-        <div className="flex flex-wrap w-72">
-          {item.genres?.map((genre) => (
-            <span className="w-fit font mt-1 mr-1 px-1 py-0 rounded-lg bg-red-700 text-white font-semibold text-xs">
-              {genre.name}
-            </span>
-          ))}
+      <div
+        className="flex flex-row cursor-pointer"
+        onClick={() => {
+          router.push(`/movie/${item.id}`);
+          setShowModal(false);
+        }}
+      >
+        <img
+          className="w-20 h-32 drop-shadow-lg rounded"
+          src={
+            item.poster_path
+              ? `https://image.tmdb.org/t/p/original/${item.poster_path}`
+              : "https://www.altavod.com/assets/images/poster-placeholder.png"
+          }
+          alt=""
+        />
+        <div className="flex flex-col ml-4 items">
+          <span className="text-black font-semibold">{item.title}</span>
+          <div className="flex flex-wrap w-72">
+            {item.genres?.map((genre) => (
+              <span className="w-fit font mt-1 mr-1 px-1 py-0 rounded-lg bg-red-700 text-white font-semibold text-xs">
+                {genre.name}
+              </span>
+            ))}
+          </div>
+          <div className=""></div>
         </div>
-        <div className=""></div>
       </div>
       <span className="flex flex-col text-2xl font-bold grow items-end">
         ${item.price || 5}
         <button
           onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
             handelRemoveFromCart(item.id);
           }}
         >

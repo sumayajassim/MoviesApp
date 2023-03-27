@@ -1,4 +1,4 @@
-import MovieComponent from "@/components/Movie";
+import Movie from "@/components/Movie";
 import Spinner from "@/components/Spinner";
 import { useAuth } from "@/context/auth";
 import { MovieType } from "@/types";
@@ -27,9 +27,9 @@ function Purchases() {
           {userDetailsLoading ? (
             <Spinner />
           ) : (
-            <div className="grid grid-cols-4 gap-4 max-w-fit">
+            <div className="grid lg:grid-cols-4 gap-4  md:grid-cols-3  sm:grid-cols-1 max-w-fit">
               {previousPurchases?.data?.purchases.map((movie: MovieType) => (
-                <MovieComponent movie={movie} />
+                <Movie movie={movie} />
               ))}
             </div>
           )}

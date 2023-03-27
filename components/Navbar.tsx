@@ -61,8 +61,6 @@ function Navbar() {
               <button
                 id="wishlist"
                 onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
                   setIsComponentVisible(true);
                 }}
                 type="button"
@@ -96,7 +94,7 @@ function Navbar() {
                     <div className="px-1 py-1 ">
                       <Menu.Item>
                         <button
-                          onClick={() => router.push("/Purchases")}
+                          onClick={() => router.push("/purchases")}
                           className={`
                          
                             group flex w-full items-center rounded-md px-2 py-2 text-sm`}

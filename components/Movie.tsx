@@ -22,28 +22,28 @@ function Movie(props: { movie: MovieType }) {
         ),
       onSuccess: (res) => {
         toast.success(res.data.message);
+        queryClient.invalidateQueries(["userDetails"]);
         setLike((isLiked) => !isLiked);
       },
       onError: (err: MutationResponse) => {
-        toast.error(`${err?.response?.data?.message}`, {
+        toast.error(err?.response?.data?.message, {
           toastId: 1,
         });
       },
     });
 
-  const { mutate: removeHandler, isLoading: removeHandlerLoading } =
-    useMutation({
-      mutationFn: (movieID: any) =>
-        axios.post(
-          "/api/wishlist/remove",
-          { moviesIDs: [movieID.toString()] },
-          { headers: { Authorization: token } }
-        ),
-      onSuccess: (res, movieID) => {
-        setLike((isLiked) => !isLiked);
-        toast.success("Movie removed successfully from your wishlist!!");
-      },
-    });
+  const { mutate: removeHandler } = useMutation({
+    mutationFn: (movieID: any) =>
+      axios.post(
+        "/api/wishlist/remove",
+        { moviesIDs: [movieID.toString()] },
+        { headers: { Authorization: token } }
+      ),
+    onSuccess: (res) => {
+      setLike((isLiked) => !isLiked);
+      toast.success(res.data.message);
+    },
+  });
 
   const { mutate: handleAddToCartClick, isLoading: handleAddToCartLoading } =
     useMutation({
@@ -70,36 +70,35 @@ function Movie(props: { movie: MovieType }) {
   return (
     <div
       className="h-96 min-w-fit max-w-fit rounded-md relative drop-shadow-md"
-      key={movie.id}
-      onClick={() => handleMovieClick(movie.id)}
+      key={movie?.id}
     >
       <img
-        className="h-96 w-60 object-fill rounded-md"
+        className="h-96 w-60 object-fill rounded-md cursor-pointer"
+        onClick={() => handleMovieClick(movie.id)}
         src={
-          movie.poster_path
+          movie?.poster_path
             ? `https://image.tmdb.org/t/p/original/${movie.poster_path}`
             : "https://www.altavod.com/assets/images/poster-placeholder.png"
         }
         alt=""
       />
       <div className="absolute bottom-0 bg-white w-60 h-20 rounded-br-md rounded-bl-md p-4 flex justify-between">
-        <span className="text-red-700 truncate w-40">{movie.title}</span>
+        <span className="text-red-700 truncate w-40">{movie?.title}</span>
         <span>
           <i className="fa-solid fa-star text-yellow mr-1"></i>
-          {movie.vote_average.toPrecision(2)}
+          {movie?.vote_average.toPrecision(2)}
         </span>
       </div>
-      {!movie.isPurchased && (
+      {!movie?.isPurchased && (
         <>
           <div className="absolute bottom-1 left-4 text-xl font-bold text-[#C21807]">
-            ${movie.price || 5}
+            ${movie?.price || 5}
           </div>
           <div className="absolute bottom-2 bg-red w-60 h-10 rounded-br-md rounded-bl-md p-4 flex justify-end space-x-3">
             {isLiked ? (
               <button
                 className=""
                 onClick={(e) => {
-                  e.stopPropagation();
                   removeHandler(movie.id);
                 }}
               >
@@ -109,7 +108,6 @@ function Movie(props: { movie: MovieType }) {
               <button
                 className=""
                 onClick={(e) => {
-                  e.stopPropagation();
                   handleLikeClick(movie.id);
                 }}
               >
@@ -119,7 +117,6 @@ function Movie(props: { movie: MovieType }) {
             <button
               className=""
               onClick={(e) => {
-                e.stopPropagation();
                 handleAddToCartClick(movie.id);
               }}
             >

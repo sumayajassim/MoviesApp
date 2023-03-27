@@ -2,7 +2,7 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { LandingPage, MovieType } from "@/types";
-import Spinner from "../components/spinner";
+import Spinner from "@/components/Spinner";
 import Movie from "@/components/Movie";
 import { useAuth } from "@/context/auth";
 

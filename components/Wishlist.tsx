@@ -32,8 +32,7 @@ function Wishlist() {
         toast.success(res.data.message);
       },
       onError: (err: MutationResponse) => {
-        console.log(err);
-        toast.error(`${err?.response?.data?.message}`);
+        toast.error(err?.response?.data?.message);
       },
     });
 
@@ -45,22 +44,20 @@ function Wishlist() {
           { moviesIDs: [movieID.toString()] },
           { headers: { Authorization: token } }
         ),
-      onSuccess: () => {
+      onSuccess: (res) => {
         queryClient.invalidateQueries(["userDetails"]);
-        toast.success("Movie removed successfully from your wishlist!!");
+        toast.success(res.data.message);
       },
     });
 
   const wishlistItems = userDetails?.data?.wishlist.map((movie: MovieType) => (
-    <li
-      key={movie.id}
-      className="flex p-4 items-center justify-between"
-      onClick={(e) => {
-        e.stopPropagation();
-        router.push(`/movie/${movie.id}`);
-      }}
-    >
-      <div className="flex items-center">
+    <li key={movie.id} className="flex p-4 items-center justify-between">
+      <div
+        className="flex items-center"
+        onClick={(e) => {
+          router.push(`/movie/${movie.id}`);
+        }}
+      >
         <img
           className="h-20 w-20 object-fill rounded-md mr-4"
           src={
@@ -75,14 +72,12 @@ function Wishlist() {
         <i
           className="fa-solid fa-heart cursor-pointer hover:text-red-900"
           onClick={(e) => {
-            e.stopPropagation();
             removeHandler(movie.id);
           }}
         ></i>
         <i
           className="fa-solid fa-cart-plus cursor-pointer"
           onClick={(e) => {
-            e.stopPropagation();
             handleAddToCartClick(movie.id);
           }}
         ></i>
