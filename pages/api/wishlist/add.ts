@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../../lib/prisma";
 import axios from "axios";
-import authUser from "@/components/helpers/auth";
+import authUser from "@/helpers/auth";
 
 export default async function addToWishList(
   req: NextApiRequest,
