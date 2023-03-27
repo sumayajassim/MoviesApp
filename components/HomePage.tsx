@@ -1,16 +1,19 @@
 import React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { LandingPage, Movie } from "@/types";
-import MovieComponent from "./Movie";
-import Spinner from "../components/spinner";
+import { LandingPage, MovieType } from "@/types";
+import Movie from "@/components/Movie";
+import Spinner from "@/components/Spinner";
+import { useAuth } from "@/context/auth";
 
 function HomePage() {
   const queryClient = useQueryClient();
-  type Response = { data: LandingPage };
+  const { token } = useAuth();
+  type Response = { data: LandingPage[] };
+
   const query = (): Promise<Response> =>
     axios.get("http://localhost:8000/api/landingpage", {
-      headers: { Authorization: localStorage.getItem("token") },
+      headers: { Authorization: token },
     });
 
   const { data, isLoading } = useQuery<Response, Error>(["categories"], query, {
@@ -29,8 +32,8 @@ function HomePage() {
               {category.title}
             </h1>
             <div className="flex flex-row overflow-x-scroll space-x-3 pl-5 pb-5 pt-5 ">
-              {category.movies?.map((movie) => (
-                <MovieComponent movie={movie} page="home" />
+              {category.movies?.map((movie: MovieType) => (
+                <Movie movie={movie} />
               ))}
             </div>
           </div>
@@ -42,7 +45,7 @@ function HomePage() {
     <div className="pt-12">
       {isLoading ? (
         <div className="flex w-full h-[calc(100vh-45px)] justify-center items-center">
-          {" "}
+          <Spinner></Spinner>
         </div>
       ) : (
         HomePageContent

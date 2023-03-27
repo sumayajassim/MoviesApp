@@ -1,5 +1,5 @@
 import MovieComponent from "@/components/Movie";
-import Spinner from "@/components/spinner";
+import Spinner from "@/components/Spinner";
 import { useAuth } from "@/context/auth";
 import { MovieType } from "@/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -12,7 +12,7 @@ function Purchases() {
   const { data: previousPurchases, isLoading: userDetailsLoading } = useQuery({
     queryKey: ["previousPurchases"],
     queryFn: () =>
-      axios.get("/api/user/details", {
+      axios.get("/api/user", {
         headers: { Authorization: token },
       }),
     enabled: !!token,

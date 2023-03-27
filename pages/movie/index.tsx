@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
-import MovieComponent from "@/components/Movie";
+import Movie from "@/components/Movie";
 import { useInView } from "react-intersection-observer";
 import { useDebounce } from "use-debounce";
 import { useAuth } from "@/context/auth";
-import Spinner from "@/components/spinner";
-import { Genre, Movie } from "@/types";
+import Spinner from "@/components/Spinner";
+import { Genre, MovieType } from "@/types";
 
 function index() {
   const { ref, inView } = useInView();
@@ -69,16 +69,10 @@ function index() {
           </div>
         </div>
         <div className="grid grid-cols-4 gap-4 max-w-fit">
-          {/* {data?.pages?.map((page) =>
-            page?.results?.map((movie: Movie) => (
-              <MovieComponent key={page.page + movie.id} movie={movie} />
-            ))
-          )} */}
-
           {data?.pages
             ?.flatMap(({ results }) => results)
-            .map((movie: Movie) => (
-              <MovieComponent key={movie.id} movie={movie} />
+            .map((movie: MovieType) => (
+              <Movie key={movie.id} movie={movie} />
             ))}
           <div className="">
             <button
