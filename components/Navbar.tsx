@@ -21,7 +21,7 @@ function Navbar() {
   const { data: userDetails, isLoading: userDetailsLoading } = useQuery({
     queryKey: ["userDetails"],
     queryFn: () =>
-      axios.get("/api/user/details", {
+      axios.get("/api/user", {
         headers: { Authorization: token },
       }),
     enabled: !!token,

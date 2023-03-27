@@ -17,7 +17,7 @@ export default function Modal(props) {
   const { data: userDetails } = useQuery(
     ["cartDetails"],
     () =>
-      axios.get("/api/user/details", {
+      axios.get("/api/user", {
         headers: { Authorization: token },
       }),
     { enabled: !!token }

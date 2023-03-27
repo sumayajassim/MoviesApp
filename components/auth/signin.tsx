@@ -13,7 +13,7 @@ function SignIn() {
 
   const { mutate: handleAuth, isLoading: handleLoginLoading } = useMutation({
     mutationFn: (values: { emailAddress: String; password: String }) =>
-      axios.post("/api/auth/signIn", values),
+      axios.post("/api/auth/login", values),
     onSuccess: (res) => {
       if (!res.data.token) return;
       login(res.data.token);
@@ -46,7 +46,7 @@ function SignIn() {
           <Formik
             initialValues={{ emailAddress: "", password: "" }}
             validate={(values) => {
-              const errors = { emailAddress: "" };
+              const errors = {};
               if (!values.emailAddress) {
                 errors.emailAddress = "Required";
               } else if (
