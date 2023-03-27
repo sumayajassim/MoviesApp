@@ -4,6 +4,8 @@ import getMovie from "@/helpers/getmovie";
 import axios from "axios";
 import authUser from "../../../helpers/auth";
 
+const API_KEY = process.env.API_KEY
+
 const BADGES = {
   obama: {
     id: 1,
@@ -115,7 +117,7 @@ export default async function details(
   }
 
   const trendingMovies = await axios.get(
-    "https://api.themoviedb.org/3/discover/movie?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1"
+`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1`
   );
 
   const trendingMoviesArray = trendingMovies.data.results.map(
@@ -123,7 +125,7 @@ export default async function details(
   );
 
   const upcomingMovies = await axios.get(
-    `https://api.themoviedb.org/3/movie/upcoming?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&page=1`
+    `https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}&language=en-US&page=1`
   );
 
   const upcomingMoviesArray = upcomingMovies.data.results.map(
@@ -131,12 +133,13 @@ export default async function details(
   );
 
   const topRatedMovies = await axios.get(
-    `https://api.themoviedb.org/3/movie/top_rated?api_key=010b85a5594b639d99d3ea642bd45c74&language=en-US&page=1`
+    `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&language=en-US&page=1`
   );
 
   const topRatedMoviesArray = topRatedMovies.data.results.map(
     (movie: any) => movie.id
   );
+
 
   const cartMovies = user?.cart?.moviesIDs;
 
