@@ -13,8 +13,15 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
     const searchText = req.query.search;
     const genreId = req.query.genre || null;
 
+    if(searchText){
+      const { data } = await axios.get(
+            `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${searchText}`
+          );
+      res.json(data);
+    }
+
     const { data } = await axios.get(
-      `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=original_title.asc&include_adult=false&include_video=false&page=${pageNumber}&with_watch_monetization_types=flatrate&with_genres=${genreId}`
+          `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=original_title.asc&include_adult=false&include_video=false&page=${pageNumber}&with_watch_monetization_types=flatrate&with_genres=${genreId}`
     );
 
     const movieIdsArray = data.results.map(
@@ -55,21 +62,8 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
 
     res.json(data.results);
 
-    try {
-      if (!searchText) {
-        const { data } = await axios.get(
-          `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=original_title.asc&include_adult=false&include_video=false&page=${pageNumber}&with_watch_monetization_types=flatrate&with_genres=${genreId}`
-        );
-        res.json(data);
-      } else {
-        const { data } = await axios.get(
-          `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${searchText}`
-        );
-        res.json(data);
-      }
-    } catch (err) {
-      res.send(err);
-    }
+      
+    
   }
 
   // authorized
@@ -77,6 +71,13 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
     const pageNumber = req.query.page || 1;
     const searchText = req.query.search;
     const genreId = req.query.genre || null;
+
+    if(searchText){
+      const { data } = await axios.get(
+        `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${searchText}`
+      );
+      res.json(data);
+    }
 
     const { data } = await axios.get(
       `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=original_title.asc&include_adult=false&include_video=false&page=${pageNumber}&with_watch_monetization_types=flatrate&with_genres=${genreId}`
@@ -164,22 +165,7 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
         : (data.results[index].inWishlist = false);
     });
 
-    res.json(data);
-
-    try {
-      if (!searchText) {
-        const { data } = await axios.get(
-          `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=original_title.asc&include_adult=false&include_video=false&page=${pageNumber}&with_watch_monetization_types=flatrate&with_genres=${genreId}`
-        );
-        res.json(data);
-      } else {
-        const { data } = await axios.get(
-          `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${searchText}`
-        );
-        res.json(data);
-      }
-    } catch (err) {
-      res.send(err);
-    }
+    res.json(data)
+    
   }
 }
