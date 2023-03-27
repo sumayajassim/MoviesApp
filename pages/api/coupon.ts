@@ -5,14 +5,25 @@ export default async function coupon(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  try {
-    const coupon = await prisma.discount.findFirstOrThrow({
-      where: {
-        code: req.body.code,
-      },
-    });
-    res.status(200).json(coupon);
-  } catch (e) {
+
+  if(req.method !== "GET"){
+    res.status(400).json({ message: "Not A GET Request" });
+  }
+
+  const { code } = req.body
+
+  const coupon = await prisma.discount.findFirst({
+    where: {
+      code,
+    },
+  })
+
+  if(!coupon){
     res.status(404).json({ message: "Coupon is invalid!" });
   }
+
+  res.json({
+    discountPercentage : coupon?.amount
+  })
+  
 }
