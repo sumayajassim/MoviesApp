@@ -1,43 +1,119 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { prisma } from "../../../lib/prisma";
+import { prisma } from "@/lib/prisma";
+import getMovie from "@/helpers/getmovie";
+import axios from "axios";
 import authUser from "@/helpers/auth";
+import { AxiosResponse, AxiosError } from "axios";
 
-export default async function (req: NextApiRequest, res: NextApiResponse) {
-  const token = req.headers["authorization"];
+export default async function test(req: NextApiRequest, res: NextApiResponse) {
+  const API_KEY = process.env.API_KEY;
 
-  if (!token) {
-    res.status(401).json({ message: "UnAuthorized" });
+  const token = req.headers["authorization"] as string;
+
+  if (!req.headers["authorization"]) {
+    res.json("UnAuthorized");
   }
 
   if (req.method !== "POST") {
-    res.status(400).json({ message: "Not A POST Request" });
+    res.status(400).send("Not A POST Request");
   }
 
-  const { id } = await authUser(token as string);
+  const { code } = req.body;
 
-  const { movieId } = req.body;
+  const { id } = await authUser(token);
 
-  const purchased = await prisma.purchases.findMany({
-    where: {
-      userID: id,
-      moviesIDs: { has: movieId },
-    },
-  });
-
-  if (purchased.length > 0) {
-    res.status(400).json({ message: "Movie Already Purchased" });
-  } else {
-    await prisma.wishlist.update({
+  const { purchases, balance, cart, wishlist } =
+    await prisma.user.findUniqueOrThrow({
       where: {
-        userID: id,
+        id: id,
       },
-      data: {
-        moviesIDs: {
-          push: movieId,
-        },
+      include: {
+        purchases: true,
+        wishlist: true,
+        cart: true,
       },
     });
 
-    res.json({ message: "Added to Wishlist" });
+  let discount = 0;
+  let discountPercentage = 0;
+
+  const checkCartPrice = await axios.post(
+    "http://localhost:8000/api/cart/getCartBalance",
+    { cart }
+  );
+
+  const cartPrice = checkCartPrice.data;
+
+  const checkCoupon = async () => {
+    try {
+      const check = await axios.post("http://localhost:8000/api/coupon/", {
+        code,
+      });
+      discountPercentage = check.data.discountPercentage;
+
+      discount = (check.data.discountPercentage / 100) * cartPrice;
+    } catch {
+      return res.status(404).json("invalid coupon");
+    }
+  };
+
+  await checkCoupon();
+
+  if (balance <= Math.floor(cartPrice - discount)) {
+    res.json({ message: "Your out of Balance" });
   }
+
+  console.log(discountPercentage);
+  await prisma.purchases.create({
+    data: {
+      moviesIDs: cart?.moviesIDs,
+      amount: Math.floor(cartPrice - discount),
+      user: {
+        connect: {
+          id: id,
+        },
+      },
+    },
+  });
+
+  await prisma.cart.update({
+    where: {
+      userID: id,
+    },
+    data: {
+      moviesIDs: [],
+    },
+  });
+
+  await prisma.user.update({
+    where: {
+      id: id,
+    },
+    data: {
+      balance: balance - Math.floor(cartPrice - discount),
+    },
+  });
+
+  let purchasedMovies: string | any[] = [];
+
+  if (purchases.length > 0) {
+    purchasedMovies = purchases
+      .map((movie: any) => movie.moviesIDs)
+      .flatMap((x: any) => x);
+  }
+
+  const updatedWishlist = wishlist?.moviesIDs?.filter(
+    (x: any) => !purchasedMovies?.includes(x)
+  );
+
+  await prisma.wishlist.update({
+    where: {
+      userID: id,
+    },
+    data: {
+      moviesIDs: updatedWishlist,
+    },
+  });
+
+  res.json({ message: "Purchase Succesful" });
 }
