@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../../lib/prisma";
-import jwtDecode from "jwt-decode";
 import getMovie from "@/components/helpers/getmovie";
 import axios from "axios";
 import authUser from "@/components/helpers/auth";
@@ -51,8 +50,6 @@ export default async function details(
 
   const { id } = await authUser(token);
 
-  console.log(id);
-
   const user = await prisma.user.findUniqueOrThrow({
     where: {
       id: id,
@@ -64,9 +61,7 @@ export default async function details(
     },
   });
 
-  const userWishlistLength = user.wishlist?.moviesIDs.length || [];
   const userCartLength = user.cart?.moviesIDs.length || [];
-
   let wishlistLength = user.wishlist?.moviesIDs.length || [];
   let purchasedMovies = [];
   let userWishlistMovieDetails = [];

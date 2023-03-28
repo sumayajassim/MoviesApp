@@ -25,8 +25,6 @@ export default async function removeFromeCart(
     },
   });
 
-  res.json(moviesIDs);
-
   const cartAfterRemovingMovie = moviesIDs.filter(
     (movie: any) => !req.body.moviesIDs.includes(movie)
   );

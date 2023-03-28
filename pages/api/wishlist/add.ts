@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../../lib/prisma";
-import jwtDecode from "jwt-decode";
 import axios from "axios";
 import authUser from "@/components/helpers/auth";
 
@@ -37,6 +36,10 @@ export default async function addToWishList(
   });
 
   // you could return an error here if purchases is not empty
+
+  if (purchased.length > 0) {
+    res.status(400).send("Movie is purchased");
+  }
 
   const purchasedMovies = purchased.flatMap(({ moviesIDs }) => moviesIDs);
 
