@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 import { prisma } from "../../../lib/prisma";
 import jwtDecode from "jwt-decode";
-import authUser from "@/components/helpers/auth";
+import authUser from "../../../helpers/auth";
 
 export default async function getSimilarMovie(
   req: NextApiRequest,
