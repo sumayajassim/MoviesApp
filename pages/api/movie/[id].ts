@@ -72,7 +72,6 @@ export default async function movie(req: NextApiRequest, res: NextApiResponse) {
     let isPurchased = false;
     let inCart = false;
     let inWishlist = false;
-    let price = 5;
 
     const wishlistMoviesLength = wishlist?.moviesIDs?.length || 0;
     const cartMoviesLength = cart?.moviesIDs?.length || 0;
