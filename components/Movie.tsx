@@ -5,8 +5,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/auth";
-function Movie(props: { movie: MovieType }) {
-  const { movie } = props;
+function Movie(props: { movie: MovieType; purchased: Boolean }) {
+  const { movie, purchased } = props;
   const router = useRouter();
   const [isLiked, setLike] = useState<Boolean>(movie?.inWishlist);
   const { token } = useAuth();
@@ -96,7 +96,7 @@ function Movie(props: { movie: MovieType }) {
           {movie?.vote_average.toPrecision(2)}
         </span>
       </div>
-      {!movie?.isPurchased && (
+      {!movie?.isPurchased && !purchased && (
         <>
           <div className="absolute bottom-1 left-4 text-xl font-bold text-[#C21807]">
             ${movie?.price || 5}
