@@ -26,7 +26,18 @@ export default async function removeFromCart(
     },
   });
 
-  moviesIDs.filter((cartMovie) => cartMovie !== movieId);
+  const cartAfterRemovingMovie = moviesIDs.filter(
+    (cartMovie) => cartMovie !== movieId
+  );
+
+  await prisma.cart.update({
+    where: {
+      userID: id,
+    },
+    data: {
+      moviesIDs: cartAfterRemovingMovie,
+    },
+  });
 
   res.json({ message: "Movie Removed" });
 }
