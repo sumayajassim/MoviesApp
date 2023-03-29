@@ -7,7 +7,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   const token = req.headers["authorization"];
 
   if (!token) {
-    res.status(401).send("UnAuthorized");
+    res.status(401).json({ message: "UnAuthorized" });
   }
 
   if (req.method !== "POST") {
@@ -21,38 +21,34 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   const purchased = await prisma.purchases.findMany({
     where: {
       userID: id,
-      moviesIDs : {has : movieId}
+      moviesIDs: { has: movieId },
     },
   });
 
-
-  if(purchased.length > 0){
-    res.status(400).send("Movie Already Purchased")
+  if (purchased.length > 0) {
+    res.status(400).json({ message: "Movie Already Purchased" });
   }
 
-
-  const {moviesIDs} = await prisma.wishlist.findUniqueOrThrow({
-    where:{
-      userID : id
-    }
-  })
-
-  if(moviesIDs.includes(movieId)){
-    res.status(400).send("Movie Already In Wishlist")
-  }
-
-     await prisma.wishlist.update({
-    where:{
-      userID: id
+  const { moviesIDs } = await prisma.wishlist.findUniqueOrThrow({
+    where: {
+      userID: id,
     },
-    data:{
-      moviesIDs: {
-        push: movieId
-      }
-    }
-  })
+  });
 
-  res.json({message: "Added to Wishlist"})
-  
- 
+  if (moviesIDs.includes(movieId)) {
+    res.status(400).json({ message: "Movie Already In Wishlist" });
+  }
+
+  await prisma.wishlist.update({
+    where: {
+      userID: id,
+    },
+    data: {
+      moviesIDs: {
+        push: movieId,
+      },
+    },
+  });
+
+  res.json({ message: "Added to Wishlist" });
 }

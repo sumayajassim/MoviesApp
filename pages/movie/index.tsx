@@ -21,7 +21,7 @@ function index() {
       queryFn: async ({ pageParam = 1 }) => {
         const res = await axios.get(
           `/api/movie?page=${pageParam}&search=${value}&genre=${genre}`,
-          { headers: { Authorization: localStorage.getItem("token") } }
+          { headers: { Authorization: token } }
         );
         return res.data;
       },
@@ -30,6 +30,7 @@ function index() {
         else return pages.length + 1;
       },
       refetchOnWindowFocus: false,
+      enabled: !!token,
     });
 
   const { data: genres } = useQuery({

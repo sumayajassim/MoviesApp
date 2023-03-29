@@ -96,7 +96,7 @@ function Movie(props: { movie: MovieType; purchased: Boolean }) {
           {movie?.vote_average.toPrecision(2)}
         </span>
       </div>
-      {!movie?.isPurchased && !purchased && (
+      {!movie?.isPurchased && !purchased ? (
         <>
           <div className="absolute bottom-1 left-4 text-xl font-bold text-[#C21807]">
             ${movie?.price || 5}
@@ -131,6 +131,15 @@ function Movie(props: { movie: MovieType; purchased: Boolean }) {
             </button>
           </div>
         </>
+      ) : (
+        <a
+          href={`https://image.tmdb.org/t/p/original/${movie?.backdrop_path}`}
+          target="_blank"
+          className="absolute bottom-1 flex items-center  left-4 font-bold text-[#C21807]"
+        >
+          <i className="fa-regular fa-circle-play text-2xl"></i>
+          <span className="text-sm pl-2">Watch now</span>
+        </a>
       )}
     </div>
   );

@@ -94,12 +94,12 @@ function Navbar() {
                     <div className="px-1 py-1 ">
                       <Menu.Item>
                         <button
-                          onClick={() => router.push("/purchases")}
+                          onClick={() => router.push("/profile")}
                           className={`
                          
                             group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                         >
-                          Previously purchased
+                          My profile
                         </button>
                       </Menu.Item>
                       <Menu.Item>

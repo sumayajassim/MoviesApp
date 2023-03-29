@@ -127,7 +127,7 @@ function GetMovie() {
               <div className="text-3xl font-bold text-white flex justify-between">
                 <span className="">
                   {movie?.data?.title} (
-                  {convertMinutesToHours(movie?.data.runtime || 0)})
+                  {convertMinutesToHours(movie?.data.runtime || 0)} h)
                 </span>
                 <div className="min-w-fit">
                   <i className="fa-solid fa-star text-yellow mx-2"></i>
