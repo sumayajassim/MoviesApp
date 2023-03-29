@@ -54,7 +54,7 @@ export default async function details(
 
   const user = await prisma.user.findUniqueOrThrow({
     where: {
-      id: id,
+      id,
     },
     include: {
       wishlist: true,
@@ -142,7 +142,13 @@ export default async function details(
 
   const cartMovies = user?.cart?.moviesIDs;
 
-  cartMovies?.map((movie: any, index: any) => {
+  userCartMoviesDetails.forEach((movie) =>
+    trendingMoviesArray.includes(movie.id)
+      ? (movie.price = 10)
+      : (movie.price = 5)
+  );
+
+  userCartMoviesDetails.map((movie: any, index: any) => {
     trendingMoviesArray.includes(+movie) ||
     upcomingMoviesArray.includes(+movie) ||
     topRatedMoviesArray.includes(+movie)
