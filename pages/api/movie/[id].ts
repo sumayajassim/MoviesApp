@@ -12,6 +12,7 @@ export default async function movie(req: NextApiRequest, res: NextApiResponse) {
   const movieID = req.query.id as string;
 
   let movie: any = await getMovie(movieID);
+  let price = 5;
 
   const token = req.headers["authorization"];
 
@@ -19,7 +20,40 @@ export default async function movie(req: NextApiRequest, res: NextApiResponse) {
     res.status(401).send("Not A GET Request");
   }
 
+  const trendingMovies = await axios.get(
+    `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1`
+  );
+
+  const trendingMoviesArray = trendingMovies.data.results.map(
+    (id: any) => id.id
+  );
+
+  const upcomingMovies = await axios.get(
+    `https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}&language=en-US&page=1`
+  );
+
+  const upcomingMoviesArray = upcomingMovies.data.results.map(
+    (id: any) => id.id
+  );
+
+  const topRatedMovies = await axios.get(
+    `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&language=en-US&page=1`
+  );
+
+  const topRatedMoviesArray = topRatedMovies.data.results.map(
+    (id: any) => id.id
+  );
+
+  if (
+    trendingMoviesArray.includes(+movieID) ||
+    upcomingMoviesArray.includes(+movieID) ||
+    topRatedMoviesArray.includes(+movieID)
+  ) {
+    price = 10;
+  }
+
   if (!token) {
+    movie.price = price;
     res.json(movie);
   } else {
     const { id } = await authUser(token);
@@ -60,37 +94,6 @@ export default async function movie(req: NextApiRequest, res: NextApiResponse) {
       cart?.moviesIDs.includes(movieID) ? (inCart = true) : (inCart = false);
     }
 
-    const trendingMovies = await axios.get(
-      `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1`
-    );
-
-    const trendingMoviesArray = trendingMovies.data.results.map(
-      (id: any) => id.id
-    );
-
-    const upcomingMovies = await axios.get(
-      `https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}&language=en-US&page=1`
-    );
-
-    const upcomingMoviesArray = upcomingMovies.data.results.map(
-      (id: any) => id.id
-    );
-
-    const topRatedMovies = await axios.get(
-      `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&language=en-US&page=1`
-    );
-
-    const topRatedMoviesArray = topRatedMovies.data.results.map(
-      (id: any) => id.id
-    );
-
-    if (
-      trendingMoviesArray.includes(+movieID) ||
-      upcomingMoviesArray.includes(+movieID) ||
-      topRatedMoviesArray.includes(+movieID)
-    ) {
-      price = 10;
-    }
     movie = { ...movie, isPurchased, inCart, inWishlist, price };
     res.json(movie);
   }
