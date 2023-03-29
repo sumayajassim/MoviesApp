@@ -29,7 +29,7 @@ function Purchases() {
           ) : (
             <div className="grid lg:grid-cols-4 gap-4  md:grid-cols-3  sm:grid-cols-1 max-w-fit">
               {previousPurchases?.data?.purchases.map((movie: MovieType) => (
-                <Movie movie={movie} />
+                <Movie movie={movie} purchased={true} />
               ))}
             </div>
           )}
