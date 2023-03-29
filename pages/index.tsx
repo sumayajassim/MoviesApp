@@ -9,9 +9,10 @@ import { useAuth } from "@/context/auth";
 function App() {
   type Response = { data: LandingPage[] };
   const { token } = useAuth();
+  console.log({ token });
   const query = (): Promise<Response> =>
-    axios.get("http://localhost:8000/api/landingpage", {
-      headers: { Authorization: token },
+    axios.get("/api/landingpage", {
+      headers: { Authorization: localStorage.getItem("token") },
     });
 
   const { data, isLoading } = useQuery<Response, Error>(["categories"], query, {

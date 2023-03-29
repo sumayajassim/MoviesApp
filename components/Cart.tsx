@@ -19,7 +19,7 @@ export default function Modal(props: {
   const queryClient = useQueryClient();
 
   const { data: userDetails } = useQuery(
-    ["cartDetails"],
+    ["userDetails"],
     () =>
       axios.get("/api/user", {
         headers: { Authorization: token },
@@ -27,7 +27,7 @@ export default function Modal(props: {
     { enabled: !!token }
   );
   const totalPrice: number = userDetails?.data.cart?.reduce(
-    (total: number, item: MovieType) => total + item.price,
+    (total: number, item: MovieType) => total + item?.price,
     0
   );
   let finalPrice = totalPrice;
@@ -44,7 +44,12 @@ export default function Modal(props: {
       toast.error(err.data.message);
     },
     onSuccess: (res) => {
-      queryClient.invalidateQueries(["cartDetails"]);
+      // queryClient.invalidateQueries(["cartDetails"]);
+      queryClient.refetchQueries({
+        queryKey: ["userDetails"],
+        type: "active",
+        exact: true,
+      });
       toast.success(res.data.message);
     },
   });
@@ -57,7 +62,12 @@ export default function Modal(props: {
       ),
     onError: (err: MutationResponse) => toast.error(err?.data.message),
     onSuccess: (res) => {
-      queryClient.invalidateQueries(["cartDetails"]);
+      // queryClient.invalidateQueries(["cartDetails"]);
+      queryClient.refetchQueries({
+        queryKey: ["userDetails"],
+        type: "active",
+        exact: true,
+      });
       toast.success(res.data.message);
     },
   });
@@ -69,23 +79,24 @@ export default function Modal(props: {
     onSuccess: (res) => {
       setCouponData(res.data);
       if (coupon) {
-        setDiscount(totalPrice - (totalPrice * res.data.amount) / 100);
-        // finalPrice = res.data.total;
+        setDiscount(
+          totalPrice - (totalPrice * res.data.discountPercentage) / 100
+        );
       }
-      queryClient.invalidateQueries(["userDetails"]);
-      queryClient.invalidateQueries(["cartDetails"]);
+      // queryClient.invalidateQueries(["userDetails"]);
+      // queryClient.invalidateQueries(["cartDetails"]);
+      queryClient.refetchQueries({
+        queryKey: ["userDetails"],
+        type: "active",
+        exact: true,
+      });
       toast.success(res.data.message);
     },
   });
 
-  if (coupon) {
-    // setDiscount(totalPrice - (totalPrice * couponData?.amount) / 100);
-    // finalPrice = res.data.total;
-  }
-
   const cartItems = userDetails?.data.cart?.map((item: MovieType) => (
     <li
-      key={item.id}
+      key={item?.id}
       className="border-t-1 border-b-1 list-none py-4 px-8 flex items-center"
     >
       <div
@@ -98,16 +109,16 @@ export default function Modal(props: {
         <img
           className="w-20 h-32 drop-shadow-lg rounded"
           src={
-            item.poster_path
+            item?.poster_path
               ? `https://image.tmdb.org/t/p/original/${item.poster_path}`
               : "https://www.altavod.com/assets/images/poster-placeholder.png"
           }
           alt=""
         />
         <div className="flex flex-col ml-4 items">
-          <span className="text-black font-semibold">{item.title}</span>
+          <span className="text-black font-semibold">{item?.title}</span>
           <div className="flex flex-wrap w-72">
-            {item.genres?.map((genre) => (
+            {item?.genres?.map((genre) => (
               <span className="w-fit font mt-1 mr-1 px-1 py-0 rounded-lg bg-red-700 text-white font-semibold text-xs">
                 {genre.name}
               </span>
@@ -117,7 +128,7 @@ export default function Modal(props: {
         </div>
       </div>
       <span className="flex flex-col text-2xl font-bold grow items-end">
-        ${item.price || 5}
+        ${item?.price || 5}
         <button
           onClick={(e) => {
             handelRemoveFromCart(item.id);
@@ -189,7 +200,7 @@ export default function Modal(props: {
                         Coupon Discount
                       </span>
                       <span className="font-bold tracking-wide text-md">
-                        ( -{discountData?.data.amount}%) - $
+                        ( -{discountData?.data.discountPercentage}%) - $
                         {(totalPrice - discount).toPrecision(3)}
                       </span>
                     </div>
@@ -200,7 +211,8 @@ export default function Modal(props: {
                       <span className="font-bold tracking-wide text-md">
                         $
                         {couponData &&
-                          totalPrice - (totalPrice * couponData?.amount) / 100}
+                          totalPrice -
+                            (totalPrice * couponData?.discountPercentage) / 100}
                       </span>
                     </div>
                   </div>

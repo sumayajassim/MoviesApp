@@ -3,6 +3,7 @@
         "formik",
         "headlessui",
         "imdb",
+        "landingpage",
         "Signin",
         "Signup",
         "tanstack",

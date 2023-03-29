@@ -26,7 +26,11 @@ function SignIn() {
           "translate-x-full"
         );
       document.querySelector("div[drawer-backdrop]")?.removeAttribute("class");
-      queryClient.invalidateQueries(["userDetails"]);
+      queryClient.refetchQueries({
+        queryKey: ["userDetails", 1],
+        type: "active",
+        exact: true,
+      });
     },
     onError: (err: MutationResponse) => {
       console.log(err);

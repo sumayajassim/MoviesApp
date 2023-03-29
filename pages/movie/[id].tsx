@@ -49,8 +49,13 @@ function GetMovie() {
         { headers: { Authorization: token } }
       ),
     onSuccess: (res) => {
-      queryClient.invalidateQueries(["movie"]);
-      queryClient.invalidateQueries(["userDetails"]);
+      queryClient.refetchQueries(["movie"]);
+      // queryClient.invalidateQueries(["userDetails"]);
+      queryClient.refetchQueries({
+        queryKey: ["userDetails", 1],
+        type: "active",
+        exact: true,
+      });
       toast.success(res.data.message);
     },
     onError: (err: MutationResponse) => {
@@ -70,7 +75,12 @@ function GetMovie() {
       );
     },
     onSuccess: (res) => {
-      queryClient.invalidateQueries(["cartDetails"]);
+      // queryClient.invalidateQueries(["cartDetails"]);
+      queryClient.refetchQueries({
+        queryKey: ["userDetails"],
+        type: "active",
+        exact: true,
+      });
       queryClient.invalidateQueries(["movie"]);
       toast.success(res?.data?.message);
     },
@@ -134,11 +144,14 @@ function GetMovie() {
               <div>
                 {movie?.data?.isPurchased ? (
                   <button className="btn rounded bg-[rgba(255,255,255,.5)]">
-                    <span>
+                    <a
+                      href={`https://image.tmdb.org/t/p/original/${movie?.data?.backdrop_path}`}
+                      target="_blank"
+                    >
                       <span>Watch now</span>
                       <i className="fa-solid fa-video text-red-700 text-xl ml-1"></i>
                       {/* <i className="fa-solid fa-cart-shopping text-red-600 text-xl ml-1"></i> */}
-                    </span>
+                    </a>
                   </button>
                 ) : (
                   <>
