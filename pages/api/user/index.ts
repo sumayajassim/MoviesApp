@@ -28,8 +28,8 @@ const BADGES = {
     url: "/badges/yuda.webp",
   },
   ramen: {
-    id: 4,
-    name: "/Yuda",
+    id: 5,
+    name: "/ramen",
     url: "/badges/ramen.png",
   },
 };

@@ -18,23 +18,16 @@ function App() {
   const { data, isLoading } = useQuery<Response, Error>(["categories"], query, {
     refetchOnWindowFocus: false,
   });
-  const HomePageContent = data?.data.map(
-    (category) =>
-      category.movies && (
-        <>
-          <div key={category.id}>
-            <h1 className="p-7 text-red-700 font-bold text-2xl">
-              {category.title}
-            </h1>
-            <div className="flex flex-row overflow-x-scroll space-x-3 pl-5 pb-5 pt-5 ">
-              {category.movies?.map((movie: MovieType) => (
-                <Movie movie={movie} />
-              ))}
-            </div>
-          </div>
-        </>
-      )
-  );
+  const HomePageContent = data?.data.map((category) => (
+    <div key={category.id}>
+      <h1 className="p-7 text-red-700 font-bold text-2xl">{category.title}</h1>
+      <div className="flex flex-row overflow-x-scroll space-x-3 pl-5 pb-5 pt-5 ">
+        {category.movies?.map((movie: MovieType) => (
+          <Movie movie={movie} key={movie.id} />
+        ))}
+      </div>
+    </div>
+  ));
 
   return (
     <div className="pt-12">

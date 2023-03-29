@@ -11,9 +11,13 @@ function SignUp() {
   const { login } = useAuth();
   const queryClient = useQueryClient();
 
-  const { mutate: handleAuth, isLoading: handleLoginLoading } = useMutation({
-    mutationFn: (values: { emailAddress: String; password: String }) =>
-      axios.post("/api/auth/signup", values),
+  const { mutate: handleAuth } = useMutation({
+    mutationFn: (values: {
+      firstName: String;
+      lastName: String;
+      emailAddress: String;
+      password: String;
+    }) => axios.post("/api/auth/signup", values),
     onSuccess: (res) => {
       if (!res.data.token) return;
       login(res.data.token);
@@ -29,10 +33,10 @@ function SignUp() {
       queryClient.invalidateQueries(["userDetails"]);
     },
     onError: (err: MutationResponse) => {
-      console.log(err);
-      toast.error(`${err?.response?.data?.message}`);
+      toast.error(err?.response?.data?.message);
     },
   });
+
   return (
     <div
       id="sign-up-drawer"
@@ -51,7 +55,7 @@ function SignUp() {
               password: "",
             }}
             validate={(values) => {
-              const errors = { emailAddress: "" };
+              const errors = {};
               if (!values.emailAddress) {
                 errors.emailAddress = "Required";
               } else if (
@@ -64,10 +68,9 @@ function SignUp() {
               return errors;
             }}
             onSubmit={(values, { setSubmitting }) => {
+              console.log("hi good morning");
               setTimeout(() => {
-                // alert(JSON.stringify(values, null, 2));
                 handleAuth(values);
-
                 setSubmitting(false);
               }, 400);
             }}
@@ -91,7 +94,6 @@ function SignUp() {
                   onBlur={handleBlur}
                   value={values.firstName}
                 />
-                {errors.firstName && touched.firstName && errors.firstName}
                 <input
                   type="text"
                   name="lastName"
@@ -100,7 +102,6 @@ function SignUp() {
                   onBlur={handleBlur}
                   value={values.lastName}
                 />
-                {errors.lastName && touched.lastName && errors.lastName}
                 <input
                   type="email"
                   name="emailAddress"

@@ -44,76 +44,76 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
 
   const cartPrice = checkCartPrice.data;
 
-  const checkCoupon = async () => {
-    try {
-      const check = await axios.post("http://localhost:8000/api/coupon/", {
-        code,
-      });
-      discountPercentage = check.data.discountPercentage;
+  if (code) {
+    const checkCoupon = async () => {
+      try {
+        const check = await axios.post("http://localhost:8000/api/coupon/", {
+          code,
+        });
+        discountPercentage = check.data.discountPercentage;
 
-      discount = (check.data.discountPercentage / 100) * cartPrice;
-    } catch {
-      return res.status(404).json("invalid coupon");
-    }
-  };
-
-  await checkCoupon();
+        discount = (check.data.discountPercentage / 100) * cartPrice;
+      } catch {
+        return res.status(404).json("invalid coupon");
+      }
+    };
+    await checkCoupon();
+  }
 
   if (balance <= Math.floor(cartPrice - discount)) {
-    res.json({ message: "Your out of Balance" });
-  }
-
-  console.log(discountPercentage);
-  await prisma.purchases.create({
-    data: {
-      moviesIDs: cart?.moviesIDs,
-      amount: Math.floor(cartPrice - discount),
-      user: {
-        connect: {
-          id: id,
+    res.status(400).json({ message: "Your out of Balance" });
+  } else {
+    await prisma.purchases.create({
+      data: {
+        moviesIDs: cart?.moviesIDs,
+        amount: Math.floor(cartPrice - discount),
+        user: {
+          connect: {
+            id: id,
+          },
         },
       },
-    },
-  });
+    });
 
-  await prisma.cart.update({
-    where: {
-      userID: id,
-    },
-    data: {
-      moviesIDs: [],
-    },
-  });
+    await prisma.cart.update({
+      where: {
+        userID: id,
+      },
+      data: {
+        moviesIDs: [],
+      },
+    });
 
-  await prisma.user.update({
-    where: {
-      id: id,
-    },
-    data: {
-      balance: balance - Math.floor(cartPrice - discount),
-    },
-  });
+    await prisma.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        balance: balance - Math.floor(cartPrice - discount),
+      },
+    });
 
-  let purchasedMovies: string | any[] = [];
+    let purchasedMovies: string | any[] = [];
 
-  if (purchases.length > 0) {
-    purchasedMovies = purchases
-      .map((movie: any) => movie.moviesIDs)
-      .flatMap((x: any) => x);
+    if (purchases.length > 0) {
+      purchasedMovies = purchases
+        .map((movie: any) => movie.moviesIDs)
+        .flatMap((x: any) => x);
+    }
+
+    const updatedWishlist = wishlist?.moviesIDs?.filter(
+      (x: any) => !purchasedMovies?.includes(x)
+    );
+
+    await prisma.wishlist.update({
+      where: {
+        userID: id,
+      },
+      data: {
+        moviesIDs: updatedWishlist,
+      },
+    });
+
+    res.json({ message: "Purchase Succesful" });
   }
-
-  const updatedWishlist = wishlist?.moviesIDs?.filter(
-    (x: any) => !purchasedMovies?.includes(x)
-  );
-
-  await prisma.wishlist.update({
-    where: {
-      userID: id,
-    },
-    data: {
-      moviesIDs: updatedWishlist,
-    },
-  });
-
-  res.json({ message: "Purchase Succesful" });
 }

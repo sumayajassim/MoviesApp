@@ -54,10 +54,10 @@ export default function Modal(props: {
     },
   });
   const { mutate: handelCheckout } = useMutation({
-    mutationFn: (confirm: boolean) =>
+    mutationFn: () =>
       axios.post(
         "/api/purchase/add",
-        { confirm, cartPrice: finalPrice },
+        { code: coupon },
         { headers: { Authorization: token } }
       ),
     onError: (err: MutationResponse) => toast.error(err?.data.message),
@@ -236,7 +236,7 @@ export default function Modal(props: {
                     className="btn btn-red hover:shadow-lg active:bg-red-900 ease-linear transition-all duration-150"
                     type="button"
                     onClick={() => {
-                      handelCheckout(true);
+                      handelCheckout();
                       setDiscount(0);
                       setShowModal(false);
                     }}
