@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../../lib/prisma";
 import authUser from "@/helpers/auth";
 
-export default async function removeFromeCart(
+export default async function removeFromCart(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
@@ -18,7 +18,7 @@ export default async function removeFromeCart(
 
   const { id } = await authUser(token);
 
-  const { movie } = req.body;
+  const { movieId } = req.body;
 
   const { moviesIDs } = await prisma.cart.findUniqueOrThrow({
     where: {
@@ -26,23 +26,7 @@ export default async function removeFromeCart(
     },
   });
 
-  const cartAfterRemovingMovie = moviesIDs.filter(
-    (cartMovie) => cartMovie !== movie
-  );
+  moviesIDs.filter((cartMovie) => cartMovie !== movieId);
 
-  res.json({
-    cart: moviesIDs,
-    after: cartAfterRemovingMovie,
-  });
-
-  // await prisma.cart.update({
-  //   where: {
-  //     userID: id,
-  //   },
-  //   data: {
-  //     moviesIDs: cartAfterRemovingMovie,
-  //   },
-  // });
-
-  // res.send("Movie Removed");
+  res.json({ message: "Movie Removed" });
 }

@@ -11,7 +11,7 @@ function SignIn() {
   const { login } = useAuth();
   const queryClient = useQueryClient();
 
-  const { mutate: handleAuth, isLoading: handleLoginLoading } = useMutation({
+  const { mutate: handleAuth } = useMutation({
     mutationFn: (values: { emailAddress: String; password: String }) =>
       axios.post("/api/auth/login", values),
     onSuccess: (res) => {
@@ -33,8 +33,7 @@ function SignIn() {
       });
     },
     onError: (err: MutationResponse) => {
-      console.log(err);
-      toast.error(`${err?.response?.data?.message}`);
+      toast.error(err?.response?.data?.message);
     },
   });
   return (
@@ -63,6 +62,7 @@ function SignIn() {
               return errors;
             }}
             onSubmit={(values, { setSubmitting }) => {
+              console.log("hi good morning");
               setTimeout(() => {
                 handleAuth(values);
                 setSubmitting(false);
