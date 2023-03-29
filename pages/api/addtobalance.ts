@@ -18,12 +18,20 @@ export default async function addToBalance(
 
   const { id } = await authUser(token);
 
+  const { balanceToBeAdded } = req.body;
+
+  const { balance } = await prisma.user.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
+
   await prisma.user.update({
     where: {
       id,
     },
     data: {
-      balance: req.body.addBalance + 100,
+      balance: balance + balanceToBeAdded,
     },
   });
 
