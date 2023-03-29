@@ -59,8 +59,5 @@ interface MutationResponse {
 }
 
 export type Coupon = {
-  id: string;
-  userID: string;
-  amount: number;
-  code: string;
+  discountPercentage: number;
 };

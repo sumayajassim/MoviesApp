@@ -8,7 +8,7 @@ import { useAuth } from "@/context/auth";
 function Movie(props: { movie: MovieType }) {
   const { movie } = props;
   const router = useRouter();
-  const [isLiked, setLike] = useState<Boolean>(movie?.inWishlist || false);
+  const [isLiked, setLike] = useState<Boolean>(movie?.inWishlist);
   const { token } = useAuth();
   const queryClient = useQueryClient();
 
@@ -21,7 +21,11 @@ function Movie(props: { movie: MovieType }) {
       ),
     onSuccess: (res) => {
       toast.success(res.data.message);
-      queryClient.invalidateQueries(["userDetails"]);
+      queryClient.refetchQueries({
+        queryKey: ["userDetails"],
+        type: "active",
+        exact: true,
+      });
       setLike((isLiked) => !isLiked);
     },
     onError: (err: MutationResponse) => {
@@ -58,7 +62,12 @@ function Movie(props: { movie: MovieType }) {
       toast.error(err?.response?.data?.message);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["cartDetails"]);
+      // queryClient.invalidateQueries(["cartDetails"]);
+      queryClient.refetchQueries({
+        queryKey: ["userDetails"],
+        type: "active",
+        exact: true,
+      });
     },
   });
 

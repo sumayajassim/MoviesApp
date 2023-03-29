@@ -28,7 +28,11 @@ function Wishlist() {
           { headers: { Authorization: token } }
         ),
       onSuccess: (res) => {
-        queryClient.invalidateQueries(["userDetails"]);
+        queryClient.refetchQueries({
+          queryKey: ["userDetails", 1],
+          type: "active",
+          exact: true,
+        });
         toast.success(res.data.message);
       },
       onError: (err: MutationResponse) => {
@@ -45,7 +49,11 @@ function Wishlist() {
           { headers: { Authorization: token } }
         ),
       onSuccess: (res) => {
-        queryClient.invalidateQueries(["userDetails"]);
+        queryClient.refetchQueries({
+          queryKey: ["userDetails", 1],
+          type: "active",
+          exact: true,
+        });
         toast.success(res.data.message);
       },
     });
