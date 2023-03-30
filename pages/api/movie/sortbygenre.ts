@@ -8,7 +8,7 @@ export default async function sortMovieByGenre(
   res.json(await fetchData(req.body.genreId));
 }
 
-async function fetchData(genre: any) {
+async function fetchData(genre: number) {
   const { data } = await axios.get(
     `https://api.themoviedb.org/3/discover/movie?api_key=010b85a5594b639d99d3ea642bd45c74&sort_by=popularity.desc&page=1&with_genres=${genre}`
   );
