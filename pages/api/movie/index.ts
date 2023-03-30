@@ -25,7 +25,7 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
     );
 
     const movieIdsArray = data.results.map(
-      (movie: string, index: any) => data.results[index].id
+      (movie: string, index: number) => data.results[index].id
     );
 
     const trendingMovies = await axios.get(
@@ -33,7 +33,7 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
     );
 
     const trendingMoviesArray = data.results.map(
-      (movie: string, index: any) => trendingMovies.data.results[index].id
+      (movie: string, index: number) => trendingMovies.data.results[index].id
     );
 
     const topRatedMovies = await axios.get(
@@ -41,7 +41,7 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
     );
 
     const topRatedMoviesArray = data.results.map(
-      (movie: string, index: any) => topRatedMovies.data.results[index].id
+      (movie: string, index: number) => topRatedMovies.data.results[index].id
     );
 
     const UpcomingMovies = await axios.get(
@@ -49,10 +49,10 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
     );
 
     const UpcomingMoviesArray = data.results.map(
-      (movie: string, index: any) => UpcomingMovies.data.results[index].id
+      (movie: string, index: number) => UpcomingMovies.data.results[index].id
     );
 
-    movieIdsArray.map((movie: string, index: any) => {
+    movieIdsArray.map((movie: string, index: number) => {
       trendingMoviesArray.includes(movie.toString()) ||
       topRatedMoviesArray.includes(movie.toString()) ||
       UpcomingMoviesArray.includes(movie.toString())
@@ -76,7 +76,7 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
         `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${searchText}`
       );
       const movieIdsArray = data.results.map(
-        (movie: string, index: any) => data.results[index].id
+        (movie: string, index: number) => data.results[index].id
       );
 
       const trendingMovies = await axios.get(
@@ -84,7 +84,7 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
       );
 
       const trendingMoviesArray = data.results.map(
-        (movie: string, index: any) => trendingMovies.data.results[index].id
+        (movie: string, index: number) => trendingMovies.data.results[index].id
       );
 
       const topRatedMovies = await axios.get(
@@ -92,7 +92,7 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
       );
 
       const topRatedMoviesArray = data.results.map(
-        (movie: string, index: any) => topRatedMovies.data.results[index].id
+        (movie: string, index: number) => topRatedMovies.data.results[index].id
       );
 
       const UpcomingMovies = await axios.get(
@@ -100,10 +100,10 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
       );
 
       const UpcomingMoviesArray = data.results.map(
-        (movie: string, index: any) => UpcomingMovies.data.results[index].id
+        (movie: string, index: number) => UpcomingMovies.data.results[index].id
       );
 
-      movieIdsArray.map((movie: string, index: any) => {
+      movieIdsArray.map((movie: string, index: number) => {
         trendingMoviesArray.includes(parseInt(movie)) ||
         topRatedMoviesArray.includes(parseInt(movie)) ||
         UpcomingMoviesArray.includes(parseInt(movie))
@@ -118,8 +118,8 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
       });
 
       const purchasedMovies = purchases
-        .map((x: any, index: number) => x.moviesIDs)
-        .flatMap((x) => x);
+        .map((movie) => movie.moviesIDs)
+        .flatMap((ids) => ids);
 
       const cart = await prisma.cart.findUniqueOrThrow({
         where: {
@@ -137,19 +137,19 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
 
       const userWishlist = wishlist.moviesIDs;
 
-      movieIdsArray.map((movie: any, index: number) => {
+      movieIdsArray.map((movie: number, index: number) => {
         purchasedMovies.includes(movie.toString())
           ? (data.results[index].isPurchased = true)
           : (data.results[index].isPurchased = false);
       });
 
-      movieIdsArray.map((movie: any, index: number) => {
+      movieIdsArray.map((movie: number, index: number) => {
         userCart.includes(movie.toString())
           ? (data.results[index].inCart = true)
           : (data.results[index].inCart = false);
       });
 
-      movieIdsArray.map((movie: any, index: number) => {
+      movieIdsArray.map((movie: number, index: number) => {
         userWishlist.includes(movie.toString())
           ? (data.results[index].inWishlist = true)
           : (data.results[index].inWishlist = false);
@@ -163,7 +163,7 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
     );
 
     const movieIdsArray = data.results.map(
-      (movie: string, index: any) => data.results[index].id
+      (movie: string, index: number) => data.results[index].id
     );
 
     const trendingMovies = await axios.get(
@@ -171,7 +171,7 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
     );
 
     const trendingMoviesArray = data.results.map(
-      (movie: string, index: any) => trendingMovies.data.results[index].id
+      (movie: string, index: number) => trendingMovies.data.results[index].id
     );
 
     const topRatedMovies = await axios.get(
@@ -179,7 +179,7 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
     );
 
     const topRatedMoviesArray = data.results.map(
-      (movie: string, index: any) => topRatedMovies.data.results[index].id
+      (movie: string, index: number) => topRatedMovies.data.results[index].id
     );
 
     const UpcomingMovies = await axios.get(
@@ -187,10 +187,10 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
     );
 
     const UpcomingMoviesArray = data.results.map(
-      (movie: string, index: any) => UpcomingMovies.data.results[index].id
+      (movie: string, index: number) => UpcomingMovies.data.results[index].id
     );
 
-    movieIdsArray.map((movie: string, index: any) => {
+    movieIdsArray.map((movie: string, index: number) => {
       trendingMoviesArray.includes(parseInt(movie)) ||
       topRatedMoviesArray.includes(parseInt(movie)) ||
       UpcomingMoviesArray.includes(parseInt(movie))
@@ -205,8 +205,8 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
     });
 
     const purchasedMovies = purchases
-      .map((x: any, index: number) => x.moviesIDs)
-      .flatMap((x) => x);
+      .map((movie) => movie.moviesIDs)
+      .flatMap((ids) => ids);
 
     const cart = await prisma.cart.findUniqueOrThrow({
       where: {
@@ -224,19 +224,19 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
 
     const userWishlist = wishlist.moviesIDs;
 
-    movieIdsArray.map((movie: any, index: number) => {
+    movieIdsArray.map((movie: number, index: number) => {
       purchasedMovies.includes(movie.toString())
         ? (data.results[index].isPurchased = true)
         : (data.results[index].isPurchased = false);
     });
 
-    movieIdsArray.map((movie: any, index: number) => {
+    movieIdsArray.map((movie: number, index: number) => {
       userCart.includes(movie.toString())
         ? (data.results[index].inCart = true)
         : (data.results[index].inCart = false);
     });
 
-    movieIdsArray.map((movie: any, index: number) => {
+    movieIdsArray.map((movie: number, index: number) => {
       userWishlist.includes(movie.toString())
         ? (data.results[index].inWishlist = true)
         : (data.results[index].inWishlist = false);

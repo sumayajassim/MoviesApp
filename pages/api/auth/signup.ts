@@ -7,7 +7,8 @@ export default async function signup(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const SECRET_KEY = process.env.SECRET_KEY;
+  const SECRET_KEY = process.env.SECRET_KEY as string;
+
   if (!SECRET_KEY) throw Error("Secret key is not provided!");
 
   if (req.method !== "POST") {
@@ -15,7 +16,7 @@ export default async function signup(
   }
 
   const { firstName, lastName, emailAddress, password } = req.body;
-  const salt = parseInt(process.env.SALT);
+  const salt = parseInt(process.env.SALT as string);
   const validFirstName = firstName.length >= 3 && firstName.length <= 25;
   const validLastName = lastName.length >= 3 && lastName.length <= 25;
   const validEmail = emailAddress.includes("@") && emailAddress.includes(".");
