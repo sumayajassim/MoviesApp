@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import authUser from "@/helpers/auth";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
-  const token: any = req.headers["authorization"];
+  const token = req.headers["authorization"] as string;
 
   if (!token) {
     res.status(401).send("UnAuthorized");

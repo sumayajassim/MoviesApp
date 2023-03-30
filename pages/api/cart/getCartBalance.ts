@@ -18,7 +18,7 @@ export default async function cartBalance(
   );
 
   const trendingMoviesArray = trendingMovies.data.results.map(
-    (movie: any) => movie.id
+    (movie: { id: number }) => movie.id as number
   );
 
   const upcomingMovies = await axios.get(
@@ -26,7 +26,7 @@ export default async function cartBalance(
   );
 
   const upcomingMoviesArray = upcomingMovies.data.results.map(
-    (movie: any) => movie.id
+    (movie: { id: number }) => movie.id as number
   );
 
   const topRatedMovies = await axios.get(
@@ -34,15 +34,15 @@ export default async function cartBalance(
   );
 
   const topRatedMoviesArray = topRatedMovies.data.results.map(
-    (movie: any) => movie.id
+    (movie: { id: number }) => movie.id as number
   );
 
   let cartPrice = 0;
 
-  cart.moviesIDs?.map((id: any) => {
-    trendingMoviesArray.includes(+id) ||
-    upcomingMoviesArray.includes(+id) ||
-    topRatedMoviesArray.includes(+id)
+  cart.moviesIDs?.map((id: number) => {
+    trendingMoviesArray.includes(id) ||
+    upcomingMoviesArray.includes(id) ||
+    topRatedMoviesArray.includes(id)
       ? (cartPrice = cartPrice + 10)
       : (cartPrice = cartPrice + 5);
   });

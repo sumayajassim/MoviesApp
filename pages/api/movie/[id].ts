@@ -11,7 +11,7 @@ export default async function movie(req: NextApiRequest, res: NextApiResponse) {
 
   const movieID = req.query.id as string;
 
-  let movie: any = await getMovie(movieID);
+  let movie = await getMovie(movieID);
   let price = 5;
 
   const token = req.headers["authorization"];
@@ -25,7 +25,7 @@ export default async function movie(req: NextApiRequest, res: NextApiResponse) {
   );
 
   const trendingMoviesArray = trendingMovies.data.results.map(
-    (id: any) => id.id
+    (movie: { id: number }) => movie.id as number
   );
 
   const upcomingMovies = await axios.get(
@@ -33,7 +33,7 @@ export default async function movie(req: NextApiRequest, res: NextApiResponse) {
   );
 
   const upcomingMoviesArray = upcomingMovies.data.results.map(
-    (id: any) => id.id
+    (movie: { id: number }) => movie.id as number
   );
 
   const topRatedMovies = await axios.get(
@@ -41,7 +41,7 @@ export default async function movie(req: NextApiRequest, res: NextApiResponse) {
   );
 
   const topRatedMoviesArray = topRatedMovies.data.results.map(
-    (id: any) => id.id
+    (movie: { id: number }) => movie.id as number
   );
 
   if (
@@ -78,8 +78,8 @@ export default async function movie(req: NextApiRequest, res: NextApiResponse) {
 
     if (purchases.length > 0) {
       let purchasedMOviesArray = purchases
-        .map((movie: any) => movie.moviesIDs)
-        .flatMap((x: any) => x);
+        .map((movie) => movie.moviesIDs)
+        .flatMap((x) => x);
       purchasedMOviesArray.includes(movieID)
         ? (isPurchased = true)
         : (isPurchased = false);
