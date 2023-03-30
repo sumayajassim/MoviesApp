@@ -8,7 +8,7 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 
 function Purchases() {
-  const [balance, setBalance] = useState<number>();
+  const [balance, setBalance] = useState<number>(0);
   const { token } = useAuth();
   const queryClient = useQueryClient();
   const { data: user, isLoading: userDetailsLoading } = useQuery({
@@ -45,15 +45,21 @@ function Purchases() {
           <h1 className="text-2xl font-bold ">My profile</h1>
           <div>
             <label htmlFor="name">Name: </label>
-            <span id="name">{user?.data.user.userName}</span>
+            <span id="name" className="font-bold">
+              {user?.data.user.userName}
+            </span>
           </div>
           <div>
             <label htmlFor="email">Email: </label>
-            <span id="name">{user?.data.user.email}</span>
+            <span id="name" className="font-bold">
+              {user?.data.user.email}
+            </span>
           </div>
           <div>
             <label htmlFor="email">Balance: </label>
-            <span id="name">{user?.data.user.balance}</span>
+            <span id="name" className="font-bold">
+              ${user?.data.user.balance}
+            </span>
           </div>
         </div>
 

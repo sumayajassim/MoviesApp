@@ -15,7 +15,7 @@ export default async function login(req: NextApiRequest, res: NextApiResponse) {
   const validEmail = emailAddress.includes("@") && emailAddress.includes(".");
 
   if (!validEmail) {
-    res.status(404).send("Invalid Email Address");
+    res.status(404).json({ message: "Invalid Email Address" });
   }
 
   const user = await prisma.user.findUnique({
@@ -25,13 +25,13 @@ export default async function login(req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!user) {
-    return res.status(404).send("User Not Found");
+    return res.status(404).json({ message: "User Not Found" });
   }
 
   const isMatch = bcrypt.compareSync(password, user.password);
 
   if (!isMatch) {
-    res.status(400).send("Wrong Password");
+    res.status(400).json({ message: "Wrong Password" });
   }
 
   res.json({ token: jwt.sign(user.id, secret) });
