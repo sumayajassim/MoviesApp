@@ -27,10 +27,10 @@ export default async function getSimilarMovie(
     },
   });
 
-  const purchasedMovies = purchases.moviesIDs.map((movies: any) => movies);
+  const purchasedMovies = purchases.moviesIDs.map((movies) => movies);
 
   if (purchasedMovies.length > 0) {
-    data.results.forEach((movie: any, index: any) => {
+    data.results.forEach((movie: string, index: number) => {
       purchasedMovies.includes(movie)
         ? (data.results[index].isPurchased = true)
         : (data.results[index].isPurchased = false);
@@ -47,7 +47,7 @@ export default async function getSimilarMovie(
   console.log(cartMovies);
 
   if (cartMovies.length > 0) {
-    data.results.forEach((movie: any, index: number) => {
+    data.results.forEach((movie: string, index: number) => {
       cartMovies.includes(movie)
         ? (data.results[index].inCart = true)
         : (data.results[index].inCart = false);
@@ -63,7 +63,7 @@ export default async function getSimilarMovie(
   const wishlistMovies = wishlist.moviesIDs;
 
   if (wishlistMovies.length > 0) {
-    data.results.foreach((movie: any, index: number) => {
+    data.results.foreach((movie: string, index: number) => {
       wishlistMovies.includes(movie)
         ? (data.results[index].inWishlist = true)
         : (data.results[index].inWishlist = false);
