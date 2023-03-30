@@ -12,18 +12,19 @@ function App() {
   console.log({ token });
   const query = (): Promise<Response> =>
     axios.get("/api/landingpage", {
-      headers: { Authorization: localStorage.getItem("token") },
+      headers: { Authorization: token },
     });
 
   const { data, isLoading } = useQuery<Response, Error>(["categories"], query, {
     refetchOnWindowFocus: false,
+    // enabled: !!token,
   });
   const HomePageContent = data?.data.map((category) => (
     <div key={category.id}>
       <h1 className="p-7 text-red-700 font-bold text-2xl">{category.title}</h1>
       <div className="flex flex-row overflow-x-scroll space-x-3 pl-5 pb-5 pt-5 ">
         {category.movies?.map((movie: MovieType) => (
-          <Movie movie={movie} key={movie.id} />
+          <Movie movie={movie} key={movie.id} purchased={false} />
         ))}
       </div>
     </div>

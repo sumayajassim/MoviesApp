@@ -107,7 +107,7 @@ export default function Modal(props: {
         }}
       >
         <img
-          className="w-20 h-32 drop-shadow-lg rounded"
+          className="w-[4rem] h-[5rem] drop-shadow-lg rounded"
           src={
             item?.poster_path
               ? `https://image.tmdb.org/t/p/original/${item.poster_path}`
@@ -144,7 +144,7 @@ export default function Modal(props: {
   return (
     <>
       <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-non box">
-        <div className="relative  my-6 mx-auto min-w-[50rem] ">
+        <div className="relative  my-6 mx-auto w-1/2 sm:w-1/2 lg:w-1/2 ">
           <div className="border-0 rounded-lg shadow-lg  relative flex flex-col w-full bg-white outline-none focus:outline-none">
             <div className="flex items-start justify-between p-3  shadow-md border-solid rounded-t">
               <h3 className="text-3xl font-semibold">
@@ -159,11 +159,13 @@ export default function Modal(props: {
                 </span>
               </button>
             </div>
-            <div className="relative p-0 flex-auto overflow-auto max-h-[50vh] min-h-[50vh] max-w-4xl min-w-[60%]">
+            <div className="relative p-0 flex-auto overflow-auto max-h-[21rem] min-h-[21rem]  max-w-4xl min-w-[60%]">
               {cartItems?.length > 0 ? (
                 cartItems
               ) : (
-                <div className="p-5 w-72 h-44">Your cart is empty</div>
+                <div className="p-10 text-lg text-center italic font-bold text-dark-grey">
+                  Your cart is empty
+                </div>
               )}
             </div>
             {cartItems?.length > 0 && (

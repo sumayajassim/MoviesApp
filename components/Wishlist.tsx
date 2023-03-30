@@ -17,6 +17,7 @@ function Wishlist() {
       axios.get("/api/user", {
         headers: { Authorization: token },
       }),
+    enabled: !!token,
   });
 
   const { mutate: handleAddToCartClick, isLoading: handleAddToCartLoading } =
