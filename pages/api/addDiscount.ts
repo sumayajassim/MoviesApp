@@ -32,5 +32,3 @@ export default async function addDiscount(
     res.status(500).json(e);
   }
 }
-
-// userID to id / not authorized

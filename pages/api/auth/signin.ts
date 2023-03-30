@@ -2,44 +2,37 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../../lib/prisma";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { Prisma } from "@prisma/client";
 
-export default async function signIn(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  const SECRET_KEY = process.env.SECRET_KEY;
-  if (!SECRET_KEY) throw Error("Secret key is not provided!");
+export default async function login(req: NextApiRequest, res: NextApiResponse) {
+  const secret = process.env.SECRET_KEY;
+  if (!secret) throw Error("Secret key is not provided!");
 
   if (req.method !== "POST") {
     res.status(401).send("Not A POST Request");
   }
 
-  try {
-    const user = await prisma.user.findUniqueOrThrow({
-      where: {
-        emailAddress: req.body.emailAddress,
-      },
-    });
+  const { emailAddress, password } = req.body;
+  const validEmail = emailAddress.includes("@") && emailAddress.includes(".");
 
-    const userPass = user.password;
-    const isMatched = bcrypt.compare(req.body.password, userPass);
-
-    isMatched.then((isMatch: Boolean) => {
-      if (!isMatch) {
-        res.status(400).json({ message: "Wrong Password" });
-      } else {
-        const token = jwt.sign({ id: user.id }, SECRET_KEY, {
-          expiresIn: 604800,
-        });
-        res.json({ token });
-      }
-    });
-  } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      console.log(error);
-      res.status(404).json({ message: error.message });
-    }
-    throw error;
+  if (!validEmail) {
+    res.status(404).send("Invalid Email Address");
   }
+
+  const user = await prisma.user.findUnique({
+    where: {
+      emailAddress,
+    },
+  });
+
+  if (!user) {
+    return res.status(404).send("User Not Found");
+  }
+
+  const isMatch = bcrypt.compareSync(password, user.password);
+
+  if (!isMatch) {
+    res.status(400).send("Wrong Password");
+  }
+
+  res.json({ token: jwt.sign(user.id, secret) });
 }
