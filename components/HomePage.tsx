@@ -31,9 +31,9 @@ function HomePage() {
             <h1 className="p-7 text-red-700 font-bold text-2xl">
               {category.title}
             </h1>
-            <div className="flex flex-row overflow-x-scroll space-x-3 pl-5 pb-5 pt-5 ">
+            <div className="flex flex-row overflow-x-scroll space-x-3 p-5 ">
               {category.movies?.map((movie: MovieType) => (
-                <Movie movie={movie} />
+                <Movie movie={movie} purchased={false} />
               ))}
             </div>
           </div>

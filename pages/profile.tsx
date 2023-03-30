@@ -8,7 +8,7 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 
 function Purchases() {
-  const [balance, setBalance] = useState<number>();
+  const [balance, setBalance] = useState<number>(0);
   const { token } = useAuth();
   const queryClient = useQueryClient();
   const { data: user, isLoading: userDetailsLoading } = useQuery({
@@ -24,7 +24,7 @@ function Purchases() {
     mutationFn: () =>
       axios.post(
         "/api/addtobalance",
-        { balanceToBeAdded: +balance },
+        { balanceToBeAdded: balance },
         { headers: { Authorization: token } }
       ),
     onError: (err: MutationResponse) => toast.error(err?.response.data.message),
@@ -45,15 +45,21 @@ function Purchases() {
           <h1 className="text-2xl font-bold ">My profile</h1>
           <div>
             <label htmlFor="name">Name: </label>
-            <span id="name">{user?.data.user.userName}</span>
+            <span id="name" className="font-bold">
+              {user?.data.user.userName}
+            </span>
           </div>
           <div>
             <label htmlFor="email">Email: </label>
-            <span id="name">{user?.data.user.email}</span>
+            <span id="name" className="font-bold">
+              {user?.data.user.email}
+            </span>
           </div>
           <div>
             <label htmlFor="email">Balance: </label>
-            <span id="name">{user?.data.user.balance}</span>
+            <span id="name" className="font-bold">
+              ${user?.data.user.balance}
+            </span>
           </div>
         </div>
 
@@ -64,7 +70,7 @@ function Purchases() {
               type="text"
               id="addToBalance"
               name="addToBalance"
-              onChange={(e) => setBalance(e.target.value)}
+              onChange={(e) => setBalance(+e.target.value)}
               placeholder="Amount to add"
               className="bg-gray-200 appearance-none border-2 w-48 border-gray-200 rounded py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:border-none active:border-none focus:border-red-700 rounded-br-none rounded-tr-none"
             />

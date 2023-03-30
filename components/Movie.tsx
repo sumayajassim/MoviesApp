@@ -8,7 +8,7 @@ import { useAuth } from "@/context/auth";
 function Movie(props: { movie: MovieType; purchased: Boolean }) {
   const { movie, purchased } = props;
   const router = useRouter();
-  const [isLiked, setLike] = useState<Boolean>(movie?.inWishlist);
+  const [isLiked, setLike] = useState<Boolean>(movie?.inWishlist || false);
   const { token } = useAuth();
   const queryClient = useQueryClient();
 
