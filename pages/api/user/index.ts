@@ -72,8 +72,8 @@ export default async function details(
 
   if (user.purchases.length > 0) {
     purchasedMovies = user.purchases
-      .map((movie: any) => movie.moviesIDs)
-      .flatMap((movies: any) => movies);
+      .map((movie) => movie.moviesIDs)
+      .flatMap((movies) => movies);
 
     await prisma.purchases.findUniqueOrThrow({
       where: {
@@ -121,7 +121,7 @@ export default async function details(
   );
 
   const trendingMoviesArray = trendingMovies.data.results.map(
-    (movie: any) => movie.id
+    (movie: { id: number }) => movie.id
   );
 
   const upcomingMovies = await axios.get(
@@ -129,7 +129,7 @@ export default async function details(
   );
 
   const upcomingMoviesArray = upcomingMovies.data.results.map(
-    (movie: any) => movie.id
+    (movie: { id: number }) => movie.id
   );
 
   const topRatedMovies = await axios.get(
@@ -137,7 +137,7 @@ export default async function details(
   );
 
   const topRatedMoviesArray = topRatedMovies.data.results.map(
-    (movie: any) => movie.id
+    (movie: { id: number }) => movie.id
   );
 
   const cartMovies = user?.cart?.moviesIDs;
