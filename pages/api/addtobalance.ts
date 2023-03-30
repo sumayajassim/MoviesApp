@@ -37,5 +37,3 @@ export default async function addToBalance(
 
   res.json({ message: "Balance Added" });
 }
-
-// if not authorized
