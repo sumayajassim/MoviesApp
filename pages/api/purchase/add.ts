@@ -97,12 +97,12 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
 
     if (purchases.length > 0) {
       purchasedMovies = purchases
-        .map((movie: any) => movie.moviesIDs)
-        .flatMap((x: any) => x);
+        .map((movie) => movie.moviesIDs)
+        .flatMap((ids) => ids);
     }
 
     const updatedWishlist = wishlist?.moviesIDs?.filter(
-      (x: any) => !purchasedMovies?.includes(x)
+      (movie) => !purchasedMovies?.includes(movie)
     );
 
     await prisma.wishlist.update({
