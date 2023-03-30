@@ -7,7 +7,7 @@ export default async function removeFromWishlist(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const token: any = req.headers["authorization"];
+  const token = req.headers["authorization"] as string;
 
   if (!token) {
     res.status(401).send("UnAuthorized - Sign in /Sign Up First");
@@ -32,7 +32,7 @@ export default async function removeFromWishlist(
   }
 
   const wishlistMoviesAfter = moviesIDs.filter(
-    (wishlistMovie: any) => wishlistMovie !== movieId
+    (wishlistMovie) => wishlistMovie !== movieId
   );
 
   await prisma.wishlist.update({
