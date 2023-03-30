@@ -24,7 +24,7 @@ function Purchases() {
     mutationFn: () =>
       axios.post(
         "/api/addtobalance",
-        { balanceToBeAdded: +balance },
+        { balanceToBeAdded: balance },
         { headers: { Authorization: token } }
       ),
     onError: (err: MutationResponse) => toast.error(err?.response.data.message),
@@ -70,7 +70,7 @@ function Purchases() {
               type="text"
               id="addToBalance"
               name="addToBalance"
-              onChange={(e) => setBalance(e.target.value)}
+              onChange={(e) => setBalance(+e.target.value)}
               placeholder="Amount to add"
               className="bg-gray-200 appearance-none border-2 w-48 border-gray-200 rounded py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:border-none active:border-none focus:border-red-700 rounded-br-none rounded-tr-none"
             />

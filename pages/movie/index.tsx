@@ -73,7 +73,7 @@ function index() {
           {data?.pages
             ?.flatMap(({ results }) => results)
             .map((movie: MovieType) => (
-              <Movie key={movie?.id} movie={movie} />
+              <Movie key={movie?.id} movie={movie} purchased={false} />
             ))}
           <div className="">
             <button
